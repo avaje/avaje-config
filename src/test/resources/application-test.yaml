@@ -1,0 +1,9 @@
+myapp:
+  activateFoo: true
+  fooName: Hello
+  fooHome: ${HOME}/config
+  bar:
+    barRules: 42
+    barDouble: 33.3
+
+
