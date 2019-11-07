@@ -9,6 +9,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConfigTest {
 
   @Test
+  public void fallbackToSystemProperty() {
+
+    assertThat(Config.get("MySystemProp", null)).isNull();
+
+    System.setProperty("MySystemProp", "hello");
+    assertThat(Config.get("MySystemProp")).isEqualTo("hello");
+    System.clearProperty("MySystemProp");
+  }
+
+  @Test
   public void get() {
     assertThat(Config.get("myapp.fooName", "junk")).isEqualTo("Hello");
   }
@@ -118,7 +128,6 @@ public class ConfigTest {
     Config.setProperty("some.intKey", "42");
     assertThat(ref.get()).isEqualTo(42);
   }
-
 
   @Test
   public void onChangeLong() {

@@ -20,9 +20,13 @@ class ConfigurationData {
     this.properties.registerListener(this);
   }
 
+  private String getProperty(String key) {
+    String val = properties.getProperty(key);
+    return (val != null) ? val : System.getProperty(key);
+  }
 
   private String getRequired(String key) {
-    String value = properties.getProperty(key);
+    String value = getProperty(key);
     if (value == null) {
       throw new IllegalStateException("Missing required configuration parameter [" + key + "]");
     }
@@ -34,34 +38,35 @@ class ConfigurationData {
   }
 
   String get(String key, String defaultValue) {
-    return properties.getProperty(key, defaultValue);
+    final String value = getProperty(key);
+    return (value != null) ? value : defaultValue;
   }
 
   boolean getBool(String key) {
-    return Boolean.valueOf(getRequired(key));
+    return Boolean.parseBoolean(getRequired(key));
   }
 
   boolean getBool(String key, boolean defaultValue) {
-    String val = properties.getProperty(key);
-    return (val == null) ? defaultValue : Boolean.valueOf(val);
+    String val = getProperty(key);
+    return (val == null) ? defaultValue : Boolean.parseBoolean(val);
   }
 
   int getInt(String key) {
-    return Integer.valueOf(getRequired(key));
+    return Integer.parseInt(getRequired(key));
   }
 
   int getInt(String key, int defaultValue) {
-    String val = properties.getProperty(key);
-    return (val == null) ? defaultValue : Integer.valueOf(val);
+    String val = getProperty(key);
+    return (val == null) ? defaultValue : Integer.parseInt(val);
   }
 
   long getLong(String key) {
-    return Long.valueOf(getRequired(key));
+    return Long.parseLong(getRequired(key));
   }
 
   long getLong(String key, long defaultValue) {
-    String val = properties.getProperty(key);
-    return (val == null) ? defaultValue : Long.valueOf(val);
+    String val = getProperty(key);
+    return (val == null) ? defaultValue : Long.parseLong(val);
   }
 
   void onChange(String key, Consumer<String> callback) {
