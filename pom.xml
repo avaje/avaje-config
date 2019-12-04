@@ -14,6 +14,11 @@
     <version>2.1</version>
   </parent>
 
+  <scm>
+    <developerConnection>scm:git:git@github.com:avaje/config.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
     <snakeyaml.version>1.25</snakeyaml.version>
   </properties>
