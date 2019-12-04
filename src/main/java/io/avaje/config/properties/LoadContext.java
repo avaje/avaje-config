@@ -103,4 +103,16 @@ class LoadContext {
     }
     return indirectLocation;
   }
+
+  /**
+   * Return the number of properties resources loaded.
+   */
+  int size() {
+    return loadedResources.size();
+  }
+
+  String getAppName() {
+    final String appName = map.get("appName");
+    return (appName != null) ? appName : System.getProperty("appName");
+  }
 }

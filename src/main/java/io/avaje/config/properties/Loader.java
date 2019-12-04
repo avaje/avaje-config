@@ -3,6 +3,7 @@ package io.avaje.config.properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -57,16 +58,41 @@ class Loader {
 
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
-    loadTest();
+    if (!loadTest()) {
+      loadLocalDev();
+    }
+  }
+
+  /**
+   * Provides a way to override properties when running via main() locally.
+   */
+  private void loadLocalDev() {
+
+    File localDev = new File(System.getProperty("user.home"), ".localdev");
+    if (localDev.exists()) {
+      final String appName = loadContext.getAppName();
+      if (appName != null) {
+        final String prefix = localDev.getAbsolutePath() + File.separator + appName;
+        if (log.isDebugEnabled()) {
+          log.debug("looking to load .localdev yaml/properties for appName:{}", appName);
+        }
+        loadFileWithExtensionCheck(prefix + ".yaml");
+        loadFileWithExtensionCheck(prefix + ".properties");
+      }
+    }
   }
 
   /**
    * Load test configuration.
+   *
+   * @return true if test properties have been loaded.
    */
-  private void loadTest() {
+  private boolean loadTest() {
+    int before = loadContext.size();
     loadProperties("application-test.properties", Source.RESOURCE);
     loadYaml("application-test.yaml", Source.RESOURCE);
     loadYaml("application-test.yml", Source.RESOURCE);
+    return loadContext.size() > before;
   }
 
   /**
@@ -152,7 +178,6 @@ class Loader {
   }
 
   private void loadProperties(InputStream is) {
-
     if (is != null) {
       try {
         Properties properties = new Properties();
