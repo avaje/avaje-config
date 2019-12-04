@@ -20,6 +20,10 @@ class ConfigurationData {
     this.properties.registerListener(this);
   }
 
+  Properties asProperties() {
+    return properties;
+  }
+
   private String getProperty(String key) {
     String val = properties.getProperty(key);
     return (val != null) ? val : System.getProperty(key);
@@ -123,6 +127,7 @@ class ConfigurationData {
     STRING
   }
 
+  @SuppressWarnings("rawtypes")
   private static class Callback {
 
     private final DataType type;

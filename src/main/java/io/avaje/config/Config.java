@@ -24,6 +24,13 @@ public class Config {
   }
 
   /**
+   * Return the loaded properties as standard Properties map.
+   */
+  public static Properties asProperties() {
+    return data.asProperties();
+  }
+
+  /**
    * Return a required configuration value as String.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.

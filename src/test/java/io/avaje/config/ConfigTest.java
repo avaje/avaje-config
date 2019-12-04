@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import org.junit.Test;
 
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +17,16 @@ public class ConfigTest {
     System.setProperty("MySystemProp", "hello");
     assertThat(Config.get("MySystemProp")).isEqualTo("hello");
     System.clearProperty("MySystemProp");
+  }
+
+  @Test
+  public void asProperties() {
+    String home = System.getProperty("user.home");
+
+    final Properties properties = Config.asProperties();
+    assertThat(properties.getProperty("myapp.fooName")).isEqualTo("Hello");
+    assertThat(properties.getProperty("myapp.fooHome")).isEqualTo(home + "/config");
+    assertThat(properties).hasSize(5);
   }
 
   @Test

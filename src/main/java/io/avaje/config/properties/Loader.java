@@ -28,8 +28,7 @@ class Loader {
   private YamlLoader yamlLoader;
 
   Loader() {
-    String skipYaml = System.getProperty("skipYaml");
-    if (!"true".equals(skipYaml)) {
+    if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
         Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
         if (exists != null) {
@@ -74,8 +73,9 @@ class Loader {
 
     String location = loadContext.indirectLocation();
     if (location != null) {
+      // TODO: split ,; for each
       location = PropertyEval.eval(location);
-      loadWithExtensionCheck(location);
+      loadFileWithExtensionCheck(location);
     }
   }
 
@@ -93,18 +93,18 @@ class Loader {
     if (fileName == null) {
       fileName = System.getProperty("props.file");
       if (fileName != null) {
-        loadWithExtensionCheck(fileName);
+        loadFileWithExtensionCheck(fileName);
       }
     }
   }
 
-  void loadWithExtensionCheck(String fileName) {
+  void loadFileWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
       loadYaml(fileName, Source.FILE);
     } else if (fileName.endsWith("properties")) {
       loadProperties(fileName, Source.FILE);
     } else {
-      throw new IllegalArgumentException("Expecting only yml or properties file but got [" + fileName + "]");
+      throw new IllegalArgumentException("Expecting only yaml or properties file but got [" + fileName + "]");
     }
   }
 
