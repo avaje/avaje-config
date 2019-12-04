@@ -74,10 +74,8 @@ class PropertyEval {
 	}
 
 	private static String eval(String val, int sp, int ep) {
-
 		return new EvalBuffer(val, sp, ep).process();
 	}
-
 
 	private static boolean isJndiExpression(String exp) {
 		return exp.startsWith("JNDI:") || exp.startsWith("jndi:");

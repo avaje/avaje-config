@@ -61,6 +61,29 @@ class Loader {
     if (!loadTest()) {
       loadLocalDev();
     }
+    loadViaCommandLineArgs();
+  }
+
+  private void loadViaCommandLineArgs() {
+    final String rawArgs = System.getProperty("sun.java.command");
+    if (rawArgs != null) {
+      final String[] args = rawArgs.split(" ");
+      loadViaCommandLine(args);
+    }
+  }
+
+  private void loadViaCommandLine(String[] args) {
+    for (int i = 0; i < args.length; i++) {
+      String arg = args[i];
+      if (arg.startsWith("-P") || arg.startsWith("-p")) {
+        if (arg.length() == 2 && i < args.length - 1) {
+          i++;
+          loadViaPaths(args[i]);
+        } else {
+          loadViaPaths(arg.substring(2));
+        }
+      }
+    }
   }
 
   /**
@@ -73,9 +96,6 @@ class Loader {
       final String appName = loadContext.getAppName();
       if (appName != null) {
         final String prefix = localDev.getAbsolutePath() + File.separator + appName;
-        if (log.isDebugEnabled()) {
-          log.debug("looking to load .localdev yaml/properties for appName:{}", appName);
-        }
         loadFileWithExtensionCheck(prefix + ".yaml");
         loadFileWithExtensionCheck(prefix + ".properties");
       }
@@ -100,12 +120,15 @@ class Loader {
    */
   private void loadViaIndirection() {
 
-    String location = loadContext.indirectLocation();
-    if (location != null) {
-      final String[] paths = splitPaths(location);
-      for (String path : paths) {
-        loadFileWithExtensionCheck(PropertyEval.eval(path));
-      }
+    String paths = loadContext.indirectLocation();
+    if (paths != null) {
+      loadViaPaths(paths);
+    }
+  }
+
+  private void loadViaPaths(String paths) {
+    for (String path : splitPaths(paths)) {
+      loadFileWithExtensionCheck(PropertyEval.eval(path));
     }
   }
 

@@ -54,7 +54,7 @@ public class LoaderTest {
     loader.loadYaml("test-properties/foo.yml", Loader.Source.RESOURCE);
     Properties properties = loader.eval();
 
-    assertThat(properties.getProperty("ebean.oracle.password")).isEqualTo("someDefault");
+    assertThat(properties.getProperty("Some.Other.pass")).isEqualTo("someDefault");
   }
 
   @Test
