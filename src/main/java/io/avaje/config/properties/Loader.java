@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -17,6 +18,8 @@ import java.util.Properties;
 class Loader {
 
   private static final Logger log = LoggerFactory.getLogger(Loader.class);
+
+  private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
   enum Source {
     RESOURCE,
@@ -73,10 +76,15 @@ class Loader {
 
     String location = loadContext.indirectLocation();
     if (location != null) {
-      // TODO: split ,; for each
-      location = PropertyEval.eval(location);
-      loadFileWithExtensionCheck(location);
+      final String[] paths = splitPaths(location);
+      for (String path : paths) {
+        loadFileWithExtensionCheck(PropertyEval.eval(path));
+      }
     }
+  }
+
+  String[] splitPaths(String location) {
+    return SPLIT_PATHS.split(location);
   }
 
   /**

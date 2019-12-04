@@ -67,4 +67,13 @@ public class LoaderTest {
     assertThat(properties.getProperty("hello")).isEqualTo("there");
     assertThat(properties.getProperty("name")).isEqualTo("Rob");
   }
+
+  @Test
+  public void splitPaths() {
+    Loader loader = new Loader();
+    assertThat(loader.splitPaths("one two three")).contains("one", "two", "three");
+    assertThat(loader.splitPaths("one,two,three")).contains("one", "two", "three");
+    assertThat(loader.splitPaths("one;two;three")).contains("one", "two", "three");
+    assertThat(loader.splitPaths("one two,three;four,five six")).contains("one", "two", "three", "four", "five", "six");
+  }
 }
