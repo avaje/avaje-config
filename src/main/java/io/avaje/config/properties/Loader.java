@@ -10,6 +10,9 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import static io.avaje.config.properties.Loader.Source.FILE;
+import static io.avaje.config.properties.Loader.Source.RESOURCE;
+
 /**
  * Loads the configuration from known/expected locations.
  * <p>
@@ -49,10 +52,9 @@ class Loader {
    */
   void load() {
 
-    loadMain(Source.RESOURCE);
+    loadMain(RESOURCE);
     // external file configuration overrides the resources configuration
-    loadMain(Source.FILE);
-
+    loadMain(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
 
@@ -60,15 +62,14 @@ class Loader {
     // we should only find these resources when running tests
     if (!loadTest()) {
       loadLocalDev();
+      loadViaCommandLineArgs();
     }
-    loadViaCommandLineArgs();
   }
 
   private void loadViaCommandLineArgs() {
     final String rawArgs = System.getProperty("sun.java.command");
     if (rawArgs != null) {
-      final String[] args = rawArgs.split(" ");
-      loadViaCommandLine(args);
+      loadViaCommandLine(rawArgs.split(" "));
     }
   }
 
@@ -77,9 +78,11 @@ class Loader {
       String arg = args[i];
       if (arg.startsWith("-P") || arg.startsWith("-p")) {
         if (arg.length() == 2 && i < args.length - 1) {
+          // next argument expected to be a properties file paths
           i++;
           loadViaPaths(args[i]);
         } else {
+          // no space between -P and properties file paths
           loadViaPaths(arg.substring(2));
         }
       }
@@ -109,9 +112,9 @@ class Loader {
    */
   private boolean loadTest() {
     int before = loadContext.size();
-    loadProperties("application-test.properties", Source.RESOURCE);
-    loadYaml("application-test.yaml", Source.RESOURCE);
-    loadYaml("application-test.yml", Source.RESOURCE);
+    loadProperties("application-test.properties", RESOURCE);
+    loadYaml("application-test.yaml", RESOURCE);
+    loadYaml("application-test.yml", RESOURCE);
     return loadContext.size() > before;
   }
 
@@ -157,9 +160,9 @@ class Loader {
 
   void loadFileWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
-      loadYaml(fileName, Source.FILE);
+      loadYaml(fileName, FILE);
     } else if (fileName.endsWith("properties")) {
-      loadProperties(fileName, Source.FILE);
+      loadProperties(fileName, FILE);
     } else {
       throw new IllegalArgumentException("Expecting only yaml or properties file but got [" + fileName + "]");
     }

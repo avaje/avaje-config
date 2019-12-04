@@ -15,7 +15,7 @@
   </parent>
 
   <properties>
-    <snakeyaml.version>1.21</snakeyaml.version>
+    <snakeyaml.version>1.25</snakeyaml.version>
   </properties>
 
   <dependencies>
