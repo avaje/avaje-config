@@ -24,6 +24,12 @@ public class Config {
   }
 
   /**
+   * Hide constructor.
+   */
+  private Config() {
+  }
+
+  /**
    * Return the loaded properties as standard Properties map.
    */
   public static Properties asProperties() {
