@@ -131,7 +131,7 @@ class PropertyEval {
 
 		void moveToStart() {
 			if (start > position) {
-				buf.append(original.substring(position, start));
+				buf.append(original, position, start);
 				position = start;
 			}
 		}
@@ -173,7 +173,7 @@ class PropertyEval {
 					int endPos = original.indexOf(END, startPos + 1);
 					if (endPos > -1) {
 						if (startPos > end + 1) {
-							buf.append(original.substring(end + 1, startPos));
+							buf.append(original, end + 1, startPos);
 						}
 						this.start = startPos;
 						this.end = endPos;
