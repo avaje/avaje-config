@@ -55,7 +55,6 @@ Config.onChangeBool("myapp.foo", newBooleanValue -> {
 Config loads properties from expected locations as well as via command line arguments. 
 Below is the how it looks for configuration properties.
   
-
 - loads from main resources (if they exist)
     - application.yaml
     - application.properties
@@ -66,21 +65,24 @@ Below is the how it looks for configuration properties.
 
 - loads via system property `props.file` or environment variable `PROPS_FILE` (if defined)
 
-- loads via `load.properties` property
+- loads via `load.properties` property.
+
 We can define a `load.properties` property which has path locations for other properties/yaml files to load
 
-- loads test resources (if they exist)
+- loads test resources (if they exist, nb: Test resources are only visible when running tests)
     - application-test.properties
     - application-test.yaml
-Test resources are only visible when running tests.
-    
-If no test resources where loaded then it additionally loads from "local dev" and command line:
 
-- loads from "local dev" 
+    
+If no test resources were loaded then it additionally loads from "local dev" and command line:
+
+- loads from "local dev".
+
 We can specify an `appName` property and then put a properties/yaml file at: `${user.home}/.localdev/{appName}.yaml`
 We do this to set/override properties when we want to run the application locally (aka main method)
 
 - loads from command line arguments
+
 Command line arguments starting with `-P` can specify properties/yaml files to load
 
 
