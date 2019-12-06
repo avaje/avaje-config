@@ -3,6 +3,13 @@ This library loads properties files that can be used to configure
 an application including "testing" and "local development" and 
 dynamic configuration (changes to configuration properties at runtime).
 
+```xml
+<dependency>
+  <groupId>io.avaje</groupId>
+  <artifactId>config</artifactId>
+  <version>0.1</version>
+</dependency>
+```
 
 ## Typical use
 
