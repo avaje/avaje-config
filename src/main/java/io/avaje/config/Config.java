@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import io.avaje.config.properties.PropertiesLoader;
 
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -16,17 +17,54 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  private static ConfigurationData data = init();
+  private static ConfigurationData data = initData();
 
-  private static ConfigurationData init() {
+  private static ConfigurationData initData() {
+    initFromEnvironmentVars();
     Properties properties = PropertiesLoader.load();
     return new ConfigurationData(properties);
+  }
+
+  /**
+   * If we are in Kubernetes and expose environment variables
+   * POD_NAME, POD_NAMESPACE, POD_VERSION, POD_ID we can set these
+   * for appInstanceId, appName, appEnvironment, appVersion and appIp.
+   */
+  private static void initFromEnvironmentVars() {
+    initSystemProperty(System.getenv("POD_NAMESPACE"), "appEnvironment");
+    initSystemProperty(System.getenv("POD_VERSION"), "appVersion");
+    initSystemProperty(System.getenv("POD_IP"), "appIp");
+
+    final String podName = System.getenv("POD_NAME");
+    final String podService = podService(podName);
+    initSystemProperty(podName, "appInstanceId");
+    initSystemProperty(podService, "appName");
+  }
+
+  private static void initSystemProperty(String envValue, String key) {
+    if (envValue != null && System.getProperty(key) == null) {
+      System.setProperty(key, envValue);
+    }
+  }
+
+  static String podService(String podName) {
+    if (podName != null && podName.length() > 16) {
+      int p0 = podName.lastIndexOf('-', podName.length() - 16);
+      if (p0 > -1) {
+        return podName.substring(0, p0);
+      }
+    }
+    return null;
   }
 
   /**
    * Hide constructor.
    */
   private Config() {
+  }
+
+  public static void init() {
+    // initialised by class loading
   }
 
   /**
@@ -50,7 +88,7 @@ public class Config {
   }
 
   /**
-   * Return a configuration value as String given a default value.
+   * Return a configuration string value with a given default.
    *
    * @param key          The configuration key
    * @param defaultValue The default value used
@@ -58,6 +96,17 @@ public class Config {
    */
   public static String get(String key, String defaultValue) {
     return data.get(key, defaultValue);
+  }
+
+
+  /**
+   * Return a configuration value that might not exist.
+   *
+   * @param key The configuration key
+   * @return The configured value wrapped as optional
+   */
+  public static Optional<String> getOptional(String key) {
+    return Optional.ofNullable(get(key, null));
   }
 
   /**

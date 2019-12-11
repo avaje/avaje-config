@@ -46,6 +46,12 @@ public class ConfigTest {
     assertThat(Config.get("myapp.doesNotExist", null)).isNull();
   }
 
+  @Test
+  public void get_optional() {
+    assertThat(Config.getOptional("myapp.doesNotExist")).isEmpty();
+    assertThat(Config.getOptional("myapp.fooName")).isNotEmpty();
+  }
+
   @Test(expected = IllegalStateException.class)
   public void getBool_required_missing() {
     assertThat(Config.getBool("myapp.doesNotExist")).isTrue();
