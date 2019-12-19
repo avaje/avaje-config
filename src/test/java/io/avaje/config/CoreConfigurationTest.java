@@ -4,12 +4,12 @@ import org.junit.Test;
 
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 
 public class CoreConfigurationTest {
 
@@ -46,10 +46,16 @@ public class CoreConfigurationTest {
 
   @Test
   public void getInt() {
+    assertThat(data.getInt("a", 99)).isEqualTo(1);
+    assertThat(data.getInt("foo.bar", 99)).isEqualTo(42);
+    assertThat(data.getInt("doesNotExist", 99)).isEqualTo(99);
   }
 
   @Test
   public void getLong() {
+    assertThat(data.getLong("a", 99)).isEqualTo(1);
+    assertThat(data.getLong("foo.bar", 99)).isEqualTo(42);
+    assertThat(data.getLong("doesNotExist", 99)).isEqualTo(99);
   }
 
   @Test
@@ -81,14 +87,53 @@ public class CoreConfigurationTest {
 
   @Test
   public void onChangeInt() {
+
+    AtomicReference<Integer> ref = new AtomicReference<>();
+    ref.set(1);
+
+    data.onChangeInt("some.intKey", ref::set);
+
+    assertThat(ref.get()).isEqualTo(1);
+
+    data.setProperty("some.intKey", "2");
+    assertThat(ref.get()).isEqualTo(2);
+
+    data.setProperty("some.intKey", "42");
+    assertThat(ref.get()).isEqualTo(42);
   }
 
   @Test
   public void onChangeLong() {
+
+    AtomicReference<Long> ref = new AtomicReference<>();
+    ref.set(1L);
+
+    data.onChangeLong("some.longKey", ref::set);
+
+    assertThat(ref.get()).isEqualTo(1);
+
+    data.setProperty("some.longKey", "2");
+    assertThat(ref.get()).isEqualTo(2);
+
+    data.setProperty("some.longKey", "42");
+    assertThat(ref.get()).isEqualTo(42);
   }
 
   @Test
   public void onChangeBool() {
+
+    AtomicReference<Boolean> ref = new AtomicReference<>();
+    ref.set(false);
+
+    data.onChangeBool("some.boolKey", ref::set);
+
+    assertThat(ref.get()).isFalse();
+
+    data.setProperty("some.boolKey", "true");
+    assertThat(ref.get()).isTrue();
+
+    data.setProperty("some.boolKey", "false");
+    assertThat(ref.get()).isFalse();
   }
 
   @Test
