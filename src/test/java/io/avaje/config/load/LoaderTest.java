@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Properties;
 
+import static io.avaje.config.load.Loader.Source.RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -16,11 +17,11 @@ public class LoaderTest {
     String userHome = System.getProperty("user.home");
 
     Loader loader = new Loader();
-    loader.loadProperties("test-properties/application.properties", Loader.Source.RESOURCE);
-    loader.loadYaml("test-properties/application.yaml", Loader.Source.RESOURCE);
+    loader.loadProperties("test-properties/application.properties", RESOURCE);
+    loader.loadYaml("test-properties/application.yaml", RESOURCE);
 
-    loader.loadProperties("test-properties/one.properties", Loader.Source.RESOURCE);
-    loader.loadYaml("test-properties/foo.yml", Loader.Source.RESOURCE);
+    loader.loadProperties("test-properties/one.properties", RESOURCE);
+    loader.loadYaml("test-properties/foo.yml", RESOURCE);
 
     Properties properties = loader.eval();
 
@@ -30,6 +31,9 @@ public class LoaderTest {
     assertEquals("bart", properties.getProperty("eval.withDefault"));
     assertEquals(userName, properties.getProperty("eval.name"));
     assertEquals(userHome + "/after", properties.getProperty("eval.home"));
+
+    assertEquals("before|Beta|after", properties.getProperty("someOne"));
+    assertEquals("before|Two|after", properties.getProperty("someTwo"));
   }
 
   @Test
@@ -51,7 +55,7 @@ public class LoaderTest {
   public void loadYaml() {
 
     Loader loader = new Loader();
-    loader.loadYaml("test-properties/foo.yml", Loader.Source.RESOURCE);
+    loader.loadYaml("test-properties/foo.yml", RESOURCE);
     Properties properties = loader.eval();
 
     assertThat(properties.getProperty("Some.Other.pass")).isEqualTo("someDefault");
@@ -61,7 +65,7 @@ public class LoaderTest {
   public void loadProperties() {
 
     Loader loader = new Loader();
-    loader.loadProperties("test-properties/one.properties", Loader.Source.RESOURCE);
+    loader.loadProperties("test-properties/one.properties", RESOURCE);
     Properties properties = loader.eval();
 
     assertThat(properties.getProperty("hello")).isEqualTo("there");

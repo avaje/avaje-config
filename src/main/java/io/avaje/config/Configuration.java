@@ -147,4 +147,15 @@ public interface Configuration {
    * Put the loaded properties into System properties.
    */
   void loadIntoSystemProperties();
+
+  /**
+   * Expression evaluation.
+   */
+  interface ExpressionEval {
+
+    /**
+     * Evaluate a configuration expression.
+     */
+    String eval(String expression);
+  }
 }

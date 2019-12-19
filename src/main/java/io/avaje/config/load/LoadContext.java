@@ -1,6 +1,5 @@
 package io.avaje.config.load;
 
-import io.avaje.config.PropertyExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +29,16 @@ class LoadContext {
    * Names of resources/files that were loaded.
    */
   private final Set<String> loadedResources = new LinkedHashSet<>();
+
+  private final CoreExpressionEval exprEval;
+
+  LoadContext() {
+    this.exprEval = new CoreExpressionEval(map);
+  }
+
+  String eval(String expression) {
+    return exprEval.eval(expression);
+  }
 
   /**
    * If we are in Kubernetes and expose environment variables
@@ -109,7 +118,7 @@ class LoadContext {
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-  Properties eval() {
+  Properties evalAll() {
 
     log.info("loaded properties from {}", loadedResources);
 
@@ -117,8 +126,7 @@ class LoadContext {
 
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();
-      String value = PropertyExpression.eval(entry.getValue());
-      properties.setProperty(key, value);
+      properties.setProperty(key, exprEval.eval(entry.getValue()));
     }
 
     return properties;

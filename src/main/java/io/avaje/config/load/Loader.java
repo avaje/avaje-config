@@ -1,6 +1,5 @@
 package io.avaje.config.load;
 
-import io.avaje.config.PropertyExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,7 +181,7 @@ public class Loader {
 
   private void loadViaPaths(String paths) {
     for (String path : splitPaths(paths)) {
-      loadFileWithExtensionCheck(PropertyExpression.eval(path));
+      loadFileWithExtensionCheck(loadContext.eval(path));
     }
   }
 
@@ -228,7 +227,7 @@ public class Loader {
    * Evaluate all the configuration entries and return as properties.
    */
   Properties eval() {
-    return loadContext.eval();
+    return loadContext.evalAll();
   }
 
   boolean loadYaml(String resourcePath, Source source) {
