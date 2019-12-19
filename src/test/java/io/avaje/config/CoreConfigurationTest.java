@@ -15,16 +15,18 @@ public class CoreConfigurationTest {
 
   private CoreConfiguration data = createSample();
 
-  private CoreConfiguration createSample() {
-
+  private Properties basicProperties() {
     Properties properties = new Properties();
     properties.setProperty("a", "1");
     properties.setProperty("foo.bar", "42");
     properties.setProperty("foo.t", "true");
     properties.setProperty("foo.f", "false");
     properties.setProperty("modify", "me");
+    return properties;
+  }
 
-    return new CoreConfiguration(properties);
+  private CoreConfiguration createSample() {
+    return new CoreConfiguration(basicProperties());
   }
 
   @Test
@@ -87,5 +89,17 @@ public class CoreConfigurationTest {
 
   @Test
   public void onChangeBool() {
+  }
+
+  @Test
+  public void evalProperties() {
+
+    final Properties properties = basicProperties();
+    properties.setProperty("someA", "before-${foo.bar}-after");
+
+    final CoreConfiguration config = new CoreConfiguration(new Properties());
+    final Properties copy = config.eval(properties);
+
+    assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
   }
 }

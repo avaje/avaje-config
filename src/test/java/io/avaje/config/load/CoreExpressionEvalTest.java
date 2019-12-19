@@ -2,6 +2,12 @@ package io.avaje.config.load;
 
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -71,7 +77,33 @@ public class CoreExpressionEvalTest {
     System.clearProperty("two");
   }
 
+  @Test
+  public void eval_withSourceMap() {
+
+    Map<String,String> source = new HashMap<>();
+    source.put("one", "1");
+    source.put("two", "2");
+    final CoreExpressionEval exprEval = new CoreExpressionEval(source);
+
+    assertThat(exprEval.eval("foo${one}bar${two}baz${one}")).isEqualTo("foo1bar2baz1");
+    assertThat(exprEval.eval("foo{one}bar{two}")).isEqualTo("foo{one}bar{two}");
+    assertThat(exprEval.eval("${one}${two}${one}")).isEqualTo("121");
+  }
+
+  @Test
+  public void eval_withSourceProperties() {
+
+    Properties source = new Properties();
+    source.put("one", "1");
+    source.put("two", "2");
+    final CoreExpressionEval exprEval = new CoreExpressionEval(source);
+
+    assertThat(exprEval.eval("foo${one}bar${two}baz${one}")).isEqualTo("foo1bar2baz1");
+    assertThat(exprEval.eval("foo{one}bar{two}")).isEqualTo("foo{one}bar{two}");
+    assertThat(exprEval.eval("${one}${two}${one}")).isEqualTo("121");
+  }
+
   private String eval(String key) {
-    return new CoreExpressionEval().eval(key);
+    return new CoreExpressionEval(Collections.emptyMap()).eval(key);
   }
 }

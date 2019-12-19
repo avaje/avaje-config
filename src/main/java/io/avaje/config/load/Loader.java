@@ -1,5 +1,6 @@
 package io.avaje.config.load;
 
+import io.avaje.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,13 @@ public class Loader {
   private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
+
+  /**
+   * Return the Expression evaluator using the given properties.
+   */
+  public static Configuration.ExpressionEval evalFor(Properties properties) {
+    return new CoreExpressionEval(properties);
+  }
 
   enum Source {
     RESOURCE,

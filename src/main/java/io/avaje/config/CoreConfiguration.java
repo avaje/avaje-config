@@ -3,6 +3,7 @@ package io.avaje.config;
 import io.avaje.config.load.Loader;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +29,20 @@ class CoreConfiguration implements Configuration {
     this.properties = new ModifyAwareProperties();
     this.properties.loadAll(source);
     this.properties.registerListener(this);
+  }
+
+  @Override
+  public Properties eval(Properties properties) {
+
+    final ExpressionEval exprEval = Loader.evalFor(properties);
+
+    Properties evalCopy = new Properties();
+    Enumeration<?> names = properties.propertyNames();
+    while (names.hasMoreElements()) {
+      String name = (String) names.nextElement();
+      evalCopy.setProperty(name, exprEval.eval(properties.getProperty(name)));
+    }
+    return evalCopy;
   }
 
   @Override

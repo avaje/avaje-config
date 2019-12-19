@@ -5,6 +5,7 @@ import io.avaje.config.Configuration;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Helper used to evaluate expressions such as ${CATALINA_HOME}.
@@ -32,29 +33,37 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
    */
   private static final String END = "}";
 
-  private Map<String, String> map;
+  private Map<String, String> sourceMap;
+  private Properties sourceProperties;
 
-  CoreExpressionEval(){
+  /**
+   * Create with source map that can use used to eval expressions.
+   */
+  CoreExpressionEval(Map<String, String> sourceMap) {
+    this.sourceMap = sourceMap;
   }
 
-  CoreExpressionEval(Map<String, String> map) {
-    this.map = map;
+  /**
+   * Create with source properties that can be used to eval expressions.
+   */
+  CoreExpressionEval(Properties sourceProperties) {
+    this.sourceProperties = sourceProperties;
   }
 
-	@Override
-	public String eval(String val) {
-		if (val == null) {
-			return null;
-		}
-		int sp = val.indexOf(START);
-		if (sp > -1) {
-			int ep = val.indexOf(END, sp + 1);
-			if (ep > -1) {
-				return eval(val, sp, ep);
-			}
-		}
-		return val;
-	}
+  @Override
+  public String eval(String val) {
+    if (val == null) {
+      return null;
+    }
+    int sp = val.indexOf(START);
+    if (sp > -1) {
+      int ep = val.indexOf(END, sp + 1);
+      if (ep > -1) {
+        return eval(val, sp, ep);
+      }
+    }
+    return val;
+  }
 
   /**
    * Convert the expression using JNDI, Environment variables, System Properties
@@ -64,30 +73,32 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
     String val = System.getProperty(exp);
     if (val == null) {
       val = System.getenv(exp);
-			if (val == null) {
-				val = localLookup(exp);
-			}
-			if (val == null) {
-				if (isJndiExpression(exp)) {
-					// JNDI property lookup...
-					val = getJndiProperty(exp);
-					if (val != null) {
-						return val;
-					}
-				}
-			}
+      if (val == null) {
+        val = localLookup(exp);
+      }
+      if (val == null) {
+        if (isJndiExpression(exp)) {
+          // JNDI property lookup...
+          val = getJndiProperty(exp);
+          if (val != null) {
+            return val;
+          }
+        }
+      }
     }
-		return val;
+    return val;
   }
 
-	private String localLookup(String exp) {
-    if (map != null) {
-      return map.get(exp);
+  private String localLookup(String exp) {
+    if (sourceMap != null) {
+      return sourceMap.get(exp);
+    } else if (sourceProperties != null) {
+      return sourceProperties.getProperty(exp);
     }
-		return null;
-	}
+    return null;
+  }
 
-	private String eval(String val, int sp, int ep) {
+  private String eval(String val, int sp, int ep) {
     return new EvalBuffer(val, sp, ep).process();
   }
 

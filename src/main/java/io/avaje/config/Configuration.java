@@ -149,6 +149,11 @@ public interface Configuration {
   void loadIntoSystemProperties();
 
   /**
+   * Return a copy of the properties with 'eval' run on all the values.
+   */
+  Properties eval(Properties properties);
+
+  /**
    * Expression evaluation.
    */
   interface ExpressionEval {

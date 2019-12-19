@@ -24,13 +24,6 @@ public class Config {
   }
 
   /**
-   * Put all loaded properties into System properties.
-   */
-  public static void loadIntoSystemProperties() {
-    data.loadIntoSystemProperties();
-  }
-
-  /**
    * Return the loaded properties as standard Properties map.
    */
   public static Properties asProperties() {
@@ -42,6 +35,13 @@ public class Config {
    */
   public static Configuration asConfiguration() {
     return data;
+  }
+
+  /**
+   * Put all loaded properties into System properties.
+   */
+  public static void loadIntoSystemProperties() {
+    data.loadIntoSystemProperties();
   }
 
   /**
