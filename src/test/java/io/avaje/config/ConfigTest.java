@@ -30,6 +30,15 @@ public class ConfigTest {
     assertThat(properties).hasSize(5);
   }
 
+  @Test
+  public void asConfiguration() {
+    String home = System.getProperty("user.home");
+
+    final Configuration configuration = Config.asConfiguration();
+    assertThat(configuration.get("myapp.fooName")).isEqualTo("Hello");
+    assertThat(configuration.get("myapp.fooHome")).isEqualTo(home + "/config");
+  }
+
   @Ignore
   @Test
   public void load() {

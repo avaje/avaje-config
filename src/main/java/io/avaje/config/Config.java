@@ -38,6 +38,13 @@ public class Config {
   }
 
   /**
+   * Return the underlying configuration.
+   */
+  public static Configuration asConfiguration() {
+    return data;
+  }
+
+  /**
    * Return a required configuration value as String.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
