@@ -17,10 +17,10 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  private static ConfigurationData data = initData();
+  private static Configuration data = initData();
 
-  private static ConfigurationData initData() {
-    initFromEnvironmentVars();
+  private static Configuration initData() {
+    final Properties commonProps = initFromEnvironmentVars();
     Properties properties = PropertiesLoader.load();
     return new ConfigurationData(properties);
   }
@@ -28,22 +28,26 @@ public class Config {
   /**
    * If we are in Kubernetes and expose environment variables
    * POD_NAME, POD_NAMESPACE, POD_VERSION, POD_ID we can set these
-   * for appInstanceId, appName, appEnvironment, appVersion and appIp.
+   * for app.instanceId, app.name, app.environment, app.version and app.ipAddress.
    */
-  private static void initFromEnvironmentVars() {
-    initSystemProperty(System.getenv("POD_NAMESPACE"), "appEnvironment");
-    initSystemProperty(System.getenv("POD_VERSION"), "appVersion");
-    initSystemProperty(System.getenv("POD_IP"), "appIp");
+  private static Properties initFromEnvironmentVars() {
+
+    Properties properties = new Properties();
+    initSystemProperty(properties, System.getenv("POD_NAMESPACE"), "app.environment");
+    initSystemProperty(properties, System.getenv("POD_VERSION"), "app.version");
+    initSystemProperty(properties, System.getenv("POD_IP"), "app.ipAddress");
 
     final String podName = System.getenv("POD_NAME");
     final String podService = podService(podName);
-    initSystemProperty(podName, "appInstanceId");
-    initSystemProperty(podService, "appName");
+    initSystemProperty(properties, podName, "app.instanceId");
+    initSystemProperty(properties, podService, "app.name");
+
+    return properties;
   }
 
-  private static void initSystemProperty(String envValue, String key) {
+  private static void initSystemProperty(Properties properties, String envValue, String key) {
     if (envValue != null && System.getProperty(key) == null) {
-      System.setProperty(key, envValue);
+      properties.setProperty(key, envValue);
     }
   }
 
@@ -63,8 +67,11 @@ public class Config {
   private Config() {
   }
 
-  public static void init() {
-    // initialised by class loading
+  /**
+   * Put all loaded properties into System properties.
+   */
+  public static void loadIntoSystemProperties() {
+    data.loadIntoSystemProperties();
   }
 
   /**
@@ -98,7 +105,6 @@ public class Config {
     return data.get(key, defaultValue);
   }
 
-
   /**
    * Return a configuration value that might not exist.
    *
@@ -106,7 +112,7 @@ public class Config {
    * @return The configured value wrapped as optional
    */
   public static Optional<String> getOptional(String key) {
-    return Optional.ofNullable(get(key, null));
+    return data.getOptional(key);
   }
 
   /**

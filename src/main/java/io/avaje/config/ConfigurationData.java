@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-class ConfigurationData {
+class ConfigurationData implements Configuration {
 
   private final ModifyAwareProperties properties;
 
@@ -20,7 +21,15 @@ class ConfigurationData {
     this.properties.registerListener(this);
   }
 
-  Properties asProperties() {
+  @Override
+  public void loadIntoSystemProperties() {
+    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+      System.setProperty((String)entry.getKey(), (String)entry.getValue());
+    }
+  }
+
+  @Override
+  public Properties asProperties() {
     return properties;
   }
 
@@ -37,60 +46,76 @@ class ConfigurationData {
     return value;
   }
 
-  String get(String key) {
+  @Override
+  public String get(String key) {
     return getRequired(key);
   }
 
-  String get(String key, String defaultValue) {
+  @Override
+  public String get(String key, String defaultValue) {
     final String value = getProperty(key);
     return (value != null) ? value : defaultValue;
   }
 
-  boolean getBool(String key) {
+  @Override
+  public Optional<String> getOptional(String key) {
+    return Optional.ofNullable(getProperty(key));
+  }
+
+  @Override
+  public boolean getBool(String key) {
     return Boolean.parseBoolean(getRequired(key));
   }
 
-  boolean getBool(String key, boolean defaultValue) {
+  @Override
+  public boolean getBool(String key, boolean defaultValue) {
     String val = getProperty(key);
     return (val == null) ? defaultValue : Boolean.parseBoolean(val);
   }
 
-  int getInt(String key) {
+  @Override
+  public int getInt(String key) {
     return Integer.parseInt(getRequired(key));
   }
 
-  int getInt(String key, int defaultValue) {
+  @Override
+  public int getInt(String key, int defaultValue) {
     String val = getProperty(key);
     return (val == null) ? defaultValue : Integer.parseInt(val);
   }
 
-  long getLong(String key) {
+  @Override
+  public long getLong(String key) {
     return Long.parseLong(getRequired(key));
   }
 
-  long getLong(String key, long defaultValue) {
+  @Override
+  public long getLong(String key, long defaultValue) {
     String val = getProperty(key);
     return (val == null) ? defaultValue : Long.parseLong(val);
   }
 
-  void onChange(String key, Consumer<String> callback) {
+  @Override
+  public void onChange(String key, Consumer<String> callback) {
     onChangeRegister(DataType.STRING, key, callback);
   }
 
-  void onChangeInt(String key, Consumer<Integer> callback) {
+  @Override
+  public void onChangeInt(String key, Consumer<Integer> callback) {
     onChangeRegister(DataType.INT, key, callback);
   }
 
-  void onChangeLong(String key, Consumer<Long> callback) {
+  @Override
+  public void onChangeLong(String key, Consumer<Long> callback) {
     onChangeRegister(DataType.LONG, key, callback);
   }
 
-  void onChangeBool(String key, Consumer<Boolean> callback) {
+  @Override
+  public void onChangeBool(String key, Consumer<Boolean> callback) {
     onChangeRegister(DataType.BOOL, key, callback);
   }
 
   private void fireOnChange(String key, String value) {
-
     OnChangeListener listener = callbacks.get(key);
     if (listener != null) {
       listener.fireOnChange(value);
@@ -101,7 +126,8 @@ class ConfigurationData {
     callbacks.computeIfAbsent(key, s -> new OnChangeListener()).register(new Callback(type, callback));
   }
 
-  void setProperty(String key, String newValue) {
+  @Override
+  public void setProperty(String key, String newValue) {
     properties.setProperty(key, newValue);
   }
 
@@ -178,7 +204,6 @@ class ConfigurationData {
 
     @Override
     public synchronized Object setProperty(String key, String newValue) {
-
       Object oldValue;
       if (newValue == null) {
         oldValue = super.remove(key);
