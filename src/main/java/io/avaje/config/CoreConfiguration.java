@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import io.avaje.config.load.Loader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,10 @@ class CoreConfiguration implements Configuration {
   private final ModifyAwareProperties properties;
 
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
+
+  static Configuration load() {
+    return new CoreConfiguration(new Loader().load());
+  }
 
   CoreConfiguration(Properties source) {
     this.properties = new ModifyAwareProperties();

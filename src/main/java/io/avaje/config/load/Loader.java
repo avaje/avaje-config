@@ -18,7 +18,7 @@ import static io.avaje.config.load.Loader.Source.RESOURCE;
  * Defines the loading order of resources and files.
  * </p>
  */
-class Loader {
+public class Loader {
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -31,7 +31,49 @@ class Loader {
 
   private YamlLoader yamlLoader;
 
-  Loader() {
+  public Loader() {
+  }
+
+  /**
+   * Provides properties by reading known locations.
+   * <p>
+   * <h3>Main configuration</h3>
+   * <p>
+   * <p>Firstly loads from main resources</p>
+   * <pre>
+   *   - application.properties
+   *   - application.yaml
+   * </pre>
+   * <p>
+   * <p>Then loads from local files</p>
+   * <pre>
+   *   - application.properties
+   *   - application.yaml
+   * </pre>
+   * <p>
+   * <p>Then loads from environment variable <em>PROPS_FILE</em></p>
+   * <p>Then loads from system property <em>props.file</em></p>
+   * <p>Then loads from <em>load.properties</em></p>
+   * <p>
+   * <h3>Test configuration</h3>
+   * <p>
+   * Once the main configuration is read it will try to read common test configuration.
+   * This will only be successful if the test resources are available (i.e. running tests).
+   * </p>
+   * <p>Loads from test resources</p>
+   * <pre>
+   *   - application-test.properties
+   *   - application-test.yaml
+   * </pre>
+   */
+  public Properties load() {
+    initYamlLoader();
+    loadEnvironmentVars();
+    loadLocalFiles();
+    return eval();
+  }
+
+  void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
         Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
@@ -49,9 +91,9 @@ class Loader {
   }
 
   /**
-   * Load the configuration with the expected ordering.
+   * Load from local files and resources.
    */
-  void load() {
+  void loadLocalFiles() {
 
     loadMain(RESOURCE);
     // external file configuration overrides the resources configuration

@@ -1,7 +1,5 @@
 package io.avaje.config;
 
-import io.avaje.config.load.PropertiesLoader;
-
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -17,12 +15,7 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  private static Configuration data = initData();
-
-  private static Configuration initData() {
-    Properties properties = new PropertiesLoader().load();
-    return new CoreConfiguration(properties);
-  }
+  private static Configuration data = CoreConfiguration.load();
 
   /**
    * Hide constructor.

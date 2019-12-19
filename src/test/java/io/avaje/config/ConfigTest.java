@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -27,6 +28,18 @@ public class ConfigTest {
     assertThat(properties.getProperty("myapp.fooName")).isEqualTo("Hello");
     assertThat(properties.getProperty("myapp.fooHome")).isEqualTo(home + "/config");
     assertThat(properties).hasSize(5);
+  }
+
+  @Ignore
+  @Test
+  public void load() {
+    assertThat(System.getProperty("myapp.fooName")).isNull();
+
+    assertThat(Config.get("myapp.fooName")).isEqualTo("Hello");
+    assertThat(System.getProperty("myapp.fooName")).isNull();
+
+    Config.loadIntoSystemProperties();
+    assertThat(System.getProperty("myapp.fooName")).isEqualTo("Hello");
   }
 
   @Test
