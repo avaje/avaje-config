@@ -36,6 +36,7 @@ public class Loader {
   private YamlLoader yamlLoader;
 
   public Loader() {
+    initYamlLoader();
   }
 
   /**
@@ -71,13 +72,12 @@ public class Loader {
    * </pre>
    */
   public Properties load() {
-    initYamlLoader();
     loadEnvironmentVars();
     loadLocalFiles();
     return eval();
   }
 
-  void initYamlLoader() {
+  private void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
         Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
