@@ -4,7 +4,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>config</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
 
   <parent>
     <groupId>org.avaje</groupId>
@@ -14,7 +14,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/config.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>config-0.3</tag>
   </scm>
 
   <properties>
