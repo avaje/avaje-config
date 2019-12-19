@@ -1,5 +1,6 @@
-package io.avaje.config.properties;
+package io.avaje.config.load;
 
+import io.avaje.config.PropertyExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,36 @@ class LoadContext {
    * Names of resources/files that were loaded.
    */
   private final Set<String> loadedResources = new LinkedHashSet<>();
+
+  /**
+   * If we are in Kubernetes and expose environment variables
+   * POD_NAMESPACE, POD_NAME, POD_VERSION, POD_ID we can use these to set
+   * app.environment, app.name, app.instanceId, app.version and app.ipAddress.
+   */
+  void loadEnvironmentVars() {
+    final String podName = System.getenv("POD_NAME");
+    initSystemProperty(podName, "app.instanceId");
+    initSystemProperty(podService(podName), "app.name");
+    initSystemProperty(System.getenv("POD_NAMESPACE"), "app.environment");
+    initSystemProperty(System.getenv("POD_VERSION"), "app.version");
+    initSystemProperty(System.getenv("POD_IP"), "app.ipAddress");
+  }
+
+  private void initSystemProperty(String envValue, String key) {
+    if (envValue != null && System.getProperty(key) == null) {
+      map.put(key, envValue);
+    }
+  }
+
+  static String podService(String podName) {
+    if (podName != null && podName.length() > 16) {
+      int p0 = podName.lastIndexOf('-', podName.length() - 16);
+      if (p0 > -1) {
+        return podName.substring(0, p0);
+      }
+    }
+    return null;
+  }
 
   /**
    * Return the input stream (maybe null) for the given source.
@@ -86,7 +117,7 @@ class LoadContext {
 
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();
-      String value = PropertyEval.eval(entry.getValue());
+      String value = PropertyExpression.eval(entry.getValue());
       properties.setProperty(key, value);
     }
 

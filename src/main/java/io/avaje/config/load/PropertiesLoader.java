@@ -1,14 +1,11 @@
-package io.avaje.config.properties;
+package io.avaje.config.load;
 
-import java.util.Enumeration;
 import java.util.Properties;
 
 /**
  * Loads and evaluates properties and yml configuration.
  */
 public class PropertiesLoader {
-
-  private static Properties properties;
 
   /**
    * Provides properties by reading known locations.
@@ -42,30 +39,12 @@ public class PropertiesLoader {
    *   - application-test.yaml
    * </pre>
    */
-  public static synchronized Properties load() {
+  public Properties load() {
 
-    if (properties == null) {
-      Loader loader = new Loader();
-      loader.load();
-      properties = loader.eval();
-    }
-
-    return properties;
+    Loader loader = new Loader();
+    loader.loadEnvironmentVars();
+    loader.load();
+    return loader.eval();
   }
 
-  /**
-   * Return a copy of the properties with 'eval' run on all the values.
-   * This resolves expressions like ${HOME} etc.
-   */
-  public static Properties eval(Properties properties) {
-    Properties evalCopy = new Properties();
-
-    Enumeration<?> names = properties.propertyNames();
-    while (names.hasMoreElements()) {
-      String name = (String)names.nextElement();
-      String value = PropertyEval.eval(properties.getProperty(name));
-      evalCopy.setProperty(name, value);
-    }
-    return evalCopy;
-  }
 }

@@ -9,13 +9,16 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-class ConfigurationData implements Configuration {
+/**
+ * Core implementation of Configuration.
+ */
+class CoreConfiguration implements Configuration {
 
   private final ModifyAwareProperties properties;
 
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
 
-  ConfigurationData(Properties source) {
+  CoreConfiguration(Properties source) {
     this.properties = new ModifyAwareProperties();
     this.properties.loadAll(source);
     this.properties.registerListener(this);
@@ -24,7 +27,7 @@ class ConfigurationData implements Configuration {
   @Override
   public void loadIntoSystemProperties() {
     for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-      System.setProperty((String)entry.getKey(), (String)entry.getValue());
+      System.setProperty((String) entry.getKey(), (String) entry.getValue());
     }
   }
 
@@ -186,13 +189,13 @@ class ConfigurationData implements Configuration {
 
   private static class ModifyAwareProperties extends Properties {
 
-    private ConfigurationData data;
+    private CoreConfiguration data;
 
     ModifyAwareProperties() {
       super();
     }
 
-    void registerListener(ConfigurationData data) {
+    void registerListener(CoreConfiguration data) {
       this.data = data;
     }
 

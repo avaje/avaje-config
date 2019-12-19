@@ -1,4 +1,4 @@
-package io.avaje.config.properties;
+package io.avaje.config.load;
 
 import org.yaml.snakeyaml.Yaml;
 

@@ -1,6 +1,6 @@
 package io.avaje.config;
 
-import io.avaje.config.properties.PropertiesLoader;
+import io.avaje.config.load.PropertiesLoader;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -20,45 +20,8 @@ public class Config {
   private static Configuration data = initData();
 
   private static Configuration initData() {
-    final Properties commonProps = initFromEnvironmentVars();
-    Properties properties = PropertiesLoader.load();
-    return new ConfigurationData(properties);
-  }
-
-  /**
-   * If we are in Kubernetes and expose environment variables
-   * POD_NAME, POD_NAMESPACE, POD_VERSION, POD_ID we can set these
-   * for app.instanceId, app.name, app.environment, app.version and app.ipAddress.
-   */
-  private static Properties initFromEnvironmentVars() {
-
-    Properties properties = new Properties();
-    initSystemProperty(properties, System.getenv("POD_NAMESPACE"), "app.environment");
-    initSystemProperty(properties, System.getenv("POD_VERSION"), "app.version");
-    initSystemProperty(properties, System.getenv("POD_IP"), "app.ipAddress");
-
-    final String podName = System.getenv("POD_NAME");
-    final String podService = podService(podName);
-    initSystemProperty(properties, podName, "app.instanceId");
-    initSystemProperty(properties, podService, "app.name");
-
-    return properties;
-  }
-
-  private static void initSystemProperty(Properties properties, String envValue, String key) {
-    if (envValue != null && System.getProperty(key) == null) {
-      properties.setProperty(key, envValue);
-    }
-  }
-
-  static String podService(String podName) {
-    if (podName != null && podName.length() > 16) {
-      int p0 = podName.lastIndexOf('-', podName.length() - 16);
-      if (p0 > -1) {
-        return podName.substring(0, p0);
-      }
-    }
-    return null;
+    Properties properties = new PropertiesLoader().load();
+    return new CoreConfiguration(properties);
   }
 
   /**

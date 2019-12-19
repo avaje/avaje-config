@@ -11,11 +11,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class ConfigurationDataTest {
+public class CoreConfigurationTest {
 
-  private ConfigurationData data = createSample();
+  private CoreConfiguration data = createSample();
 
-  private ConfigurationData createSample() {
+  private CoreConfiguration createSample() {
 
     Properties properties = new Properties();
     properties.setProperty("a", "1");
@@ -24,7 +24,7 @@ public class ConfigurationDataTest {
     properties.setProperty("foo.f", "false");
     properties.setProperty("modify", "me");
 
-    return new ConfigurationData(properties);
+    return new CoreConfiguration(properties);
   }
 
   @Test

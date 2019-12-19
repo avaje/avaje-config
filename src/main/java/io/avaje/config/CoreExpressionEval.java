@@ -1,4 +1,4 @@
-package io.avaje.config.properties;
+package io.avaje.config;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -12,7 +12,7 @@ import javax.naming.NamingException;
  * evaluate.
  * </p>
  */
-class PropertyEval {
+class CoreExpressionEval {
 
 	/**
 	 * Prefix for looking up JNDI Environment variable.
@@ -32,25 +32,7 @@ class PropertyEval {
 	/**
 	 * Specify the PropertyHolder.
 	 */
-	private PropertyEval() {
-	}
-
-	/**
-	 * Return the property value evaluating and replacing any expressions such as
-	 * ${CATALINA_HOME}.
-	 */
-	static String eval(String val) {
-		if (val == null) {
-			return null;
-		}
-		int sp = val.indexOf(START);
-		if (sp > -1) {
-			int ep = val.indexOf(END, sp + 1);
-			if (ep > -1) {
-				return eval(val, sp, ep);
-			}
-		}
-		return val;
+	private CoreExpressionEval() {
 	}
 
 	/**
@@ -69,6 +51,24 @@ class PropertyEval {
 		String val = System.getProperty(exp);
 		if (val == null) {
 			val = System.getenv(exp);
+		}
+		return val;
+	}
+
+	/**
+	 * Return the property value evaluating and replacing any expressions such as
+	 * ${CATALINA_HOME}.
+	 */
+	static String eval(String val) {
+		if (val == null) {
+			return null;
+		}
+		int sp = val.indexOf(START);
+		if (sp > -1) {
+			int ep = val.indexOf(END, sp + 1);
+			if (ep > -1) {
+				return eval(val, sp, ep);
+			}
 		}
 		return val;
 	}

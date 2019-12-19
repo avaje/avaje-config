@@ -1,7 +1,6 @@
-package io.avaje.config.properties;
+package io.avaje.config.load;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.avaje.config.PropertyExpression;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +9,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static io.avaje.config.properties.Loader.Source.FILE;
-import static io.avaje.config.properties.Loader.Source.RESOURCE;
+import static io.avaje.config.load.Loader.Source.FILE;
+import static io.avaje.config.load.Loader.Source.RESOURCE;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -20,8 +19,6 @@ import static io.avaje.config.properties.Loader.Source.RESOURCE;
  * </p>
  */
 class Loader {
-
-  private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -41,10 +38,14 @@ class Loader {
         if (exists != null) {
           yamlLoader = new YamlLoader(loadContext);
         }
-      } catch (Exception e) {
-        // ignored
+      } catch (ClassNotFoundException e) {
+        // ignored, no yaml loading
       }
     }
+  }
+
+  void loadEnvironmentVars() {
+    loadContext.loadEnvironmentVars();
   }
 
   /**
@@ -93,7 +94,6 @@ class Loader {
    * Provides a way to override properties when running via main() locally.
    */
   private void loadLocalDev() {
-
     File localDev = new File(System.getProperty("user.home"), ".localdev");
     if (localDev.exists()) {
       final String appName = loadContext.getAppName();
@@ -131,7 +131,7 @@ class Loader {
 
   private void loadViaPaths(String paths) {
     for (String path : splitPaths(paths)) {
-      loadFileWithExtensionCheck(PropertyEval.eval(path));
+      loadFileWithExtensionCheck(PropertyExpression.eval(path));
     }
   }
 
@@ -182,7 +182,7 @@ class Loader {
           yamlLoader.load(is);
         }
       } catch (Exception e) {
-        log.warn("Failed to read yml from:" + resourcePath, e);
+        throw new RuntimeException("Error loading yaml properties - " + resourcePath, e);
       }
     }
   }
@@ -194,8 +194,8 @@ class Loader {
           loadProperties(is);
         }
       }
-    } catch (Exception e) {
-      log.warn("Failed to read properties from:" + resourcePath, e);
+    } catch (IOException e) {
+      throw new RuntimeException("Error loading properties - " + resourcePath, e);
     }
   }
 
@@ -203,17 +203,11 @@ class Loader {
     return loadContext.resource(resourcePath, source);
   }
 
-  private void loadProperties(InputStream is) {
+  private void loadProperties(InputStream is) throws IOException {
     if (is != null) {
-      try {
-        Properties properties = new Properties();
-        properties.load(is);
-        put(properties);
-      } catch (IOException e) {
-        throw new RuntimeException("Failed to load properties?", e);
-      } finally {
-        close(is);
-      }
+      Properties properties = new Properties();
+      properties.load(is);
+      put(properties);
     }
   }
 
@@ -226,11 +220,4 @@ class Loader {
     }
   }
 
-  private void close(InputStream is) {
-    try {
-      is.close();
-    } catch (IOException e) {
-      log.warn("Error closing input stream for properties", e);
-    }
-  }
 }
