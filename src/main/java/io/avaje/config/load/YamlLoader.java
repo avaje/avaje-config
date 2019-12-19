@@ -23,10 +23,8 @@ class YamlLoader {
 
   @SuppressWarnings("unchecked")
   void load(InputStream is) {
-    if (is != null) {
-      for (Object map : yaml.loadAll(is)) {
-        loadMap((Map<String, Object>)map, null);
-      }
+    for (Object map : yaml.loadAll(is)) {
+      loadMap((Map<String, Object>)map, null);
     }
   }
 

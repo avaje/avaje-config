@@ -1,6 +1,8 @@
 package io.avaje.config.load;
 
 import io.avaje.config.PropertyExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import static io.avaje.config.load.Loader.Source.RESOURCE;
  * </p>
  */
 public class Loader {
+
+  private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -156,7 +160,12 @@ public class Loader {
     int before = loadContext.size();
     loadProperties("application-test.properties", RESOURCE);
     loadYaml("application-test.yaml", RESOURCE);
-    loadYaml("application-test.yml", RESOURCE);
+    if (loadYaml("application-test.yml", RESOURCE)) {
+      log.warn("Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
+    }
+    if (loadProperties("test-ebean.properties", RESOURCE)) {
+      log.warn("Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
+    }
     return loadContext.size() > before;
   }
 
@@ -186,8 +195,13 @@ public class Loader {
    */
   private void loadMain(Source source) {
     loadYaml("application.yaml", source);
-    loadYaml("application.yml", source);
+    if (loadYaml("application.yml", source)) {
+      log.warn("Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
+    }
     loadProperties("application.properties", source);
+    if (loadProperties("ebean.properties", source)) {
+      log.warn("Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
+    }
   }
 
   private void loadViaSystemProperty() {
@@ -217,28 +231,34 @@ public class Loader {
     return loadContext.eval();
   }
 
-  void loadYaml(String resourcePath, Source source) {
+  boolean loadYaml(String resourcePath, Source source) {
     if (yamlLoader != null) {
       try {
         try (InputStream is = resource(resourcePath, source)) {
-          yamlLoader.load(is);
+          if (is != null) {
+            yamlLoader.load(is);
+            return true;
+          }
         }
       } catch (Exception e) {
         throw new RuntimeException("Error loading yaml properties - " + resourcePath, e);
       }
     }
+    return false;
   }
 
-  void loadProperties(String resourcePath, Source source) {
+  boolean loadProperties(String resourcePath, Source source) {
     try {
       try (InputStream is = resource(resourcePath, source)) {
         if (is != null) {
           loadProperties(is);
+          return true;
         }
       }
     } catch (IOException e) {
       throw new RuntimeException("Error loading properties - " + resourcePath, e);
     }
+    return false;
   }
 
   private InputStream resource(String resourcePath, Source source) {
@@ -246,11 +266,9 @@ public class Loader {
   }
 
   private void loadProperties(InputStream is) throws IOException {
-    if (is != null) {
-      Properties properties = new Properties();
-      properties.load(is);
-      put(properties);
-    }
+    Properties properties = new Properties();
+    properties.load(is);
+    put(properties);
   }
 
   private void put(Properties properties) {
