@@ -158,7 +158,7 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
     }
 
     void parseForDefault() {
-      int colonPos = original.lastIndexOf(':', end);
+      int colonPos = original.indexOf(':', start);
       if (colonPos > start) {
         expression = original.substring(start + START.length(), colonPos);
         defaultValue = original.substring(colonPos + 1, end);

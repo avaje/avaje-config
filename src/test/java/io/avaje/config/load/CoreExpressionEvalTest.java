@@ -53,7 +53,16 @@ public class CoreExpressionEvalTest {
     assertEquals("before-bart-after", eval("before-${foo:bart}-after"));
     assertEquals("pre-bart", eval("pre-${foo:bart}"));
     assertEquals("bart-post", eval("${foo:bart}-post"));
+  }
 
+  @Test
+  public void eval_singleExpression_withDefaultIncludesColons() {
+    assertEquals("jdbc:postgresql://localhost:7432/myapp", eval("${db.url:jdbc:postgresql://localhost:7432/myapp}"));
+
+    System.setProperty("db.url", "jdbc:postgresql://foo:7432/bar");
+    assertEquals("jdbc:postgresql://foo:7432/bar", eval("${db.url:jdbc:postgresql://localhost:7432/myapp}"));
+
+    System.clearProperty("db.url");
   }
 
   @Test
