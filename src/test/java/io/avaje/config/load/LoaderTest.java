@@ -64,12 +64,19 @@ public class LoaderTest {
   @Test
   public void loadProperties() {
 
+    System.setProperty("eureka.instance.hostname", "host1");
+    System.setProperty("server.port","9876");
+
     Loader loader = new Loader();
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     Properties properties = loader.eval();
 
     assertThat(properties.getProperty("hello")).isEqualTo("there");
     assertThat(properties.getProperty("name")).isEqualTo("Rob");
+    assertThat(properties.getProperty("statusPageUrl")).isEqualTo("https://host1:9876/status");
+    assertThat(properties.getProperty("statusPageUrl2")).isEqualTo("https://aaa:9876/status2");
+    assertThat(properties.getProperty("statusPageUrl3")).isEqualTo("https://aaa:89/status3");
+    assertThat(properties.getProperty("statusPageUrl4")).isEqualTo("https://there:9876/name/Rob");
   }
 
   @Test

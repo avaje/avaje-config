@@ -159,7 +159,7 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
 
     void parseForDefault() {
       int colonPos = original.indexOf(':', start);
-      if (colonPos > start) {
+      if (colonPos > start && colonPos < end) {
         expression = original.substring(start + START.length(), colonPos);
         defaultValue = original.substring(colonPos + 1, end);
       } else {
