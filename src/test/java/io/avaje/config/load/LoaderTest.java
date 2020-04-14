@@ -87,4 +87,27 @@ public class LoaderTest {
     assertThat(loader.splitPaths("one;two;three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one two,three;four,five six")).contains("one", "two", "three", "four", "five", "six");
   }
+
+  @Test
+  public void loadViaCommandLine_whenNotValid() {
+    Loader loader = new Loader();
+    loader.loadViaCommandLine(new String[]{"-p","8765"});
+    assertEquals(0, loader.size());
+    loader.loadViaCommandLine(new String[]{"-port","8765"});
+    assertEquals(0, loader.size());
+
+    loader.loadViaCommandLine(new String[]{"-port"});
+    loader.loadViaCommandLine(new String[]{"-p","ort"});
+    assertEquals(0, loader.size());
+
+    loader.loadViaCommandLine(new String[]{"-p","doesNotExist.yaml"});
+    assertEquals(0, loader.size());
+  }
+
+  @Test
+  public void loadViaCommandLine_localFile() {
+    Loader loader = new Loader();
+    loader.loadViaCommandLine(new String[]{"-p","test-dummy2.yaml"});
+    assertEquals(1, loader.size());
+  }
 }

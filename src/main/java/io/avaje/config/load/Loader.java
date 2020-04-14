@@ -127,20 +127,30 @@ public class Loader {
     }
   }
 
-  private void loadViaCommandLine(String[] args) {
+  void loadViaCommandLine(String[] args) {
     for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       if (arg.startsWith("-P") || arg.startsWith("-p")) {
         if (arg.length() == 2 && i < args.length - 1) {
           // next argument expected to be a properties file paths
           i++;
-          loadViaPaths(args[i]);
+          loadCommandLineArg(args[i]);
         } else {
           // no space between -P and properties file paths
-          loadViaPaths(arg.substring(2));
+          loadCommandLineArg(arg.substring(2));
         }
       }
     }
+  }
+
+  private void loadCommandLineArg(String arg) {
+    if (isValidExtension(arg)) {
+      loadViaPaths(arg);
+    }
+  }
+
+  private boolean isValidExtension(String arg) {
+    return arg.endsWith(".yaml") || arg.endsWith(".yml") || arg.endsWith(".properties");
   }
 
   /**
@@ -191,6 +201,10 @@ public class Loader {
     for (String path : splitPaths(paths)) {
       loadFileWithExtensionCheck(loadContext.eval(path));
     }
+  }
+
+  int size() {
+    return loadContext.size();
   }
 
   String[] splitPaths(String location) {
