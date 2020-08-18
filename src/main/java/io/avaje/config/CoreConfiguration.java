@@ -26,9 +26,7 @@ class CoreConfiguration implements Configuration {
   }
 
   CoreConfiguration(Properties source) {
-    this.properties = new ModifyAwareProperties();
-    this.properties.loadAll(source);
-    this.properties.registerListener(this);
+    this.properties = new ModifyAwareProperties(this, source);
   }
 
   @Override
@@ -47,14 +45,12 @@ class CoreConfiguration implements Configuration {
 
   @Override
   public void loadIntoSystemProperties() {
-    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-      System.setProperty((String) entry.getKey(), (String) entry.getValue());
-    }
+    properties.loadIntoSystemProperties();
   }
 
   @Override
   public Properties asProperties() {
-    return properties;
+    return properties.asProperties();
   }
 
   private String getProperty(String key) {
@@ -208,36 +204,53 @@ class CoreConfiguration implements Configuration {
     }
   }
 
-  private static class ModifyAwareProperties extends Properties {
+  private static class ModifyAwareProperties {
 
-    private CoreConfiguration data;
+    private final Map<String,String> map = new ConcurrentHashMap<>();
 
-    ModifyAwareProperties() {
-      super();
-    }
+    private final CoreConfiguration data;
 
-    void registerListener(CoreConfiguration data) {
+    ModifyAwareProperties(CoreConfiguration data, Properties source) {
       this.data = data;
+      loadAll(source);
     }
 
-    void loadAll(Properties properties) {
+    private void loadAll(Properties properties) {
       for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-        super.put(entry.getKey(), entry.getValue());
+        if (entry.getValue() != null) {
+          map.put(entry.getKey().toString(), entry.getValue().toString());
+        }
       }
     }
 
-    @Override
-    public synchronized Object setProperty(String key, String newValue) {
+    void setProperty(String key, String newValue) {
       Object oldValue;
       if (newValue == null) {
-        oldValue = super.remove(key);
+        oldValue = map.remove(key);
       } else {
-        oldValue = super.setProperty(key, newValue);
+        oldValue = map.put(key, newValue);
       }
-      if (data != null && !Objects.equals(newValue, oldValue)) {
+      if (!Objects.equals(newValue, oldValue)) {
         data.fireOnChange(key, newValue);
       }
-      return oldValue;
+    }
+
+    String getProperty(String key) {
+      return map.get(key);
+    }
+
+    void loadIntoSystemProperties() {
+      for (Map.Entry<String, String> entry : map.entrySet()) {
+        System.setProperty(entry.getKey(), entry.getValue());
+      }
+    }
+
+    Properties asProperties() {
+      Properties properties = new Properties();
+      for (Map.Entry<String, String> entry : map.entrySet()) {
+        properties.setProperty(entry.getKey(), entry.getValue());
+      }
+      return properties;
     }
   }
 
