@@ -11,13 +11,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConfigTest {
 
   @Test
-  public void fallbackToSystemProperty() {
+  public void fallbackToSystemProperty_initial() {
+    System.setProperty("MySystemProp0", "bar");
+    assertThat(Config.get("MySystemProp0", "foo")).isEqualTo("bar");
 
+    // cached the initial value, still bar even when system property changed
+    System.setProperty("MySystemProp0", "bazz");
+    assertThat(Config.get("MySystemProp0", null)).isEqualTo("bar");
+
+    // mutate via Config.setProperty()
+    Config.setProperty("MySystemProp0", "caz");
+    assertThat(Config.get("MySystemProp0")).isEqualTo("caz");
+  }
+
+  @Test
+  public void fallbackToSystemProperty_cacheInitialNullValue() {
     assertThat(Config.get("MySystemProp", null)).isNull();
-
     System.setProperty("MySystemProp", "hello");
-    assertThat(Config.get("MySystemProp")).isEqualTo("hello");
-    System.clearProperty("MySystemProp");
+    // cached the initial null so still null
+    assertThat(Config.get("MySystemProp", null)).isNull();
+  }
+
+  @Test
+  public void fallbackToSystemProperty_cacheInitialValue() {
+    assertThat(Config.get("MySystemProp2", "foo")).isEqualTo("foo");
+    System.setProperty("MySystemProp2", "notFoo");
+    // cached the initial value foo so still foo
+    assertThat(Config.get("MySystemProp2", null)).isEqualTo("foo");
+    Config.setProperty("MySystemProp2", null);
+  }
+
+  @Test
+  public void setProperty() {
+    assertThat(Config.get("MySystemProp3", null)).isNull();
+    Config.setProperty("MySystemProp3", "hello2");
+    assertThat(Config.get("MySystemProp3")).isEqualTo("hello2");
   }
 
   @Test
@@ -64,8 +92,8 @@ public class ConfigTest {
 
   @Test
   public void get_default() {
-    assertThat(Config.get("myapp.doesNotExist", "MyDefault")).isEqualTo("MyDefault");
-    assertThat(Config.get("myapp.doesNotExist", null)).isNull();
+    assertThat(Config.get("myapp.doesNotExist2", "MyDefault")).isEqualTo("MyDefault");
+    assertThat(Config.get("myapp.doesNotExist2", null)).isEqualTo("MyDefault");
   }
 
   @Test
@@ -76,6 +104,7 @@ public class ConfigTest {
 
   @Test(expected = IllegalStateException.class)
   public void getBool_required_missing() {
+    Config.setProperty("myapp.doesNotExist", null);
     assertThat(Config.getBool("myapp.doesNotExist")).isTrue();
   }
 
@@ -92,6 +121,10 @@ public class ConfigTest {
   @Test
   public void getBool_default() {
     assertThat(Config.getBool("myapp.doesNotExist", false)).isFalse();
+    // default value is cached, still false
+    assertThat(Config.getBool("myapp.doesNotExist", true)).isFalse();
+    // can dynamically change
+    Config.setProperty("myapp.doesNotExist", "true");
     assertThat(Config.getBool("myapp.doesNotExist", true)).isTrue();
   }
 
