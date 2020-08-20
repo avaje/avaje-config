@@ -201,6 +201,32 @@ public class Config {
   }
 
   /**
+   * Return the enum configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param type The enum type
+   * @param key  The configuration key
+   * @return The configured value
+   */
+  public static <T extends Enum<T>> T getEnum(Class<T> type, String key) {
+    return data.getEnum(type, key);
+  }
+
+  /**
+   * Return the enum configuration value with a default value.
+   *
+   * @param type         The enum type
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  public static <T extends Enum<T>> T getEnum(Class<T> type, String key, T defaultValue) {
+    return data.getEnum(type, key, defaultValue);
+  }
+
+  /**
    * Return a List of values configured.
    *
    * <pre>{@code

@@ -190,6 +190,28 @@ public class ConfigTest {
     assertThat(Config.getLong("myapp.bar.doesNotExist", 99)).isEqualTo(99L);
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void getEnum_doesNotExist() {
+    Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist");
+  }
+
+  @Test
+  public void getEnum_default() {
+    assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist", MyTestEnum.C)).isEqualTo(MyTestEnum.C);
+  }
+
+  @Test
+  public void getEnum() {
+    Config.setProperty("myTestEnum", "B");
+    assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum")).isEqualTo(MyTestEnum.B);
+    assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum", MyTestEnum.C)).isEqualTo(MyTestEnum.B);
+    Config.setProperty("myTestEnum", null);
+  }
+
+  enum MyTestEnum {
+    A, B, C
+  }
+
   @Test
   public void onChange() {
 

@@ -167,6 +167,17 @@ class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public <T extends Enum<T>> T getEnum(Class<T> cls, String key) {
+    return Enum.valueOf(cls, get(key));
+  }
+
+  @Override
+  public <T extends Enum<T>> T getEnum(Class<T> cls, String key, T defaultValue) {
+    final String val = get(key, null);
+    return (val == null) ? defaultValue : Enum.valueOf(cls, val);
+  }
+
+  @Override
   public void onChange(String key, Consumer<String> callback) {
     onChangeRegister(DataType.STRING, key, callback);
   }

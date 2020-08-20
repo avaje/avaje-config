@@ -24,6 +24,7 @@ public class CoreConfigurationTest {
     properties.setProperty("modify", "me");
     properties.setProperty("someValues", "13,42,55");
     properties.setProperty("1someValues", "13,42,55");
+    properties.setProperty("myEnum", "TWO");
     return properties;
   }
 
@@ -94,6 +95,21 @@ public class CoreConfigurationTest {
     assertThat(data.getSet().ofLong("1someValues", 22L)).contains(13L, 42L, 55L);
     assertThat(data.getSet().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.getSet().ofLong("1set.long.notThere2")).isEmpty();
+  }
+
+  enum MyEnum {
+    ONE,TWO,THREE
+  }
+
+  @Test
+  public void getEnum() {
+    assertThat(data.getEnum(MyEnum.class, "myEnum")).isEqualTo(MyEnum.TWO);
+    assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.ONE)).isEqualTo(MyEnum.ONE);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getEnum_doesNotExist() {
+    data.getEnum(MyEnum.class, "myEnum.doesNotExist");
   }
 
   @Test

@@ -116,6 +116,28 @@ public interface Configuration {
   long getLong(String key, long defaultValue);
 
   /**
+   * Return the enum configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param type The enum type
+   * @param key  The configuration key
+   * @return The configured value
+   */
+  <T extends Enum<T>> T getEnum(Class<T> type, String key);
+
+  /**
+   * Return the enum configuration value with a default value.
+   *
+   * @param type         The enum type
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  <T extends Enum<T>> T getEnum(Class<T> type, String key, T defaultValue);
+
+  /**
    * Return a List of values configured.
    *
    * <pre>{@code
