@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -198,6 +199,30 @@ public class Config {
    */
   public static long getLong(String key, long defaultValue) {
     return data.getLong(key, defaultValue);
+  }
+
+  /**
+   * Return a decimal configuration value.
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  public static BigDecimal getDecimal(String key) {
+    return data.getDecimal(key);
+  }
+
+  /**
+   * Return a decimal configuration value with a default value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  public static BigDecimal getDecimal(String key, String defaultValue) {
+    return data.getDecimal(key, defaultValue);
   }
 
   /**

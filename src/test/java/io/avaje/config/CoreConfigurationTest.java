@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,6 +34,13 @@ public class CoreConfigurationTest {
   }
 
   @Test
+  public void test_toString() {
+    assertThat(data.toString()).isNotEmpty();
+    data.setWatcher(Mockito.mock(FileWatch.class));
+    data.loadIntoSystemProperties();
+  }
+
+  @Test
   public void get() {
     assertEquals(data.get("a", "something"), "1");
     assertEquals(data.get("doesNotExist", "something"), "something");
@@ -59,6 +67,25 @@ public class CoreConfigurationTest {
     assertThat(data.getLong("a", 99)).isEqualTo(1);
     assertThat(data.getLong("foo.bar", 99)).isEqualTo(42);
     assertThat(data.getLong("doesNotExist", 99)).isEqualTo(99);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getDecimal_doesNotExist() {
+    data.getDecimal("myTestDecimal.doesNotExist");
+  }
+
+  @Test
+  public void getDecimal_default() {
+    assertThat(data.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
+    data.setProperty("myTestDecimal.doesNotExist", null);
+  }
+
+  @Test
+  public void getDecimal() {
+    data.setProperty("myTestDecimal","14.3");
+    assertThat(data.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
+    assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
+    data.setProperty("myTestDecimal", null);
   }
 
   @Test

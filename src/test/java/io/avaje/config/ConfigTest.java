@@ -3,6 +3,9 @@ package io.avaje.config;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -191,6 +194,25 @@ public class ConfigTest {
   }
 
   @Test(expected = IllegalStateException.class)
+  public void getDecimal_doesNotExist() {
+    Config.getDecimal("myTestDecimal.doesNotExist");
+  }
+
+  @Test
+  public void getDecimal_default() {
+    assertThat(Config.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
+    Config.setProperty("myTestDecimal.doesNotExist", null);
+  }
+
+  @Test
+  public void getDecimal() {
+    Config.setProperty("myTestDecimal","14.3");
+    assertThat(Config.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
+    assertThat(Config.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
+    Config.setProperty("myTestDecimal", null);
+  }
+
+  @Test(expected = IllegalStateException.class)
   public void getEnum_doesNotExist() {
     Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist");
   }
@@ -210,6 +232,15 @@ public class ConfigTest {
 
   enum MyTestEnum {
     A, B, C
+  }
+
+  @Test
+  public void getUrl() throws MalformedURLException {
+
+    final URI uri = URI.create("http://foo");
+    URL url = new URL(Config.get("myUrl", "http://foo"));
+    assertThat(url).isNotNull();
+    Config.setProperty("myUrl", null);
   }
 
   @Test

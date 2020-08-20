@@ -3,6 +3,7 @@ package io.avaje.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -164,6 +165,16 @@ class CoreConfiguration implements Configuration {
   public long getLong(String key, long defaultValue) {
     String val = getProperty(key);
     return (val == null) ? defaultValue : Long.parseLong(val);
+  }
+
+  @Override
+  public BigDecimal getDecimal(String key) {
+    return new BigDecimal(get(key));
+  }
+
+  @Override
+  public BigDecimal getDecimal(String key, String defaultValue) {
+    return new BigDecimal(get(key, defaultValue));
   }
 
   @Override

@@ -110,7 +110,6 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
    * @param key the key of the JNDI Environment property including a JNDI: prefix.
    */
   private String getJndiProperty(String key) {
-
     try {
       // remove the JNDI: prefix
       key = key.substring(5);
