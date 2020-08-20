@@ -111,14 +111,22 @@ public class ConfigTest {
     assertThat(Config.getBool("myapp.doesNotExist")).isTrue();
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void enabled_required_missing() {
+    Config.setProperty("myapp.doesNotExist", null);
+    assertThat(Config.enabled("myapp.doesNotExist")).isTrue();
+  }
+
   @Test
   public void getBool_required_set() {
     assertThat(Config.getBool("myapp.activateFoo")).isTrue();
+    assertThat(Config.enabled("myapp.activateFoo")).isTrue();
   }
 
   @Test
   public void getBool() {
     assertThat(Config.getBool("myapp.activateFoo", false)).isTrue();
+    assertThat(Config.enabled("myapp.activateFoo", false)).isTrue();
   }
 
   @Test
@@ -129,6 +137,17 @@ public class ConfigTest {
     // can dynamically change
     Config.setProperty("myapp.doesNotExist", "true");
     assertThat(Config.getBool("myapp.doesNotExist", true)).isTrue();
+  }
+
+  @Test
+  public void enabled_default() {
+    assertThat(Config.enabled("myapp.en.doesNotExist", false)).isFalse();
+    // default value is cached, still false
+    assertThat(Config.enabled("myapp.en.doesNotExist", true)).isFalse();
+    // can dynamically change
+    Config.setProperty("myapp.en.doesNotExist", "true");
+    assertThat(Config.enabled("myapp.en.doesNotExist", true)).isTrue();
+    Config.setProperty("myapp.en.doesNotExist", null);
   }
 
   @Test(expected = IllegalStateException.class)

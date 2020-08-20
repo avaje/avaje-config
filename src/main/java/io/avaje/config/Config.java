@@ -90,6 +90,45 @@ public class Config {
   }
 
   /**
+   * Return boolean configuration value with the given default value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   if (Config.enabled("feature.cleanup")) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return True when configuration value is true
+   */
+  public static boolean enabled(String key) {
+    return getBool(key);
+  }
+
+  /**
+   * Return boolean configuration value with the given default value.
+   *
+   * <pre>{@code
+   *
+   *   if (Config.enabled("feature.cleanup", true)) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return True when configuration value is true
+   */
+  public static boolean enabled(String key, boolean enabledDefault) {
+    return getBool(key, enabledDefault);
+  }
+
+  /**
    * Return a required boolean configuration value.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
