@@ -155,7 +155,7 @@ public interface Configuration {
    * @param period time in milliseconds between successive task executions.
    * @param task   task to be scheduled.
    */
-  void schedule(int delay, int period, Runnable task);
+  void schedule(long delay, long period, Runnable task);
 
   /**
    * Return a copy of the properties with 'eval' run on all the values.

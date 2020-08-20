@@ -1,6 +1,5 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
-import io.avaje.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,20 +19,21 @@ class FileWatch {
   private final Configuration configuration;
   private final YamlLoader yamlLoader;
   private final List<Entry> files;
+  private final long delay;
+  private final long period;
 
   FileWatch(Configuration configuration, List<File> loadedFiles, boolean withYaml) {
     this.configuration = configuration;
     this.files = initFiles(loadedFiles);
-
-    int delayMillis = 1000 * configuration.getInt("config.watch.delay", 140);
-    int periodMillis = 1000 * configuration.getInt("config.watch.period", 63);
-
+    this.delay = configuration.getLong("config.watch.delay", 140);
+    this.period = configuration.getInt("config.watch.period", 61);
     this.yamlLoader = (withYaml) ? new LoadYaml() : null;
-    configuration.schedule(delayMillis, periodMillis, () -> {
-      if (changed()) {
-        reload();
-      }
-    });
+    configuration.schedule(delay * 1000, period * 1000, this::check);
+  }
+
+  @Override
+  public String toString() {
+    return "period:" + period + " delay:" + delay + " files:" + files;
   }
 
   private List<Entry> initFiles(List<File> loadedFiles) {
@@ -44,7 +44,13 @@ class FileWatch {
     return entries;
   }
 
-  boolean changed() {
+  void check() {
+    if (changed()) {
+      reload();
+    }
+  }
+
+  private boolean changed() {
     for (Entry file : files) {
       if (file.changed()) {
         return true;
@@ -53,9 +59,10 @@ class FileWatch {
     return false;
   }
 
-  void reload() {
+  private void reload() {
     for (Entry file : files) {
       if (file.changed()) {
+        log.debug("reloading configuration from {}", file);
         if (file.isYaml()) {
           reloadYaml(file);
         } else {
@@ -88,7 +95,7 @@ class FileWatch {
     if (yamlLoader == null) {
       log.error("Unexpected - no yamlLoader to reload config file " + file);
     } else {
-      try(InputStream is = file.inputStream()) {
+      try (InputStream is = file.inputStream()) {
         yamlLoader.load(is);
       } catch (Exception e) {
         log.error("Unexpected error reloading config file " + file, e);
@@ -96,14 +103,14 @@ class FileWatch {
     }
   }
 
-  class LoadYaml extends YamlLoader {
+  private class LoadYaml extends YamlLoader {
     @Override
     void add(String key, String val) {
       configuration.setProperty(key, val);
     }
   }
 
-  static class Entry {
+  private static class Entry {
     private final File file;
     private final long lastMod;
     private final boolean yaml;

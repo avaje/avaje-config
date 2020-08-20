@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class CoreConfigurationTest {
 
-  private CoreConfiguration data = createSample();
+  private final CoreConfiguration data = createSample();
 
   private Properties basicProperties() {
     Properties properties = new Properties();
@@ -83,6 +83,14 @@ public class CoreConfigurationTest {
     data.setProperty("modify", "change");
     assertThat(count.get()).isEqualTo(3);
     assertThat(sb.toString()).isEqualTo("change,null,change,");
+  }
+
+  @Test
+  public void setProperty_withEval() {
+    assertThat(data.get("ThisIsNotSet", null)).isNull();
+    data.setProperty("ThisIsNotSet", "A|${user.home}|B");
+    String expected = "A|" + System.getProperty("user.home") + "|B";
+    assertThat(data.get("ThisIsNotSet", null)).isEqualTo(expected);
   }
 
   @Test

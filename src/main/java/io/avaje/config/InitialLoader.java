@@ -1,6 +1,5 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
-import io.avaje.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +10,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static io.avaje.config.load.Loader.Source.FILE;
-import static io.avaje.config.load.Loader.Source.RESOURCE;
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -20,9 +19,9 @@ import static io.avaje.config.load.Loader.Source.RESOURCE;
  * Defines the loading order of resources and files.
  * </p>
  */
-public class Loader {
+class InitialLoader {
 
-  private static final Logger log = LoggerFactory.getLogger(Loader.class);
+  private static final Logger log = LoggerFactory.getLogger(InitialLoader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -38,11 +37,11 @@ public class Loader {
     FILE
   }
 
-  private final LoadContext loadContext = new LoadContext();
+  private final InitialLoadContext loadContext = new InitialLoadContext();
 
   private YamlLoader yamlLoader;
 
-  public Loader() {
+  InitialLoader() {
     initYamlLoader();
   }
 
@@ -78,10 +77,16 @@ public class Loader {
    *   - application-test.yaml
    * </pre>
    */
-  public Properties load() {
+  Properties load() {
     loadEnvironmentVars();
     loadLocalFiles();
     return eval();
+  }
+
+  void initWatcher(CoreConfiguration configuration) {
+    if (configuration.getBool("config.watch.enabled", false)) {
+      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), yamlLoader != null));
+    }
   }
 
   private void initYamlLoader() {

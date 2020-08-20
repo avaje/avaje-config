@@ -1,4 +1,4 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -27,7 +27,7 @@ abstract class YamlLoader {
   @SuppressWarnings("unchecked")
   void load(InputStream is) {
     for (Object map : yaml.loadAll(is)) {
-      loadMap((Map<String, Object>)map, null);
+      loadMap((Map<String, Object>) map, null);
     }
   }
 
@@ -42,7 +42,7 @@ abstract class YamlLoader {
       Object val = entry.getValue();
       if (val instanceof Map) {
         loadMap((Map<String, Object>) val, key);
-      } else  {
+      } else {
         addScalar(key, val);
       }
     }
@@ -50,9 +50,9 @@ abstract class YamlLoader {
 
   private void addScalar(String key, Object val) {
     if (val instanceof String) {
-      add(key,  (String) val);
+      add(key, (String) val);
     } else if (val instanceof Number || val instanceof Boolean) {
-      add(key,  val.toString());
+      add(key, val.toString());
     }
   }
 

@@ -1,6 +1,5 @@
 package io.avaje.config;
 
-import io.avaje.config.load.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,18 +26,17 @@ class CoreConfiguration implements Configuration {
 
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
 
+  private FileWatch watcher;
+
   private Timer timer;
 
-  static Configuration load() {
-    final Loader loader = new Loader();
-    final Properties properties = loader.load();
-//    loader.fileWatch()
-//    final String watch = fileWatch(properties);
-//    if () {
-//
-//    }
-    CoreConfiguration configuration = new CoreConfiguration(properties);
-    //loader.watcher(configuration);
+  /**
+   * Initialise the configuration which loads all the property sources.
+   */
+  static Configuration initialise() {
+    final InitialLoader loader = new InitialLoader();
+    CoreConfiguration configuration = new CoreConfiguration(loader.load());
+    loader.initWatcher(configuration);
     return configuration;
   }
 
@@ -46,8 +44,17 @@ class CoreConfiguration implements Configuration {
     this.properties = new ModifyAwareProperties(this, source);
   }
 
+  void setWatcher(FileWatch watcher) {
+    this.watcher = watcher;
+  }
+
   @Override
-  public void schedule(int delayMillis, int periodMillis, Runnable runnable) {
+  public String toString() {
+    return "watcher:" + watcher + " properties:" + properties;
+  }
+
+  @Override
+  public void schedule(long delayMillis, long periodMillis, Runnable runnable) {
     synchronized (this) {
       if (timer == null) {
         timer = new Timer("ConfigTimer");
@@ -56,11 +63,10 @@ class CoreConfiguration implements Configuration {
     }
   }
 
-
   @Override
   public Properties eval(Properties properties) {
 
-    final ExpressionEval exprEval = Loader.evalFor(properties);
+    final ExpressionEval exprEval = InitialLoader.evalFor(properties);
 
     Properties evalCopy = new Properties();
     Enumeration<?> names = properties.propertyNames();
@@ -240,6 +246,8 @@ class CoreConfiguration implements Configuration {
 
     private final Map<String, Boolean> propertiesBoolCache = new ConcurrentHashMap<>();
 
+    private final Configuration.ExpressionEval eval = new CoreExpressionEval(properties);
+
     private final CoreConfiguration config;
 
     ModifyAwareProperties(CoreConfiguration config, Properties source) {
@@ -255,7 +263,16 @@ class CoreConfiguration implements Configuration {
       }
     }
 
+    @Override
+    public String toString() {
+      return properties.toString();
+    }
+
+    /**
+     * Set a property with expression evaluation.
+     */
     void setProperty(String key, String newValue) {
+      newValue = eval.eval(newValue);
       Object oldValue;
       if (newValue == null) {
         oldValue = properties.remove(key);
@@ -263,6 +280,7 @@ class CoreConfiguration implements Configuration {
         oldValue = properties.put(key, newValue);
       }
       if (!Objects.equals(newValue, oldValue)) {
+        log.trace("setProperty key:{} value:{}}", key, newValue);
         propertiesBoolCache.remove(key);
         config.fireOnChange(key, newValue);
       }
@@ -303,7 +321,7 @@ class CoreConfiguration implements Configuration {
         // cache in concurrent map to provide higher concurrent use
         properties.put(key, val);
       }
-      return (val != NULL_PLACEHOLDER) ? val: null;
+      return (val != NULL_PLACEHOLDER) ? val : null;
     }
 
     void loadIntoSystemProperties() {

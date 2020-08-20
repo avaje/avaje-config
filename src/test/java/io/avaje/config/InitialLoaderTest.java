@@ -1,14 +1,14 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.junit.Test;
 
 import java.util.Properties;
 
-import static io.avaje.config.load.Loader.Source.RESOURCE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-public class LoaderTest {
+public class InitialLoaderTest {
 
   @Test
   public void load() {
@@ -16,7 +16,7 @@ public class LoaderTest {
     String userName = System.getProperty("user.name");
     String userHome = System.getProperty("user.home");
 
-    Loader loader = new Loader();
+    InitialLoader loader = new InitialLoader();
     loader.loadProperties("test-properties/application.properties", RESOURCE);
     loader.loadYaml("test-properties/application.yaml", RESOURCE);
 
@@ -39,7 +39,7 @@ public class LoaderTest {
   @Test
   public void loadWithExtensionCheck() {
 
-    Loader loader = new Loader();
+    InitialLoader loader = new InitialLoader();
     loader.loadFileWithExtensionCheck("test-dummy.properties");
     loader.loadFileWithExtensionCheck("test-dummy.yml");
     loader.loadFileWithExtensionCheck("test-dummy2.yaml");
@@ -54,7 +54,7 @@ public class LoaderTest {
   @Test
   public void loadYaml() {
 
-    Loader loader = new Loader();
+    InitialLoader loader = new InitialLoader();
     loader.loadYaml("test-properties/foo.yml", RESOURCE);
     Properties properties = loader.eval();
 
@@ -65,9 +65,9 @@ public class LoaderTest {
   public void loadProperties() {
 
     System.setProperty("eureka.instance.hostname", "host1");
-    System.setProperty("server.port","9876");
+    System.setProperty("server.port", "9876");
 
-    Loader loader = new Loader();
+    InitialLoader loader = new InitialLoader();
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     Properties properties = loader.eval();
 
@@ -81,7 +81,7 @@ public class LoaderTest {
 
   @Test
   public void splitPaths() {
-    Loader loader = new Loader();
+    InitialLoader loader = new InitialLoader();
     assertThat(loader.splitPaths("one two three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one,two,three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one;two;three")).contains("one", "two", "three");
@@ -90,24 +90,24 @@ public class LoaderTest {
 
   @Test
   public void loadViaCommandLine_whenNotValid() {
-    Loader loader = new Loader();
-    loader.loadViaCommandLine(new String[]{"-p","8765"});
+    InitialLoader loader = new InitialLoader();
+    loader.loadViaCommandLine(new String[]{"-p", "8765"});
     assertEquals(0, loader.size());
-    loader.loadViaCommandLine(new String[]{"-port","8765"});
+    loader.loadViaCommandLine(new String[]{"-port", "8765"});
     assertEquals(0, loader.size());
 
     loader.loadViaCommandLine(new String[]{"-port"});
-    loader.loadViaCommandLine(new String[]{"-p","ort"});
+    loader.loadViaCommandLine(new String[]{"-p", "ort"});
     assertEquals(0, loader.size());
 
-    loader.loadViaCommandLine(new String[]{"-p","doesNotExist.yaml"});
+    loader.loadViaCommandLine(new String[]{"-p", "doesNotExist.yaml"});
     assertEquals(0, loader.size());
   }
 
   @Test
   public void loadViaCommandLine_localFile() {
-    Loader loader = new Loader();
-    loader.loadViaCommandLine(new String[]{"-p","test-dummy2.yaml"});
+    InitialLoader loader = new InitialLoader();
+    loader.loadViaCommandLine(new String[]{"-p", "test-dummy2.yaml"});
     assertEquals(1, loader.size());
   }
 }

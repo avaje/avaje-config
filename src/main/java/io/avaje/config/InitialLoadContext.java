@@ -1,4 +1,4 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +18,9 @@ import java.util.Set;
 /**
  * Manages the underlying map of properties we are gathering.
  */
-class LoadContext {
+class InitialLoadContext {
 
-  private static final Logger log = LoggerFactory.getLogger(LoadContext.class);
+  private static final Logger log = LoggerFactory.getLogger(InitialLoadContext.class);
 
   /**
    * Map we are loading the properties into.
@@ -34,7 +34,7 @@ class LoadContext {
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
-  LoadContext() {
+  InitialLoadContext() {
     this.exprEval = new CoreExpressionEval(map);
   }
 
@@ -79,10 +79,10 @@ class LoadContext {
   /**
    * Return the input stream (maybe null) for the given source.
    */
-  InputStream resource(String resourcePath, Loader.Source source) {
+  InputStream resource(String resourcePath, InitialLoader.Source source) {
 
     InputStream is = null;
-    if (source == Loader.Source.RESOURCE) {
+    if (source == InitialLoader.Source.RESOURCE) {
       is = resourceStream(resourcePath);
       if (is != null) {
         loadedResources.add(resourcePath);

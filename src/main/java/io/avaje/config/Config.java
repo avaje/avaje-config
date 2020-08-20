@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  private static final Configuration data = CoreConfiguration.load();
+  private static final Configuration data = CoreConfiguration.initialise();
 
   /**
    * Hide constructor.

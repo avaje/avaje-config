@@ -1,6 +1,4 @@
-package io.avaje.config.load;
-
-import io.avaje.config.Configuration;
+package io.avaje.config;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
