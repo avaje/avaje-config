@@ -149,6 +149,11 @@ public interface Configuration {
   void loadIntoSystemProperties();
 
   /**
+   * Return the number of configuration properties.
+   */
+  int size();
+
+  /**
    * Schedule a task to run periodically with a given delay and period.
    *
    * @param delay  delay in milliseconds before task is to be executed.

@@ -54,6 +54,11 @@ class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public int size() {
+    return properties.size();
+  }
+
+  @Override
   public void schedule(long delayMillis, long periodMillis, Runnable runnable) {
     synchronized (this) {
       if (timer == null) {
@@ -266,6 +271,10 @@ class CoreConfiguration implements Configuration {
     @Override
     public String toString() {
       return properties.toString();
+    }
+
+    int size() {
+      return properties.size();
     }
 
     /**
