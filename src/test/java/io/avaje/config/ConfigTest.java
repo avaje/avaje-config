@@ -206,7 +206,7 @@ public class ConfigTest {
 
   @Test
   public void getDecimal() {
-    Config.setProperty("myTestDecimal","14.3");
+    Config.setProperty("myTestDecimal", "14.3");
     assertThat(Config.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(Config.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     Config.setProperty("myTestDecimal", null);
@@ -214,9 +214,9 @@ public class ConfigTest {
 
   @Test
   public void getURL() throws MalformedURLException {
-    Config.setProperty("myConfigUrl","http://bana");
+    Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
-    assertThat(Config.getURL("myConfigUrl","http://two")).isEqualTo(new URL("http://bana"));
+    assertThat(Config.getURL("myConfigUrl", "http://two")).isEqualTo(new URL("http://bana"));
     Config.setProperty("myConfigUrl", null);
   }
 

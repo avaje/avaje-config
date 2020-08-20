@@ -84,7 +84,7 @@ public class CoreConfigurationTest {
 
   @Test
   public void getDecimal() {
-    data.setProperty("myTestDecimal","14.3");
+    data.setProperty("myTestDecimal", "14.3");
     assertThat(data.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     data.setProperty("myTestDecimal", null);
@@ -115,7 +115,7 @@ public class CoreConfigurationTest {
 
   @Test
   public void getURL() throws MalformedURLException {
-    data.setProperty("myUrl","http://bar");
+    data.setProperty("myUrl", "http://bar");
     assertThat(data.getURL("myUrl")).isEqualTo(new URL("http://bar"));
     assertThat(data.getURL("myUrl", "http://baz")).isEqualTo(new URL("http://bar"));
     data.setProperty("myUrl", null);
@@ -158,13 +158,14 @@ public class CoreConfigurationTest {
   }
 
   enum MyEnum {
-    ONE,TWO,THREE
+    ONE, TWO, THREE
   }
 
   @Test
   public void getEnum() {
     assertThat(data.getEnum(MyEnum.class, "myEnum")).isEqualTo(MyEnum.TWO);
     assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.ONE)).isEqualTo(MyEnum.ONE);
+    assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.THREE)).isEqualTo(MyEnum.ONE);
   }
 
   @Test(expected = IllegalStateException.class)
