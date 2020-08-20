@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +31,12 @@ class CoreConfiguration implements Configuration {
   private Timer timer;
 
   private final CoreListValue listValue;
+  private final CoreSetValue setValue;
 
   CoreConfiguration(Properties source) {
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
+    this.setValue = new CoreSetValue(this);
   }
 
   /**
@@ -99,6 +100,11 @@ class CoreConfiguration implements Configuration {
   @Override
   public ListValue getList() {
     return listValue;
+  }
+
+  @Override
+  public SetValue getSet() {
+    return setValue;
   }
 
   private String getProperty(String key) {

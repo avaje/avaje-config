@@ -12,6 +12,17 @@ import java.util.function.Consumer;
  * properties at runtime. Plugins or code can dynamically load and change properties and
  * this can fire any registered callback handlers.
  * </p>
+ *
+ * <h3>Examples</h3>
+ * <pre>{@code
+ *
+ *  int port = Config.getInt("app.port", 8090);
+ *
+ *  String topicName = Config.get("app.topic.name");
+ *
+ *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+ *
+ * }</pre>
  */
 public class Config {
 
@@ -148,6 +159,32 @@ public class Config {
    */
   public static long getLong(String key, long defaultValue) {
     return data.getLong(key, defaultValue);
+  }
+
+  /**
+   * Return a List of values configured.
+   *
+   * <pre>{@code
+   *
+   *  List<Integer> codes = Config.getList().ofInt("my.codes", 97, 45);
+   *
+   * }</pre>
+   */
+  public static Configuration.ListValue getList() {
+    return data.getList();
+  }
+
+  /**
+   * Return a Set of values configured.
+   *
+   * <pre>{@code
+   *
+   *  Set<String> operations = Config.getSet().of("my.operations", "put","delete");
+   *
+   * }</pre>
+   */
+  public static Configuration.SetValue getSet() {
+    return data.getSet();
   }
 
   /**

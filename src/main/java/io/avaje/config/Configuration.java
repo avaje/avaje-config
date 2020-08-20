@@ -3,10 +3,22 @@ package io.avaje.config;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
+ *
+ * <h3>Examples</h3>
+ * <pre>{@code
+ *
+ *  int port = Config.getInt("app.port", 8090);
+ *
+ *  String topicName = Config.get("app.topic.name");
+ *
+ *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+ *
+ * }</pre>
  */
 public interface Configuration {
 
@@ -105,8 +117,25 @@ public interface Configuration {
 
   /**
    * Return a List of values configured.
+   *
+   * <pre>{@code
+   *
+   *  List<Integer> codes = Config.getList().ofInt("my.codes", 97, 45);
+   *
+   * }</pre>
    */
   ListValue getList();
+
+  /**
+   * Return a Set of values configured.
+   *
+   * <pre>{@code
+   *
+   *  Set<String> operations = Config.getSet().of("my.operations", "put","delete");
+   *
+   * }</pre>
+   */
+  SetValue getSet();
 
   /**
    * Set a configuration value.
@@ -186,6 +215,13 @@ public interface Configuration {
 
   /**
    * Return a List of values for a configuration key.
+   *
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+   *
+   * }</pre>
    */
   interface ListValue {
 
@@ -242,5 +278,73 @@ public interface Configuration {
      * @return The configured values or default values
      */
     List<Long> ofLong(String key, long... defaultValues);
+  }
+
+
+  /**
+   * Return a Set of values configured.
+   *
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  Set<String> operations = Config.getSet().of("my.operations", "put","delete");
+   *
+   * }</pre>
+   */
+  interface SetValue {
+
+    /**
+     * Return the Set of values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty Set if not defined
+     */
+    Set<String> of(String key);
+
+    /**
+     * Return the Set of values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    Set<String> of(String key, String... defaultValues);
+
+    /**
+     * Return the list of integer values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty list if not defined
+     */
+    Set<Integer> ofInt(String key);
+
+    /**
+     * Return the list of integer values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    Set<Integer> ofInt(String key, int... defaultValues);
+
+    /**
+     * Return the list of long values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty list if not defined
+     */
+    Set<Long> ofLong(String key);
+
+    /**
+     * Return the long values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    Set<Long> ofLong(String key, long... defaultValues);
   }
 }

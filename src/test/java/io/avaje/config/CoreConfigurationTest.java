@@ -23,6 +23,7 @@ public class CoreConfigurationTest {
     properties.setProperty("foo.f", "false");
     properties.setProperty("modify", "me");
     properties.setProperty("someValues", "13,42,55");
+    properties.setProperty("1someValues", "13,42,55");
     return properties;
   }
 
@@ -75,6 +76,24 @@ public class CoreConfigurationTest {
     assertThat(data.getList().ofLong("someValues", 22L)).contains(13L, 42L, 55L);
     assertThat(data.getList().ofLong("list.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.getList().ofLong("list.long.notThere2")).isEmpty();
+  }
+
+  @Test
+  public void getSet() {
+    assertThat(data.getSet().of("1someValues")).contains("13", "42", "55");
+    assertThat(data.getSet().of("1someValues", "a", "b")).contains("13", "42", "55");
+    assertThat(data.getSet().of("1set.notThere", "a", "b")).contains("a", "b");
+    assertThat(data.getSet().of("1set.notThere2")).isEmpty();
+
+    assertThat(data.getSet().ofInt("1someValues")).contains(13, 42, 55);
+    assertThat(data.getSet().ofInt("1someValues", 22)).contains(13, 42, 55);
+    assertThat(data.getSet().ofInt("1set.int.notThere", 51, 52)).contains(51, 52);
+    assertThat(data.getSet().ofInt("1set.int.notThere2")).isEmpty();
+
+    assertThat(data.getSet().ofLong("1someValues")).contains(13L, 42L, 55L);
+    assertThat(data.getSet().ofLong("1someValues", 22L)).contains(13L, 42L, 55L);
+    assertThat(data.getSet().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
+    assertThat(data.getSet().ofLong("1set.long.notThere2")).isEmpty();
   }
 
   @Test
