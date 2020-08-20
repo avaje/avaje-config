@@ -227,7 +227,8 @@ public class ConfigTest {
 
   @Test
   public void getEnum_default() {
-    assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist", MyTestEnum.C)).isEqualTo(MyTestEnum.C);
+    assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist2", MyTestEnum.C)).isEqualTo(MyTestEnum.C);
+    Config.setProperty("myTestEnum.doesNotExist2", null);
   }
 
   @Test

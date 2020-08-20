@@ -204,8 +204,7 @@ class CoreConfiguration implements Configuration {
 
   @Override
   public <T extends Enum<T>> T getEnum(Class<T> cls, String key, T defaultValue) {
-    final String val = get(key, null);
-    return (val == null) ? defaultValue : Enum.valueOf(cls, val);
+    return Enum.valueOf(cls, get(key, defaultValue.name()));
   }
 
   @Override
