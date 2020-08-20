@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,13 @@ class CoreConfiguration implements Configuration {
 
   private Timer timer;
 
+  private final CoreListValue listValue;
+
+  CoreConfiguration(Properties source) {
+    this.properties = new ModifyAwareProperties(this, source);
+    this.listValue = new CoreListValue(this);
+  }
+
   /**
    * Initialise the configuration which loads all the property sources.
    */
@@ -38,10 +46,6 @@ class CoreConfiguration implements Configuration {
     CoreConfiguration configuration = new CoreConfiguration(loader.load());
     loader.initWatcher(configuration);
     return configuration;
-  }
-
-  CoreConfiguration(Properties source) {
-    this.properties = new ModifyAwareProperties(this, source);
   }
 
   void setWatcher(FileWatch watcher) {
@@ -90,6 +94,11 @@ class CoreConfiguration implements Configuration {
   @Override
   public Properties asProperties() {
     return properties.asProperties();
+  }
+
+  @Override
+  public ListValue getList() {
+    return listValue;
   }
 
   private String getProperty(String key) {

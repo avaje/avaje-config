@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -103,6 +104,11 @@ public interface Configuration {
   long getLong(String key, long defaultValue);
 
   /**
+   * Return a List of values configured.
+   */
+  ListValue getList();
+
+  /**
    * Set a configuration value.
    * <p>
    * This will fire an configuration callback listeners that are registered
@@ -176,5 +182,65 @@ public interface Configuration {
      * Evaluate a configuration expression.
      */
     String eval(String expression);
+  }
+
+  /**
+   * Return a List of values for a configuration key.
+   */
+  interface ListValue {
+
+    /**
+     * Return the list of values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty list if not defined
+     */
+    List<String> of(String key);
+
+    /**
+     * Return the list of values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    List<String> of(String key, String... defaultValues);
+
+    /**
+     * Return the list of integer values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty list if not defined
+     */
+    List<Integer> ofInt(String key);
+
+    /**
+     * Return the list of integer values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    List<Integer> ofInt(String key, int... defaultValues);
+
+    /**
+     * Return the list of long values for the key returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or an empty list if not defined
+     */
+    List<Long> ofLong(String key);
+
+    /**
+     * Return the long values for the key returning the default values
+     * if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @return The configured values or default values
+     */
+    List<Long> ofLong(String key, long... defaultValues);
   }
 }
