@@ -87,10 +87,8 @@ public class Loader {
   private void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
-        Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
-        if (exists != null) {
-          yamlLoader = new YamlLoader(loadContext);
-        }
+        Class.forName("org.yaml.snakeyaml.Yaml");
+        yamlLoader = new LoadYaml();
       } catch (ClassNotFoundException e) {
         // ignored, no yaml loading
       }
@@ -105,13 +103,11 @@ public class Loader {
    * Load from local files and resources.
    */
   void loadLocalFiles() {
-
     loadMain(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
-
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
@@ -190,7 +186,6 @@ public class Loader {
    * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
-
     String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
@@ -296,8 +291,15 @@ public class Loader {
     Enumeration<?> enumeration = properties.propertyNames();
     while (enumeration.hasMoreElements()) {
       String key = (String) enumeration.nextElement();
-      String property = properties.getProperty(key);
-      loadContext.put(key, property);
+      String val = properties.getProperty(key);
+      loadContext.put(key, val);
+    }
+  }
+
+  private class LoadYaml extends YamlLoader {
+    @Override
+    void add(String key, String val) {
+      loadContext.put(key, val);
     }
   }
 

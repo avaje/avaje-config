@@ -1,6 +1,8 @@
 package io.avaje.config;
 
 import io.avaje.config.load.Loader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -9,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -17,17 +21,41 @@ import java.util.function.Consumer;
  */
 class CoreConfiguration implements Configuration {
 
+  private static final Logger log = LoggerFactory.getLogger(CoreConfiguration.class);
+
   private final ModifyAwareProperties properties;
 
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
 
+  private Timer timer;
+
   static Configuration load() {
-    return new CoreConfiguration(new Loader().load());
+    final Loader loader = new Loader();
+    final Properties properties = loader.load();
+//    loader.fileWatch()
+//    final String watch = fileWatch(properties);
+//    if () {
+//
+//    }
+    CoreConfiguration configuration = new CoreConfiguration(properties);
+    //loader.watcher(configuration);
+    return configuration;
   }
 
   CoreConfiguration(Properties source) {
     this.properties = new ModifyAwareProperties(this, source);
   }
+
+  @Override
+  public void schedule(int delayMillis, int periodMillis, Runnable runnable) {
+    synchronized (this) {
+      if (timer == null) {
+        timer = new Timer("ConfigTimer");
+      }
+      timer.schedule(new Task(runnable), delayMillis, periodMillis);
+    }
+  }
+
 
   @Override
   public Properties eval(Properties properties) {
@@ -296,6 +324,24 @@ class CoreConfiguration implements Configuration {
         }
       }
       return props;
+    }
+  }
+
+  private static class Task extends TimerTask {
+
+    private final Runnable runnable;
+
+    private Task(Runnable runnable) {
+      this.runnable = runnable;
+    }
+
+    @Override
+    public void run() {
+      try {
+        runnable.run();
+      } catch (Exception e) {
+        log.error("Error executing timer task", e);
+      }
     }
   }
 
