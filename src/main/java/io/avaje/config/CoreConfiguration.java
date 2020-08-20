@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,11 +49,18 @@ class CoreConfiguration implements Configuration {
   static Configuration initialise() {
     final InitialLoader loader = new InitialLoader();
     CoreConfiguration configuration = new CoreConfiguration(loader.load());
+    configuration.loadSources();
     loader.initWatcher(configuration);
     if (configuration.getBool("config.load.systemProperties", false)) {
       configuration.loadIntoSystemProperties();
     }
     return configuration;
+  }
+
+  private void loadSources() {
+    for (ConfigurationSource source : ServiceLoader.load(ConfigurationSource.class)) {
+      source.load(this);
+    }
   }
 
   void setWatcher(FileWatch watcher) {

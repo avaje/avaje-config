@@ -61,10 +61,14 @@ public class ConfigTest {
     final Properties properties = Config.asProperties();
     assertThat(properties.getProperty("myapp.fooName")).isEqualTo("Hello");
     assertThat(properties.getProperty("myapp.fooHome")).isEqualTo(home + "/config");
+
+    assertThat(Config.get("myExternalLoader")).isEqualTo("wasExecuted");
+
     assertThat(properties.getProperty("config.load.systemProperties")).isEqualTo("true");
     assertThat(System.getProperty("config.load.systemProperties")).isEqualTo("true");
     assertThat(Config.getBool("config.load.systemProperties")).isTrue();
-    assertThat(properties).hasSize(6);
+
+    assertThat(properties).hasSize(7);
   }
 
   @Test
