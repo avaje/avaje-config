@@ -3,6 +3,8 @@ package io.avaje.config;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -86,6 +88,37 @@ public class CoreConfigurationTest {
     assertThat(data.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     data.setProperty("myTestDecimal", null);
+  }
+
+
+  @Test(expected = IllegalStateException.class)
+  public void getURL_doesNotExist() {
+    data.getURL("myUrl.doesNotExist");
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getURL_doesNotExist_malformed() {
+    data.getURL("myUrl.doesNotExist", "junk");
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getURL_doesNotExist_malformed2() {
+    data.setProperty("myUrl.invalid", "junk");
+    data.getURL("myUrl.invalid");
+  }
+
+  @Test
+  public void getURL_default() throws MalformedURLException {
+    assertThat(data.getURL("myUrl.doesNotExist", "http://foo")).isEqualTo(new URL("http://foo"));
+    data.setProperty("myUrl.doesNotExist", null);
+  }
+
+  @Test
+  public void getURL() throws MalformedURLException {
+    data.setProperty("myUrl","http://bar");
+    assertThat(data.getURL("myUrl")).isEqualTo(new URL("http://bar"));
+    assertThat(data.getURL("myUrl", "http://baz")).isEqualTo(new URL("http://bar"));
+    data.setProperty("myUrl", null);
   }
 
   @Test

@@ -212,6 +212,14 @@ public class ConfigTest {
     Config.setProperty("myTestDecimal", null);
   }
 
+  @Test
+  public void getURL() throws MalformedURLException {
+    Config.setProperty("myConfigUrl","http://bana");
+    assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
+    assertThat(Config.getURL("myConfigUrl","http://two")).isEqualTo(new URL("http://bana"));
+    Config.setProperty("myConfigUrl", null);
+  }
+
   @Test(expected = IllegalStateException.class)
   public void getEnum_doesNotExist() {
     Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist");

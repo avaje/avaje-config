@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -175,6 +177,24 @@ class CoreConfiguration implements Configuration {
   @Override
   public BigDecimal getDecimal(String key, String defaultValue) {
     return new BigDecimal(get(key, defaultValue));
+  }
+
+  @Override
+  public URL getURL(String key) {
+    try {
+      return new URL(get(key));
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException("Invalid url for "+key, e);
+    }
+  }
+
+  @Override
+  public URL getURL(String key, String defaultValue) {
+    try {
+      return new URL(get(key, defaultValue));
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException("Invalid url for "+key, e);
+    }
   }
 
   @Override

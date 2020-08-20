@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -135,6 +136,26 @@ public interface Configuration {
    * @return The configured value
    */
   BigDecimal getDecimal(String key, String defaultValue);
+
+  /**
+   * Return a URL configuration value.
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  URL getURL(String key);
+
+  /**
+   * Return a URL configuration value with a default value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  URL getURL(String key, String defaultValue);
 
   /**
    * Return the enum configuration value.
