@@ -153,7 +153,7 @@ class InitialLoadContext {
   }
 
   String getAppName() {
-    final String appName = map.get("appName");
-    return (appName != null) ? appName : System.getProperty("appName");
+    final String appName = map.get("app.name");
+    return (appName != null) ? appName : System.getProperty("app.name");
   }
 }
