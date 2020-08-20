@@ -25,8 +25,8 @@ class FileWatch {
   FileWatch(Configuration configuration, List<File> loadedFiles, boolean withYaml) {
     this.configuration = configuration;
     this.files = initFiles(loadedFiles);
-    this.delay = configuration.getLong("config.watch.delay", 140);
-    this.period = configuration.getInt("config.watch.period", 61);
+    this.delay = configuration.getLong("config.watch.delay", 60);
+    this.period = configuration.getInt("config.watch.period", 60);
     this.yamlLoader = (withYaml) ? new LoadYaml() : null;
     configuration.schedule(delay * 1000, period * 1000, this::check);
   }
