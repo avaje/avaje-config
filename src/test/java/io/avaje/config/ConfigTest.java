@@ -244,15 +244,6 @@ public class ConfigTest {
   }
 
   @Test
-  public void getUrl() throws MalformedURLException {
-
-    final URI uri = URI.create("http://foo");
-    URL url = new URL(Config.get("myUrl", "http://foo"));
-    assertThat(url).isNotNull();
-    Config.setProperty("myUrl", null);
-  }
-
-  @Test
   public void onChange() {
 
     AtomicReference<String> ref = new AtomicReference<>();
