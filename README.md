@@ -6,8 +6,8 @@ dynamic configuration (changes to configuration properties at runtime).
 ```xml
 <dependency>
   <groupId>io.avaje</groupId>
-  <artifactId>config</artifactId>
-  <version>1.3</version>
+  <artifactId>avaje-config</artifactId>
+  <version>1.0</version>
 </dependency>
 ```
 
