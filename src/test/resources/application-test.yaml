@@ -6,4 +6,5 @@ myapp:
     barRules: 42
     barDouble: 33.3
 
+config.load.systemProperties: true
 

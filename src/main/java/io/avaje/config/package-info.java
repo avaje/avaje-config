@@ -12,6 +12,12 @@
  *
  * }</pre>
  *
+ * <h2>Loading into System properties</h2>
+ * <p>
+ * If <code>config.load.systemProperties</code> is set to <code>true</code>
+ * then all the properties are loaded into System properties.
+ * </p>
+ *
  * <h2>File watching and reloading</h2>
  * <p>
  * We can enable watching configuration files by setting
@@ -21,18 +27,19 @@
  * <p>
  * By default the files are checked every 60 seconds. We can
  * change this by setting the <code>config.watch.period</code>
- * (seconds). For example setting <code>config.watch.period=10</code>
- * means the files are checked every every 10 seconds.
+ * (which is in seconds). For example setting
+ * <code>config.watch.period=10</code> means the files are
+ * checked every every 10 seconds.
  * <p>
  * By default there is an initial delay of 60 seconds. We can
  * change this by setting <code>config.watch.delay</code>.
  * <p>
- * This can provide us a quick "feature toggle" mechanism.
+ * This can provide us a simple "feature toggle" mechanism.
  *
  * <pre>{@code
  *
  *   // we can toggle this on/off by editing the
- *   // appropriate configuration file
+ *   // appropriate property in the configuration file
  *   if (Config.enabled("feature.cleanup", false)) {
  *     ...
  *   }

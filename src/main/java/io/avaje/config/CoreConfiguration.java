@@ -49,6 +49,9 @@ class CoreConfiguration implements Configuration {
     final InitialLoader loader = new InitialLoader();
     CoreConfiguration configuration = new CoreConfiguration(loader.load());
     loader.initWatcher(configuration);
+    if (configuration.getBool("config.load.systemProperties", false)) {
+      configuration.loadIntoSystemProperties();
+    }
     return configuration;
   }
 
