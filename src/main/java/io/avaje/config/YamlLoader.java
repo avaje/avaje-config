@@ -1,4 +1,4 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -11,25 +11,28 @@ import java.util.Map;
  * Note that this ignores 'lists' so just reads 'maps' and scalar values.
  * </p>
  */
-class YamlLoader {
+abstract class YamlLoader {
 
-  private final Yaml yaml = new Yaml();
+  private final Yaml yaml;
 
-  private final LoadContext loadContext;
-
-  YamlLoader(LoadContext loadContext) {
-    this.loadContext = loadContext;
+  YamlLoader() {
+    this.yaml = new Yaml();
   }
+
+  /**
+   * Set the key value pair.
+   */
+  abstract void add(String key, String val);
 
   @SuppressWarnings("unchecked")
   void load(InputStream is) {
     for (Object map : yaml.loadAll(is)) {
-      loadMap((Map<String, Object>)map, null);
+      loadMap((Map<String, Object>) map, null);
     }
   }
 
   @SuppressWarnings("unchecked")
-  void loadMap(Map<String, Object> map, String path) {
+  private void loadMap(Map<String, Object> map, String path) {
 
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       String key = entry.getKey();
@@ -39,7 +42,7 @@ class YamlLoader {
       Object val = entry.getValue();
       if (val instanceof Map) {
         loadMap((Map<String, Object>) val, key);
-      } else  {
+      } else {
         addScalar(key, val);
       }
     }
@@ -47,9 +50,9 @@ class YamlLoader {
 
   private void addScalar(String key, Object val) {
     if (val instanceof String) {
-      loadContext.put(key, (String) val);
+      add(key, (String) val);
     } else if (val instanceof Number || val instanceof Boolean) {
-      loadContext.put(key, val.toString());
+      add(key, val.toString());
     }
   }
 

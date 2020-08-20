@@ -1,4 +1,4 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.junit.Test;
 
@@ -89,7 +89,7 @@ public class CoreExpressionEvalTest {
   @Test
   public void eval_withSourceMap() {
 
-    Map<String,String> source = new HashMap<>();
+    Map<String, String> source = new HashMap<>();
     source.put("one", "1");
     source.put("two", "2");
     final CoreExpressionEval exprEval = new CoreExpressionEval(source);

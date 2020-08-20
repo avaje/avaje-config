@@ -1,4 +1,4 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -16,9 +18,9 @@ import java.util.Set;
 /**
  * Manages the underlying map of properties we are gathering.
  */
-class LoadContext {
+class InitialLoadContext {
 
-  private static final Logger log = LoggerFactory.getLogger(LoadContext.class);
+  private static final Logger log = LoggerFactory.getLogger(InitialLoadContext.class);
 
   /**
    * Map we are loading the properties into.
@@ -29,11 +31,15 @@ class LoadContext {
    * Names of resources/files that were loaded.
    */
   private final Set<String> loadedResources = new LinkedHashSet<>();
-
+  private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
-  LoadContext() {
+  InitialLoadContext() {
     this.exprEval = new CoreExpressionEval(map);
+  }
+
+  List<File> loadedFiles() {
+    return loadedFiles;
   }
 
   String eval(String expression) {
@@ -73,10 +79,10 @@ class LoadContext {
   /**
    * Return the input stream (maybe null) for the given source.
    */
-  InputStream resource(String resourcePath, Loader.Source source) {
+  InputStream resource(String resourcePath, InitialLoader.Source source) {
 
     InputStream is = null;
-    if (source == Loader.Source.RESOURCE) {
+    if (source == InitialLoader.Source.RESOURCE) {
       is = resourceStream(resourcePath);
       if (is != null) {
         loadedResources.add(resourcePath);
@@ -87,12 +93,12 @@ class LoadContext {
         try {
           is = new FileInputStream(file);
           loadedResources.add("file:" + resourcePath);
+          loadedFiles.add(file);
         } catch (FileNotFoundException e) {
           throw new IllegalStateException(e);
         }
       }
     }
-
     return is;
   }
 
@@ -119,16 +125,12 @@ class LoadContext {
    * Evaluate all the expressions and return as a Properties object.
    */
   Properties evalAll() {
-
     log.info("loaded properties from {}", loadedResources);
-
     Properties properties = new Properties();
-
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();
       properties.setProperty(key, exprEval.eval(entry.getValue()));
     }
-
     return properties;
   }
 

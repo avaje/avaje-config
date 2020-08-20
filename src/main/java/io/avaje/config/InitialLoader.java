@@ -1,6 +1,5 @@
-package io.avaje.config.load;
+package io.avaje.config;
 
-import io.avaje.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +10,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static io.avaje.config.load.Loader.Source.FILE;
-import static io.avaje.config.load.Loader.Source.RESOURCE;
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -20,9 +19,9 @@ import static io.avaje.config.load.Loader.Source.RESOURCE;
  * Defines the loading order of resources and files.
  * </p>
  */
-public class Loader {
+class InitialLoader {
 
-  private static final Logger log = LoggerFactory.getLogger(Loader.class);
+  private static final Logger log = LoggerFactory.getLogger(InitialLoader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -38,11 +37,11 @@ public class Loader {
     FILE
   }
 
-  private final LoadContext loadContext = new LoadContext();
+  private final InitialLoadContext loadContext = new InitialLoadContext();
 
   private YamlLoader yamlLoader;
 
-  public Loader() {
+  InitialLoader() {
     initYamlLoader();
   }
 
@@ -78,19 +77,23 @@ public class Loader {
    *   - application-test.yaml
    * </pre>
    */
-  public Properties load() {
+  Properties load() {
     loadEnvironmentVars();
     loadLocalFiles();
     return eval();
   }
 
+  void initWatcher(CoreConfiguration configuration) {
+    if (configuration.getBool("config.watch.enabled", false)) {
+      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), yamlLoader != null));
+    }
+  }
+
   private void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
-        Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
-        if (exists != null) {
-          yamlLoader = new YamlLoader(loadContext);
-        }
+        Class.forName("org.yaml.snakeyaml.Yaml");
+        yamlLoader = new LoadYaml();
       } catch (ClassNotFoundException e) {
         // ignored, no yaml loading
       }
@@ -105,13 +108,11 @@ public class Loader {
    * Load from local files and resources.
    */
   void loadLocalFiles() {
-
     loadMain(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
-
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
@@ -190,7 +191,6 @@ public class Loader {
    * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
-
     String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
@@ -296,8 +296,15 @@ public class Loader {
     Enumeration<?> enumeration = properties.propertyNames();
     while (enumeration.hasMoreElements()) {
       String key = (String) enumeration.nextElement();
-      String property = properties.getProperty(key);
-      loadContext.put(key, property);
+      String val = properties.getProperty(key);
+      loadContext.put(key, val);
+    }
+  }
+
+  private class LoadYaml extends YamlLoader {
+    @Override
+    void add(String key, String val) {
+      loadContext.put(key, val);
     }
   }
 
