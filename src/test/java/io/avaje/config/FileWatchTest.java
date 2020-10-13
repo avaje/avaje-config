@@ -19,7 +19,7 @@ public class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, true);
+    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -33,7 +33,7 @@ public class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, true);
+    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.get("one", null)).isNull();
@@ -55,7 +55,7 @@ public class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, true);
+    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
     System.out.println(watch);
 
     // touch but scheduled check not run yet
@@ -80,7 +80,7 @@ public class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
-    final FileWatch watch = new FileWatch(config, files, true);
+    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
     touchFiles(files);
     watch.check();
 

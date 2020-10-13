@@ -85,7 +85,7 @@ class InitialLoader {
 
   void initWatcher(CoreConfiguration configuration) {
     if (configuration.getBool("config.watch.enabled", false)) {
-      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), yamlLoader != null));
+      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), yamlLoader));
     }
   }
 
@@ -93,9 +93,9 @@ class InitialLoader {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       try {
         Class.forName("org.yaml.snakeyaml.Yaml");
-        yamlLoader = new LoadYaml();
+        yamlLoader = new YamlLoaderSnake();
       } catch (ClassNotFoundException e) {
-        // ignored, no yaml loading
+        yamlLoader = new YamlLoaderSimple();
       }
     }
   }
@@ -257,7 +257,7 @@ class InitialLoader {
       try {
         try (InputStream is = resource(resourcePath, source)) {
           if (is != null) {
-            yamlLoader.load(is);
+            yamlLoader.load(is).forEach((key, val) -> loadContext.put(key, val));
             return true;
           }
         }
@@ -297,13 +297,6 @@ class InitialLoader {
     while (enumeration.hasMoreElements()) {
       String key = (String) enumeration.nextElement();
       String val = properties.getProperty(key);
-      loadContext.put(key, val);
-    }
-  }
-
-  private class LoadYaml extends YamlLoader {
-    @Override
-    void add(String key, String val) {
       loadContext.put(key, val);
     }
   }

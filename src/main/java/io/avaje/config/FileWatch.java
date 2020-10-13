@@ -22,12 +22,12 @@ class FileWatch {
   private final long delay;
   private final long period;
 
-  FileWatch(Configuration configuration, List<File> loadedFiles, boolean withYaml) {
+  FileWatch(Configuration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
     this.configuration = configuration;
     this.files = initFiles(loadedFiles);
     this.delay = configuration.getLong("config.watch.delay", 60);
     this.period = configuration.getInt("config.watch.period", 60);
-    this.yamlLoader = (withYaml) ? new LoadYaml() : null;
+    this.yamlLoader = yamlLoader;
     configuration.schedule(delay * 1000, period * 1000, this::check);
   }
 
@@ -96,17 +96,10 @@ class FileWatch {
       log.error("Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
-        yamlLoader.load(is);
+        yamlLoader.load(is).forEach((key, val) -> configuration.setProperty(key, val));
       } catch (Exception e) {
         log.error("Unexpected error reloading config file " + file, e);
       }
-    }
-  }
-
-  private class LoadYaml extends YamlLoader {
-    @Override
-    void add(String key, String val) {
-      configuration.setProperty(key, val);
     }
   }
 

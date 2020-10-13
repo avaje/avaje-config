@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>2.1</version>
+    <version>2.2</version>
   </parent>
 
   <scm>
@@ -23,11 +23,12 @@
 
   <dependencies>
 
-    <!-- Exclude snakeyaml if you desire - it is not strictly required. -->
+    <!-- If snakeyaml detected it will be used rather than built in simple parser -->
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>${snakeyaml.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
