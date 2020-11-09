@@ -66,6 +66,7 @@ public class ConfigTest {
 
     assertThat(properties.getProperty("config.load.systemProperties")).isEqualTo("true");
     assertThat(System.getProperty("config.load.systemProperties")).isEqualTo("true");
+    assertThat(System.getProperty("myExternalLoader")).isEqualTo("wasExecuted");
     assertThat(Config.getBool("config.load.systemProperties")).isTrue();
 
     assertThat(properties).hasSize(7);

@@ -51,10 +51,14 @@ class CoreConfiguration implements Configuration {
     CoreConfiguration configuration = new CoreConfiguration(loader.load());
     configuration.loadSources();
     loader.initWatcher(configuration);
-    if (configuration.getBool("config.load.systemProperties", false)) {
-      configuration.loadIntoSystemProperties();
-    }
+    configuration.initSystemProperties();
     return configuration;
+  }
+
+  void initSystemProperties() {
+    if (getBool("config.load.systemProperties", false)) {
+      loadIntoSystemProperties();
+    }
   }
 
   private void loadSources() {
