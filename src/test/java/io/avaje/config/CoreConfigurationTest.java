@@ -36,6 +36,22 @@ public class CoreConfigurationTest {
   }
 
   @Test
+  public void asProperties() {
+
+    final Properties properties = basicProperties();
+    System.setProperty("SetViaSystemProperty", "FooBar");
+
+    final CoreConfiguration configuration = new CoreConfiguration(properties);
+    configuration.initSystemProperties();
+
+    final Properties loaded = configuration.asProperties();
+    assertThat(loaded.get("a")).isEqualTo("1");
+    assertThat(loaded.get("SetViaSystemProperty")).isNull();
+
+    System.clearProperty("SetViaSystemProperty");
+  }
+
+  @Test
   public void test_toString() {
     assertThat(data.toString()).isNotEmpty();
     data.setWatcher(Mockito.mock(FileWatch.class));
