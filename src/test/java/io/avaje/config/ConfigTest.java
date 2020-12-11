@@ -111,6 +111,14 @@ public class ConfigTest {
   }
 
   @Test
+  public void get_default_repeated_expect_returnDefaultValue() {
+    assertThat(Config.get("myapp.doesNotExist3", null)).isNull();
+    assertThat(Config.get("myapp.doesNotExist3", "other")).isEqualTo("other");
+    assertThat(Config.get("myapp.doesNotExist3", "foo")).isEqualTo("foo");
+    assertThat(Config.get("myapp.doesNotExist3", "junk")).isEqualTo("junk");
+  }
+
+  @Test
   public void get_optional() {
     assertThat(Config.getOptional("myapp.doesNotExist")).isEmpty();
     assertThat(Config.getOptional("myapp.fooName")).isNotEmpty();

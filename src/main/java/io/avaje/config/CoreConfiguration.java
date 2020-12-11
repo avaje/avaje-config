@@ -199,7 +199,7 @@ class CoreConfiguration implements Configuration {
     try {
       return new URL(get(key));
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for "+key, e);
+      throw new IllegalStateException("Invalid url for " + key, e);
     }
   }
 
@@ -208,7 +208,7 @@ class CoreConfiguration implements Configuration {
     try {
       return new URL(get(key, defaultValue));
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for "+key, e);
+      throw new IllegalStateException("Invalid url for " + key, e);
     }
   }
 
@@ -384,7 +384,7 @@ class CoreConfiguration implements Configuration {
     }
 
     String getProperty(String key) {
-      return getProperty(key, NULL_PLACEHOLDER);
+      return getProperty(key, null);
     }
 
     /**
@@ -401,7 +401,7 @@ class CoreConfiguration implements Configuration {
         // cache in concurrent map to provide higher concurrent use
         properties.put(key, val);
       }
-      return (val != NULL_PLACEHOLDER) ? val : null;
+      return (val != NULL_PLACEHOLDER) ? val : defaultValue;
     }
 
     void loadIntoSystemProperties() {
