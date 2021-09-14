@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,7 +55,7 @@ public class CoreConfigurationTest {
   @Test
   public void test_toString() {
     assertThat(data.toString()).isNotEmpty();
-    data.setWatcher(Mockito.mock(FileWatch.class));
+    data.setWatcher(new FileWatch( Mockito.mock(Configuration.class), Collections.emptyList(), null));
     data.loadIntoSystemProperties();
   }
 

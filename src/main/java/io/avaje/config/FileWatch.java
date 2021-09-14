@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-class FileWatch {
+final class FileWatch {
 
   private static final Logger log = LoggerFactory.getLogger(FileWatch.class);
 

@@ -5,11 +5,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class CoreSetValue implements Configuration.SetValue {
+final class CoreSetValue implements Configuration.SetValue {
 
   private final CoreConfiguration config;
 
-  public CoreSetValue(CoreConfiguration config) {
+  CoreSetValue(CoreConfiguration config) {
     this.config = config;
   }
 

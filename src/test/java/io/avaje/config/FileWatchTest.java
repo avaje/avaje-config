@@ -110,7 +110,7 @@ public class FileWatchTest {
 
   private void sleepOne() {
     try {
-      Thread.sleep(2);
+      Thread.sleep(10);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw  new RuntimeException(e);

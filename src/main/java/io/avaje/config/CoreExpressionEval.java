@@ -14,7 +14,7 @@ import java.util.Properties;
  * evaluate.
  * </p>
  */
-class CoreExpressionEval implements Configuration.ExpressionEval {
+final class CoreExpressionEval implements Configuration.ExpressionEval {
 
   /**
    * Prefix for looking up JNDI Environment variable.
@@ -135,7 +135,6 @@ class CoreExpressionEval implements Configuration.ExpressionEval {
     private int position;
     private int start;
     private int end;
-
     private String expression;
     private String defaultValue;
 

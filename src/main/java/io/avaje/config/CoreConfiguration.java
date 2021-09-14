@@ -22,18 +22,14 @@ import java.util.function.Consumer;
 /**
  * Core implementation of Configuration.
  */
-class CoreConfiguration implements Configuration {
+final class CoreConfiguration implements Configuration {
 
   private static final Logger log = LoggerFactory.getLogger(CoreConfiguration.class);
 
   private final ModifyAwareProperties properties;
-
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
-
   private FileWatch watcher;
-
   private Timer timer;
-
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
 
@@ -93,9 +89,7 @@ class CoreConfiguration implements Configuration {
 
   @Override
   public Properties eval(Properties properties) {
-
     final ExpressionEval exprEval = InitialLoader.evalFor(properties);
-
     Properties evalCopy = new Properties();
     Enumeration<?> names = properties.propertyNames();
     while (names.hasMoreElements()) {
@@ -319,11 +313,8 @@ class CoreConfiguration implements Configuration {
     private static final String NULL_PLACEHOLDER = "NULL";
 
     private final Map<String, String> properties = new ConcurrentHashMap<>();
-
     private final Map<String, Boolean> propertiesBoolCache = new ConcurrentHashMap<>();
-
     private final Configuration.ExpressionEval eval = new CoreExpressionEval(properties);
-
     private final CoreConfiguration config;
 
     ModifyAwareProperties(CoreConfiguration config, Properties source) {

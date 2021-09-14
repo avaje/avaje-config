@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-class CoreListValue implements Configuration.ListValue {
+final class CoreListValue implements Configuration.ListValue {
 
   private final CoreConfiguration config;
 

@@ -15,7 +15,7 @@ import java.util.StringJoiner;
 /**
  * Simple YAML parser for loading yaml based config.
  */
-class YamlLoaderSimple implements YamlLoader {
+final class YamlLoaderSimple implements YamlLoader {
 
   enum MultiLineTrim {
     Clip,

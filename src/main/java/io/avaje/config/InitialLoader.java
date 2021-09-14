@@ -19,7 +19,7 @@ import static io.avaje.config.InitialLoader.Source.RESOURCE;
  * Defines the loading order of resources and files.
  * </p>
  */
-class InitialLoader {
+final class InitialLoader {
 
   private static final Logger log = LoggerFactory.getLogger(InitialLoader.class);
 

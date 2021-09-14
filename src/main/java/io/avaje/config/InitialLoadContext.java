@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * Manages the underlying map of properties we are gathering.
  */
-class InitialLoadContext {
+final class InitialLoadContext {
 
   private static final Logger log = LoggerFactory.getLogger(InitialLoadContext.class);
 
@@ -80,7 +80,6 @@ class InitialLoadContext {
    * Return the input stream (maybe null) for the given source.
    */
   InputStream resource(String resourcePath, InitialLoader.Source source) {
-
     InputStream is = null;
     if (source == InitialLoader.Source.RESOURCE) {
       is = resourceStream(resourcePath);
