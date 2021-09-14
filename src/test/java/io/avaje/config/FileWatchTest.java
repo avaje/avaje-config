@@ -90,8 +90,9 @@ public class FileWatchTest {
     assertThat(config.get("one", null)).isEqualTo("a");
 
     writeContent("one=NotA");
-
+    assertThat(watch.changed()).isTrue();
     watch.check();
+    assertThat(watch.changed()).isFalse();
     assertThat(config.get("one", null)).isEqualTo("NotA");
 
     writeContent("one=a");
@@ -100,10 +101,20 @@ public class FileWatchTest {
   }
 
   private void writeContent(String content) throws IOException {
+    sleepOne();
     File aProps = new File("./src/test/resources/watch/a.properties");
     FileWriter fw = new FileWriter(aProps);
     fw.write(content);
     fw.close();
+  }
+
+  private void sleepOne() {
+    try {
+      Thread.sleep(2);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw  new RuntimeException(e);
+    }
   }
 
   private CoreConfiguration newConfig() {

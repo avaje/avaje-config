@@ -44,13 +44,7 @@ class FileWatch {
     return entries;
   }
 
-  void check() {
-    if (changed()) {
-      reload();
-    }
-  }
-
-  private boolean changed() {
+  boolean changed() {
     for (Entry file : files) {
       if (file.changed()) {
         return true;
@@ -59,9 +53,9 @@ class FileWatch {
     return false;
   }
 
-  private void reload() {
+  void check() {
     for (Entry file : files) {
-      if (file.changed()) {
+      if (file.reload()) {
         log.debug("reloading configuration from {}", file);
         if (file.isYaml()) {
           reloadYaml(file);
@@ -96,7 +90,7 @@ class FileWatch {
       log.error("Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
-        yamlLoader.load(is).forEach((key, val) -> configuration.setProperty(key, val));
+        yamlLoader.load(is).forEach(configuration::setProperty);
       } catch (Exception e) {
         log.error("Unexpected error reloading config file " + file, e);
       }
@@ -105,8 +99,8 @@ class FileWatch {
 
   private static class Entry {
     private final File file;
-    private final long lastMod;
     private final boolean yaml;
+    private long lastMod;
 
     Entry(File file) {
       this.file = file;
@@ -126,6 +120,14 @@ class FileWatch {
     private boolean isYaml(String name) {
       final String lowerName = name.toLowerCase();
       return lowerName.endsWith(".yaml") || lowerName.endsWith(".yml");
+    }
+
+    boolean reload() {
+      if (!changed()) {
+        return false;
+      }
+      lastMod = file.lastModified();
+      return true;
     }
 
     boolean changed() {
