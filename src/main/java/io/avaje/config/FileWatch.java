@@ -25,7 +25,7 @@ final class FileWatch {
   FileWatch(Configuration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);
-    this.period = configuration.getInt("config.watch.period", 60);
+    this.period = configuration.getInt("config.watch.period", 10);
     this.yamlLoader = yamlLoader;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
@@ -37,7 +37,7 @@ final class FileWatch {
 
   @Override
   public String toString() {
-    return "period:" + period + " delay:" + delay + " files:" + files;
+    return "Watch[period:" + period + " delay:" + delay + " files:" + files + "]";
   }
 
   private List<Entry> initFiles(List<File> loadedFiles) {
