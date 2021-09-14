@@ -1,15 +1,15 @@
 package io.avaje.config;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConfigTest {
 
@@ -81,7 +81,7 @@ public class ConfigTest {
     assertThat(configuration.get("myapp.fooHome")).isEqualTo(home + "/config");
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void load() {
     assertThat(System.getProperty("myapp.fooName")).isNull();
@@ -124,16 +124,16 @@ public class ConfigTest {
     assertThat(Config.getOptional("myapp.fooName")).isNotEmpty();
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getBool_required_missing() {
     Config.setProperty("myapp.doesNotExist", null);
-    assertThat(Config.getBool("myapp.doesNotExist")).isTrue();
+    assertThrows(IllegalStateException.class, () -> Config.getBool("myapp.doesNotExist"));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void enabled_required_missing() {
     Config.setProperty("myapp.doesNotExist", null);
-    assertThat(Config.enabled("myapp.doesNotExist")).isTrue();
+    assertThrows(IllegalStateException.class, () -> Config.enabled("myapp.doesNotExist"));
   }
 
   @Test
@@ -169,9 +169,9 @@ public class ConfigTest {
     Config.setProperty("myapp.en.doesNotExist", null);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getInt_required_missing() {
-    assertThat(Config.getInt("myapp.doesNotExist")).isEqualTo(42);
+    assertThrows(IllegalStateException.class, () -> Config.getInt("myapp.doesNotExist"));
   }
 
   @Test
@@ -189,9 +189,9 @@ public class ConfigTest {
     assertThat(Config.getInt("myapp.bar.doesNotExist", 99)).isEqualTo(99);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getLong_required_missing() {
-    assertThat(Config.getLong("myapp.bar.doesNotExist")).isEqualTo(42L);
+    assertThrows(IllegalStateException.class, () -> Config.getLong("myapp.bar.doesNotExist"));
   }
 
   @Test
@@ -209,9 +209,9 @@ public class ConfigTest {
     assertThat(Config.getLong("myapp.bar.doesNotExist", 99)).isEqualTo(99L);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getDecimal_doesNotExist() {
-    Config.getDecimal("myTestDecimal.doesNotExist");
+    assertThrows(IllegalStateException.class, () -> Config.getDecimal("myTestDecimal.doesNotExist"));
   }
 
   @Test
@@ -236,9 +236,9 @@ public class ConfigTest {
     Config.setProperty("myConfigUrl", null);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getEnum_doesNotExist() {
-    Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist");
+    assertThrows(IllegalStateException.class, () -> Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist"));
   }
 
   @Test

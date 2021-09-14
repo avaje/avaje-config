@@ -1,6 +1,6 @@
 package io.avaje.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.Map;

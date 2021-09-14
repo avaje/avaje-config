@@ -1,6 +1,6 @@
 package io.avaje.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.net.MalformedURLException;
@@ -11,9 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreConfigurationTest {
 
@@ -88,9 +86,9 @@ public class CoreConfigurationTest {
     assertThat(data.getLong("doesNotExist", 99)).isEqualTo(99);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getDecimal_doesNotExist() {
-    data.getDecimal("myTestDecimal.doesNotExist");
+    assertThrows(IllegalStateException.class, () -> data.getDecimal("myTestDecimal.doesNotExist"));
   }
 
   @Test
@@ -108,20 +106,20 @@ public class CoreConfigurationTest {
   }
 
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getURL_doesNotExist() {
-    data.getURL("myUrl.doesNotExist");
+    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist"));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getURL_doesNotExist_malformed() {
-    data.getURL("myUrl.doesNotExist", "junk");
+    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist", "junk"));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getURL_doesNotExist_malformed2() {
     data.setProperty("myUrl.invalid", "junk");
-    data.getURL("myUrl.invalid");
+    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.invalid"));
   }
 
   @Test
@@ -185,9 +183,9 @@ public class CoreConfigurationTest {
     assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.THREE)).isEqualTo(MyEnum.ONE);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getEnum_doesNotExist() {
-    data.getEnum(MyEnum.class, "myEnum.doesNotExist");
+    assertThrows(IllegalStateException.class, () -> data.getEnum(MyEnum.class, "myEnum.doesNotExist"));
   }
 
   @Test

@@ -1,12 +1,12 @@
 package io.avaje.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InitialLoaderTest {
 
