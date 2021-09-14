@@ -38,6 +38,10 @@ final class InitialLoadContext {
     this.exprEval = new CoreExpressionEval(map);
   }
 
+  String loadedFrom() {
+    return loadedResources.toString();
+  }
+
   List<File> loadedFiles() {
     return loadedFiles;
   }
@@ -124,7 +128,7 @@ final class InitialLoadContext {
    * Evaluate all the expressions and return as a Properties object.
    */
   Properties evalAll() {
-    log.info("loaded properties from {}", loadedResources);
+    log.trace("load from {}", loadedResources);
     Properties properties = new Properties();
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();

@@ -45,6 +45,10 @@ final class InitialLoader {
     initYamlLoader();
   }
 
+  String loadedFrom() {
+    return loadContext.loadedFrom();
+  }
+
   /**
    * Provides properties by reading known locations.
    * <p>

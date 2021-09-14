@@ -28,10 +28,11 @@ final class CoreConfiguration implements Configuration {
 
   private final ModifyAwareProperties properties;
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
-  private FileWatch watcher;
-  private Timer timer;
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
+  private boolean loadedSystemProperties;
+  private FileWatch watcher;
+  private Timer timer;
 
   CoreConfiguration(Properties source) {
     this.properties = new ModifyAwareProperties(this, source);
@@ -48,7 +49,14 @@ final class CoreConfiguration implements Configuration {
     configuration.loadSources();
     loader.initWatcher(configuration);
     configuration.initSystemProperties();
+    configuration.logMessage(loader);
     return configuration;
+  }
+
+  private void logMessage(InitialLoader loader) {
+    String watchMsg = watcher == null ? "" : watcher.toString();
+    String intoMsg = loadedSystemProperties ? " into System properties" : "";
+    log.info("loaded properties from {}{} {}", loader.loadedFrom(), intoMsg, watchMsg);
   }
 
   void initSystemProperties() {
@@ -102,6 +110,7 @@ final class CoreConfiguration implements Configuration {
   @Override
   public void loadIntoSystemProperties() {
     properties.loadIntoSystemProperties();
+    loadedSystemProperties = true;
   }
 
   @Override
