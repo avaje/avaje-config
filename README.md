@@ -1,13 +1,13 @@
 # Application configuration
 This library loads properties files that can be used to configure
-an application including "testing" and "local development" and 
+an application including "testing" and "local development" and
 dynamic configuration (changes to configuration properties at runtime).
 
 ```xml
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.0</version>
+  <version>1.4</version>
 </dependency>
 ```
 
@@ -39,19 +39,19 @@ Register callback on property change.
 ```java
 
 Config.onChange("myapp.foo", newValue -> {
-  // do something ...  
+  // do something ...
 });
 
 Config.onChangeInt("myapp.foo", newIntValue -> {
-  // do something ...  
+  // do something ...
 });
 
 Config.onChangeLong("myapp.foo", newLongValue -> {
-  // do something ...  
+  // do something ...
 });
 
 Config.onChangeBool("myapp.foo", newBooleanValue -> {
-  // do something ...  
+  // do something ...
 });
 
 ```
@@ -59,13 +59,13 @@ Config.onChangeBool("myapp.foo", newBooleanValue -> {
 
 ## Loading properties
 
-Config loads properties from expected locations as well as via command line arguments. 
+Config loads properties from expected locations as well as via command line arguments.
 Below is the how it looks for configuration properties.
-  
+
 - loads from main resources (if they exist)
     - application.yaml
     - application.properties
-    
+
 - loads files from the current working directory (if they exist)
     - application.yaml
     - application.properties
@@ -80,12 +80,12 @@ We can define a `load.properties` property which has path locations for other pr
     - application-test.properties
     - application-test.yaml
 
-    
+
 If no test resources were loaded then it additionally loads from "local dev" and command line:
 
 - loads from "local dev".
 
-We can specify an `appName` property and then put a properties/yaml file at: `${user.home}/.localdev/{appName}.yaml`
+We can specify an `app.name` property and then put a properties/yaml file at: `${user.home}/.localdev/{appName}.yaml`
 We do this to set/override properties when we want to run the application locally (aka main method)
 
 - loads from command line arguments
