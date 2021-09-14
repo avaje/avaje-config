@@ -85,7 +85,7 @@ class InitialLoadContext {
     if (source == InitialLoader.Source.RESOURCE) {
       is = resourceStream(resourcePath);
       if (is != null) {
-        loadedResources.add(resourcePath);
+        loadedResources.add("resource:" + resourcePath);
       }
     } else {
       File file = new File(resourcePath);
