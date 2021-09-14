@@ -24,11 +24,15 @@ class FileWatch {
 
   FileWatch(Configuration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
     this.configuration = configuration;
-    this.files = initFiles(loadedFiles);
     this.delay = configuration.getLong("config.watch.delay", 60);
     this.period = configuration.getInt("config.watch.period", 60);
     this.yamlLoader = yamlLoader;
-    configuration.schedule(delay * 1000, period * 1000, this::check);
+    this.files = initFiles(loadedFiles);
+    if (files.isEmpty()) {
+      log.error("No files to watch?");
+    } else {
+      configuration.schedule(delay * 1000, period * 1000, this::check);
+    }
   }
 
   @Override
