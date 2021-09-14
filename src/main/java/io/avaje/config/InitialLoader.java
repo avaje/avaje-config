@@ -257,7 +257,7 @@ final class InitialLoader {
       try {
         try (InputStream is = resource(resourcePath, source)) {
           if (is != null) {
-            yamlLoader.load(is).forEach((key, val) -> loadContext.put(key, val));
+            yamlLoader.load(is).forEach(loadContext::put);
             return true;
           }
         }
