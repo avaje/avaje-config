@@ -81,7 +81,7 @@ final class CoreConfiguration implements Configuration {
   public void schedule(long delayMillis, long periodMillis, Runnable runnable) {
     synchronized (this) {
       if (timer == null) {
-        timer = new Timer("ConfigTimer");
+        timer = new Timer("ConfigTimer", true);
       }
       timer.schedule(new Task(runnable), delayMillis, periodMillis);
     }
