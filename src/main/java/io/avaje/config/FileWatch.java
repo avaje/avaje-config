@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,8 +10,6 @@ import java.util.List;
 import java.util.Properties;
 
 final class FileWatch {
-
-  private static final Logger log = LoggerFactory.getLogger(FileWatch.class);
 
   private final Configuration configuration;
   private final YamlLoader yamlLoader;
@@ -29,7 +24,7 @@ final class FileWatch {
     this.yamlLoader = yamlLoader;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
-      log.error("No files to watch?");
+      Config.log.error("No files to watch?");
     } else {
       configuration.schedule(delay * 1000, period * 1000, this::check);
     }
@@ -60,7 +55,7 @@ final class FileWatch {
   void check() {
     for (Entry file : files) {
       if (file.reload()) {
-        log.debug("reloading configuration from {}", file);
+        Config.log.debug("reloading configuration from {}", file);
         if (file.isYaml()) {
           reloadYaml(file);
         } else {
@@ -76,7 +71,7 @@ final class FileWatch {
       properties.load(is);
       put(properties);
     } catch (Exception e) {
-      log.error("Unexpected error reloading config file " + file, e);
+      Config.log.error("Unexpected error reloading config file " + file, e);
     }
   }
 
@@ -91,12 +86,12 @@ final class FileWatch {
 
   private void reloadYaml(Entry file) {
     if (yamlLoader == null) {
-      log.error("Unexpected - no yamlLoader to reload config file " + file);
+      Config.log.error("Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
         yamlLoader.load(is).forEach(configuration::setProperty);
       } catch (Exception e) {
-        log.error("Unexpected error reloading config file " + file, e);
+        Config.log.error("Unexpected error reloading config file " + file, e);
       }
     }
   }

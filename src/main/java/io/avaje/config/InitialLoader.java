@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +17,6 @@ import static io.avaje.config.InitialLoader.Source.RESOURCE;
  * </p>
  */
 final class InitialLoader {
-
-  private static final Logger log = LoggerFactory.getLogger(InitialLoader.class);
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
@@ -183,10 +178,10 @@ final class InitialLoader {
     loadProperties("application-test.properties", RESOURCE);
     loadYaml("application-test.yaml", RESOURCE);
     if (loadYaml("application-test.yml", RESOURCE)) {
-      log.warn("Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
+      Config.log.warn("Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
     }
     if (loadProperties("test-ebean.properties", RESOURCE)) {
-      log.warn("Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
+      Config.log.warn("Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
     return loadContext.size() > before;
   }
@@ -221,11 +216,11 @@ final class InitialLoader {
   private void loadMain(Source source) {
     loadYaml("application.yaml", source);
     if (loadYaml("application.yml", source)) {
-      log.warn("Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
+      Config.log.warn("Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
     }
     loadProperties("application.properties", source);
     if (loadProperties("ebean.properties", source)) {
-      log.warn("Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
+      Config.log.warn("Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
     }
   }
 

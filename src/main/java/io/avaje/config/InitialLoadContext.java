@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,8 +16,6 @@ import java.util.Set;
  * Manages the underlying map of properties we are gathering.
  */
 final class InitialLoadContext {
-
-  private static final Logger log = LoggerFactory.getLogger(InitialLoadContext.class);
 
   /**
    * Map we are loading the properties into.
@@ -128,7 +123,7 @@ final class InitialLoadContext {
    * Evaluate all the expressions and return as a Properties object.
    */
   Properties evalAll() {
-    log.trace("load from {}", loadedResources);
+    Config.log.trace("load from {}", loadedResources);
     Properties properties = new Properties();
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();

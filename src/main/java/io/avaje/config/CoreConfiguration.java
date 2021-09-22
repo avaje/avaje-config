@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,8 +20,6 @@ import java.util.function.Consumer;
  * Core implementation of Configuration.
  */
 final class CoreConfiguration implements Configuration {
-
-  private static final Logger log = LoggerFactory.getLogger(CoreConfiguration.class);
 
   private final ModifyAwareProperties properties;
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
@@ -56,7 +51,7 @@ final class CoreConfiguration implements Configuration {
   private void logMessage(InitialLoader loader) {
     String watchMsg = watcher == null ? "" : watcher.toString();
     String intoMsg = loadedSystemProperties ? " into System properties" : "";
-    log.info("loaded properties from {}{} {}", loader.loadedFrom(), intoMsg, watchMsg);
+    Config.log.info("Loaded properties from {}{} {}", loader.loadedFrom(), intoMsg, watchMsg);
   }
 
   void initSystemProperties() {
@@ -360,7 +355,7 @@ final class CoreConfiguration implements Configuration {
         oldValue = properties.put(key, newValue);
       }
       if (!Objects.equals(newValue, oldValue)) {
-        log.trace("setProperty key:{} value:{}}", key, newValue);
+        Config.log.trace("setProperty key:{} value:{}", key, newValue);
         propertiesBoolCache.remove(key);
         config.fireOnChange(key, newValue);
       }
@@ -438,7 +433,7 @@ final class CoreConfiguration implements Configuration {
       try {
         runnable.run();
       } catch (Exception e) {
-        log.error("Error executing timer task", e);
+        Config.log.error("Error executing timer task", e);
       }
     }
   }
