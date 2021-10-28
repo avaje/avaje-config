@@ -1,3 +1,5 @@
+[![Build](https://github.com/avaje/avaje-config/actions/workflows/build.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/build.yml)
+
 # Application configuration
 This library loads properties files that can be used to configure
 an application including "testing" and "local development" and
