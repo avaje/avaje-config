@@ -13,10 +13,10 @@ import java.util.Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-public class FileWatchTest {
+class FileWatchTest {
 
   @Test
-  public void test_when_notChanged() {
+  void test_when_notChanged() {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
@@ -30,7 +30,7 @@ public class FileWatchTest {
   }
 
   @Test
-  public void test_check_whenTouched_expect_loaded() {
+  void test_check_whenTouched_expect_loaded() {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
@@ -52,7 +52,7 @@ public class FileWatchTest {
   }
 
   @Test
-  public void test_check_whenTouchedScheduled_expect_loaded() {
+  void test_check_whenTouchedScheduled_expect_loaded() {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
@@ -79,7 +79,7 @@ public class FileWatchTest {
   }
 
   @Test
-  public void test_check_whenFileWritten() throws Exception {
+  void test_check_whenFileWritten() throws Exception {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();

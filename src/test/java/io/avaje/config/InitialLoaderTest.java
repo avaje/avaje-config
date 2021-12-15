@@ -8,11 +8,10 @@ import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InitialLoaderTest {
+class InitialLoaderTest {
 
   @Test
-  public void load() {
-
+  void load() {
     String userName = System.getProperty("user.name");
     String userHome = System.getProperty("user.home");
 
@@ -37,8 +36,7 @@ public class InitialLoaderTest {
   }
 
   @Test
-  public void loadWithExtensionCheck() {
-
+  void loadWithExtensionCheck() {
     InitialLoader loader = new InitialLoader();
     loader.loadFileWithExtensionCheck("test-dummy.properties");
     loader.loadFileWithExtensionCheck("test-dummy.yml");
@@ -50,10 +48,8 @@ public class InitialLoaderTest {
     assertThat(properties.getProperty("dummy.properties.foo")).isEqualTo("bar");
   }
 
-
   @Test
-  public void loadYaml() {
-
+  void loadYaml() {
     InitialLoader loader = new InitialLoader();
     loader.loadYaml("test-properties/foo.yml", RESOURCE);
     Properties properties = loader.eval();
@@ -62,8 +58,7 @@ public class InitialLoaderTest {
   }
 
   @Test
-  public void loadProperties() {
-
+  void loadProperties() {
     System.setProperty("eureka.instance.hostname", "host1");
     System.setProperty("server.port", "9876");
 
@@ -80,7 +75,7 @@ public class InitialLoaderTest {
   }
 
   @Test
-  public void splitPaths() {
+  void splitPaths() {
     InitialLoader loader = new InitialLoader();
     assertThat(loader.splitPaths("one two three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one,two,three")).contains("one", "two", "three");
@@ -89,7 +84,7 @@ public class InitialLoaderTest {
   }
 
   @Test
-  public void loadViaCommandLine_whenNotValid() {
+  void loadViaCommandLine_whenNotValid() {
     InitialLoader loader = new InitialLoader();
     loader.loadViaCommandLine(new String[]{"-p", "8765"});
     assertEquals(0, loader.size());
@@ -105,7 +100,7 @@ public class InitialLoaderTest {
   }
 
   @Test
-  public void loadViaCommandLine_localFile() {
+  void loadViaCommandLine_localFile() {
     InitialLoader loader = new InitialLoader();
     loader.loadViaCommandLine(new String[]{"-p", "test-dummy2.yaml"});
     assertEquals(1, loader.size());

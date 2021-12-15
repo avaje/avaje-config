@@ -11,26 +11,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class CoreExpressionEvalTest {
+class CoreExpressionEvalTest {
 
   @Test
-  public void eval_null() {
+  void eval_null() {
     assertNull(eval(null));
   }
 
   @Test
-  public void eval_empty() {
+  void eval_empty() {
     assertEquals("", eval(""));
   }
 
   @Test
-  public void eval_noExpressions() {
+  void eval_noExpressions() {
     assertEquals("basic", eval("basic"));
     assertEquals("{basic}", eval("{basic}"));
   }
 
   @Test
-  public void eval_singleExpression() {
+  void eval_singleExpression() {
     System.setProperty("foo", "Hello");
     assertEquals("Hello", eval("${foo}"));
     assertEquals("preHello", eval("pre${foo}"));
@@ -40,8 +40,7 @@ public class CoreExpressionEvalTest {
   }
 
   @Test
-  public void eval_singleExpression_withDefault() {
-
+  void eval_singleExpression_withDefault() {
     System.setProperty("foo", "Hello");
     assertEquals("Hello", eval("${foo:bart}"));
     assertEquals("beforeHelloAfter", eval("before${foo:bart}After"));
@@ -56,7 +55,7 @@ public class CoreExpressionEvalTest {
   }
 
   @Test
-  public void eval_singleExpression_withDefaultIncludesColons() {
+  void eval_singleExpression_withDefaultIncludesColons() {
     assertEquals("jdbc:postgresql://localhost:7432/myapp", eval("${db.url:jdbc:postgresql://localhost:7432/myapp}"));
 
     System.setProperty("db.url", "jdbc:postgresql://foo:7432/bar");
@@ -66,8 +65,7 @@ public class CoreExpressionEvalTest {
   }
 
   @Test
-  public void eval_multiExpression_withDefault() {
-
+  void eval_multiExpression_withDefault() {
     assertEquals("num1num2", eval("${one:num1}${two:num2}"));
     assertEquals("num1-num2", eval("${one:num1}-${two:num2}"));
     assertEquals("num1abnum2", eval("${one:num1}ab${two:num2}"));
@@ -87,8 +85,7 @@ public class CoreExpressionEvalTest {
   }
 
   @Test
-  public void eval_withSourceMap() {
-
+  void eval_withSourceMap() {
     Map<String, String> source = new HashMap<>();
     source.put("one", "1");
     source.put("two", "2");
@@ -100,8 +97,7 @@ public class CoreExpressionEvalTest {
   }
 
   @Test
-  public void eval_withSourceProperties() {
-
+  void eval_withSourceProperties() {
     Properties source = new Properties();
     source.put("one", "1");
     source.put("two", "2");

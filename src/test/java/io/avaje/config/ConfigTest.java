@@ -11,10 +11,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ConfigTest {
+class ConfigTest {
 
   @Test
-  public void fallbackToSystemProperty_initial() {
+  void fallbackToSystemProperty_initial() {
     System.setProperty("MySystemProp0", "bar");
     assertThat(Config.get("MySystemProp0", "foo")).isEqualTo("bar");
 
@@ -31,7 +31,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void fallbackToSystemProperty_cacheInitialNullValue() {
+  void fallbackToSystemProperty_cacheInitialNullValue() {
     assertThat(Config.get("MySystemProp", null)).isNull();
     System.setProperty("MySystemProp", "hello");
     // cached the initial null so still null
@@ -39,7 +39,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void fallbackToSystemProperty_cacheInitialValue() {
+  void fallbackToSystemProperty_cacheInitialValue() {
     assertThat(Config.get("MySystemProp2", "foo")).isEqualTo("foo");
     System.setProperty("MySystemProp2", "notFoo");
     // cached the initial value foo so still foo
@@ -48,14 +48,14 @@ public class ConfigTest {
   }
 
   @Test
-  public void setProperty() {
+  void setProperty() {
     assertThat(Config.get("MySystemProp3", null)).isNull();
     Config.setProperty("MySystemProp3", "hello2");
     assertThat(Config.get("MySystemProp3")).isEqualTo("hello2");
   }
 
   @Test
-  public void asProperties() {
+  void asProperties() {
     String home = System.getProperty("user.home");
 
     final Properties properties = Config.asProperties();
@@ -73,7 +73,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void asConfiguration() {
+  void asConfiguration() {
     String home = System.getProperty("user.home");
 
     final Configuration configuration = Config.asConfiguration();
@@ -83,7 +83,7 @@ public class ConfigTest {
 
   @Disabled
   @Test
-  public void load() {
+  void load() {
     assertThat(System.getProperty("myapp.fooName")).isNull();
 
     assertThat(Config.get("myapp.fooName")).isEqualTo("Hello");
@@ -94,12 +94,12 @@ public class ConfigTest {
   }
 
   @Test
-  public void get() {
+  void get() {
     assertThat(Config.get("myapp.fooName", "junk")).isEqualTo("Hello");
   }
 
   @Test
-  public void get_withEval() {
+  void get_withEval() {
     String home = System.getProperty("user.home");
     assertThat(Config.get("myapp.fooHome")).isEqualTo(home + "/config");
   }
@@ -111,7 +111,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void get_default_repeated_expect_returnDefaultValue() {
+  void get_default_repeated_expect_returnDefaultValue() {
     assertThat(Config.get("myapp.doesNotExist3", null)).isNull();
     assertThat(Config.get("myapp.doesNotExist3", "other")).isEqualTo("other");
     assertThat(Config.get("myapp.doesNotExist3", "foo")).isEqualTo("foo");
@@ -119,37 +119,37 @@ public class ConfigTest {
   }
 
   @Test
-  public void get_optional() {
+  void get_optional() {
     assertThat(Config.getOptional("myapp.doesNotExist")).isEmpty();
     assertThat(Config.getOptional("myapp.fooName")).isNotEmpty();
   }
 
   @Test
-  public void getBool_required_missing() {
+  void getBool_required_missing() {
     Config.setProperty("myapp.doesNotExist", null);
     assertThrows(IllegalStateException.class, () -> Config.getBool("myapp.doesNotExist"));
   }
 
   @Test
-  public void enabled_required_missing() {
+  void enabled_required_missing() {
     Config.setProperty("myapp.doesNotExist", null);
     assertThrows(IllegalStateException.class, () -> Config.enabled("myapp.doesNotExist"));
   }
 
   @Test
-  public void getBool_required_set() {
+  void getBool_required_set() {
     assertThat(Config.getBool("myapp.activateFoo")).isTrue();
     assertThat(Config.enabled("myapp.activateFoo")).isTrue();
   }
 
   @Test
-  public void getBool() {
+  void getBool() {
     assertThat(Config.getBool("myapp.activateFoo", false)).isTrue();
     assertThat(Config.enabled("myapp.activateFoo", false)).isTrue();
   }
 
   @Test
-  public void getBool_default() {
+  void getBool_default() {
     assertThat(Config.getBool("myapp.doesNotExist", false)).isFalse();
     // default value is cached, still false
     assertThat(Config.getBool("myapp.doesNotExist", true)).isFalse();
@@ -159,7 +159,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void enabled_default() {
+  void enabled_default() {
     assertThat(Config.enabled("myapp.en.doesNotExist", false)).isFalse();
     // default value is cached, still false
     assertThat(Config.enabled("myapp.en.doesNotExist", true)).isFalse();
@@ -170,58 +170,58 @@ public class ConfigTest {
   }
 
   @Test
-  public void getInt_required_missing() {
+  void getInt_required_missing() {
     assertThrows(IllegalStateException.class, () -> Config.getInt("myapp.doesNotExist"));
   }
 
   @Test
-  public void getInt_required_set() {
+  void getInt_required_set() {
     assertThat(Config.getInt("myapp.bar.barRules")).isEqualTo(42);
   }
 
   @Test
-  public void getInt() {
+  void getInt() {
     assertThat(Config.getInt("myapp.bar.barRules", 99)).isEqualTo(42);
   }
 
   @Test
-  public void getInt_default() {
+  void getInt_default() {
     assertThat(Config.getInt("myapp.bar.doesNotExist", 99)).isEqualTo(99);
   }
 
   @Test
-  public void getLong_required_missing() {
+  void getLong_required_missing() {
     assertThrows(IllegalStateException.class, () -> Config.getLong("myapp.bar.doesNotExist"));
   }
 
   @Test
-  public void getLong_required_set() {
+  void getLong_required_set() {
     assertThat(Config.getLong("myapp.bar.barRules")).isEqualTo(42L);
   }
 
   @Test
-  public void getLong() {
+  void getLong() {
     assertThat(Config.getLong("myapp.bar.barRules", 99)).isEqualTo(42L);
   }
 
   @Test
-  public void getLong_default() {
+  void getLong_default() {
     assertThat(Config.getLong("myapp.bar.doesNotExist", 99)).isEqualTo(99L);
   }
 
   @Test
-  public void getDecimal_doesNotExist() {
+  void getDecimal_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> Config.getDecimal("myTestDecimal.doesNotExist"));
   }
 
   @Test
-  public void getDecimal_default() {
+  void getDecimal_default() {
     assertThat(Config.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
     Config.setProperty("myTestDecimal.doesNotExist", null);
   }
 
   @Test
-  public void getDecimal() {
+  void getDecimal() {
     Config.setProperty("myTestDecimal", "14.3");
     assertThat(Config.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(Config.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
@@ -229,7 +229,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void getURL() throws MalformedURLException {
+  void getURL() throws MalformedURLException {
     Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
     assertThat(Config.getURL("myConfigUrl", "http://two")).isEqualTo(new URL("http://bana"));
@@ -237,18 +237,18 @@ public class ConfigTest {
   }
 
   @Test
-  public void getEnum_doesNotExist() {
+  void getEnum_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist"));
   }
 
   @Test
-  public void getEnum_default() {
+  void getEnum_default() {
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist2", MyTestEnum.C)).isEqualTo(MyTestEnum.C);
     Config.setProperty("myTestEnum.doesNotExist2", null);
   }
 
   @Test
-  public void getEnum() {
+  void getEnum() {
     Config.setProperty("myTestEnum", "B");
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum")).isEqualTo(MyTestEnum.B);
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum", MyTestEnum.C)).isEqualTo(MyTestEnum.B);
@@ -260,7 +260,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void onChange() {
+  void onChange() {
 
     AtomicReference<String> ref = new AtomicReference<>();
     ref.set("initialValue");
@@ -276,7 +276,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void onChangeInt() {
+  void onChangeInt() {
 
     AtomicReference<Integer> ref = new AtomicReference<>();
     ref.set(1);
@@ -293,7 +293,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void onChangeLong() {
+  void onChangeLong() {
 
     AtomicReference<Long> ref = new AtomicReference<>();
     ref.set(1L);
@@ -310,7 +310,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void onChangeBool() {
+  void onChangeBool() {
 
     AtomicReference<Boolean> ref = new AtomicReference<>();
     ref.set(false);

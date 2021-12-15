@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreConfigurationTest {
+class CoreConfigurationTest {
 
   private final CoreConfiguration data = createSample();
 
@@ -35,8 +35,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void asProperties() {
-
+  void asProperties() {
     final Properties properties = basicProperties();
     System.setProperty("SetViaSystemProperty", "FooBar");
 
@@ -51,20 +50,20 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void test_toString() {
+  void test_toString() {
     assertThat(data.toString()).isNotEmpty();
     data.setWatcher(new FileWatch( Mockito.mock(Configuration.class), Collections.emptyList(), null));
     data.loadIntoSystemProperties();
   }
 
   @Test
-  public void get() {
+  void get() {
     assertEquals(data.get("a", "something"), "1");
     assertEquals(data.get("doesNotExist", "something"), "something");
   }
 
   @Test
-  public void getBool() {
+  void getBool() {
     assertTrue(data.getBool("foo.t", true));
     assertTrue(data.getBool("foo.t", false));
 
@@ -73,63 +72,62 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void getInt() {
+  void getInt() {
     assertThat(data.getInt("a", 99)).isEqualTo(1);
     assertThat(data.getInt("foo.bar", 99)).isEqualTo(42);
     assertThat(data.getInt("doesNotExist", 99)).isEqualTo(99);
   }
 
   @Test
-  public void getLong() {
+  void getLong() {
     assertThat(data.getLong("a", 99)).isEqualTo(1);
     assertThat(data.getLong("foo.bar", 99)).isEqualTo(42);
     assertThat(data.getLong("doesNotExist", 99)).isEqualTo(99);
   }
 
   @Test
-  public void getDecimal_doesNotExist() {
+  void getDecimal_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> data.getDecimal("myTestDecimal.doesNotExist"));
   }
 
   @Test
-  public void getDecimal_default() {
+  void getDecimal_default() {
     assertThat(data.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
     data.setProperty("myTestDecimal.doesNotExist", null);
   }
 
   @Test
-  public void getDecimal() {
+  void getDecimal() {
     data.setProperty("myTestDecimal", "14.3");
     assertThat(data.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     data.setProperty("myTestDecimal", null);
   }
 
-
   @Test
-  public void getURL_doesNotExist() {
+  void getURL_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist"));
   }
 
   @Test
-  public void getURL_doesNotExist_malformed() {
+  void getURL_doesNotExist_malformed() {
     assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist", "junk"));
   }
 
   @Test
-  public void getURL_doesNotExist_malformed2() {
+  void getURL_doesNotExist_malformed2() {
     data.setProperty("myUrl.invalid", "junk");
     assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.invalid"));
   }
 
   @Test
-  public void getURL_default() throws MalformedURLException {
+  void getURL_default() throws MalformedURLException {
     assertThat(data.getURL("myUrl.doesNotExist", "http://foo")).isEqualTo(new URL("http://foo"));
     data.setProperty("myUrl.doesNotExist", null);
   }
 
   @Test
-  public void getURL() throws MalformedURLException {
+  void getURL() throws MalformedURLException {
     data.setProperty("myUrl", "http://bar");
     assertThat(data.getURL("myUrl")).isEqualTo(new URL("http://bar"));
     assertThat(data.getURL("myUrl", "http://baz")).isEqualTo(new URL("http://bar"));
@@ -137,7 +135,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void getList() {
+  void getList() {
     assertThat(data.getList().of("someValues")).contains("13", "42", "55");
     assertThat(data.getList().of("someValues", "a", "b")).contains("13", "42", "55");
     assertThat(data.getList().of("list.notThere", "a", "b")).contains("a", "b");
@@ -155,7 +153,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void getSet() {
+  void getSet() {
     assertThat(data.getSet().of("1someValues")).contains("13", "42", "55");
     assertThat(data.getSet().of("1someValues", "a", "b")).contains("13", "42", "55");
     assertThat(data.getSet().of("1set.notThere", "a", "b")).contains("a", "b");
@@ -177,19 +175,19 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void getEnum() {
+  void getEnum() {
     assertThat(data.getEnum(MyEnum.class, "myEnum")).isEqualTo(MyEnum.TWO);
     assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.ONE)).isEqualTo(MyEnum.ONE);
     assertThat(data.getEnum(MyEnum.class, "myEnum2", MyEnum.THREE)).isEqualTo(MyEnum.ONE);
   }
 
   @Test
-  public void getEnum_doesNotExist() {
+  void getEnum_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> data.getEnum(MyEnum.class, "myEnum.doesNotExist"));
   }
 
   @Test
-  public void onChange() {
+  void onChange() {
     AtomicInteger count = new AtomicInteger();
     StringBuilder sb = new StringBuilder();
     data.onChange("modify", newValue -> {
@@ -216,7 +214,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void setProperty_withEval() {
+  void setProperty_withEval() {
     assertThat(data.get("ThisIsNotSet", null)).isNull();
     data.setProperty("ThisIsNotSet", "A|${user.home}|B");
     String expected = "A|" + System.getProperty("user.home") + "|B";
@@ -224,8 +222,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void onChangeInt() {
-
+  void onChangeInt() {
     AtomicReference<Integer> ref = new AtomicReference<>();
     ref.set(1);
 
@@ -241,8 +238,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void onChangeLong() {
-
+  void onChangeLong() {
     AtomicReference<Long> ref = new AtomicReference<>();
     ref.set(1L);
 
@@ -258,8 +254,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void onChangeBool() {
-
+  void onChangeBool() {
     AtomicReference<Boolean> ref = new AtomicReference<>();
     ref.set(false);
 
@@ -275,8 +270,7 @@ public class CoreConfigurationTest {
   }
 
   @Test
-  public void evalProperties() {
-
+  void evalProperties() {
     final Properties properties = basicProperties();
     properties.setProperty("someA", "before-${foo.bar}-after");
 

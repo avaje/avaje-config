@@ -8,17 +8,17 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class YamlParserTest {
+class YamlParserTest {
 
   private final YamlLoaderSnake load = new YamlLoaderSnake();
 
   @Test
-  public void basic() {
+  void basic() {
     basic(parseYaml2("/yaml/basic.yaml"));
     basic(parseYaml("/yaml/basic.yaml"));
   }
 
-  public void basic(final Map<String, String> map) {
+  void basic(final Map<String, String> map) {
     assertThat(map).containsOnlyKeys("name", "properties.key1", "properties.key2", "sorted.1", "sorted.2");
     assertThat(map.get("name")).isEqualTo("Name123");
     assertThat(map.get("properties.key1")).isEqualTo("value1");
@@ -27,12 +27,12 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_singleDoc() {
+  void parse_singleDoc() {
     parse_singleDoc(parseYaml2("/yaml/single-doc.yaml"));
     parse_singleDoc(parseYaml("/yaml/single-doc.yaml"));
   }
 
-  public void parse_singleDoc(Map<String, String> map) {
+  void parse_singleDoc(Map<String, String> map) {
     assertThat(map).containsOnlyKeys("name.a.e", "name.b.t", "int", "float");
     assertThat(map.get("name.a.e")).isEqualTo("e1");
     assertThat(map.get("name.b.t")).isEqualTo("t1");
@@ -41,7 +41,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_multipleDocs() {
+  void parse_multipleDocs() {
     parse_multipleDocs(parseYaml2("/yaml/multiple-docs.yaml"));
     parse_multipleDocs(parseYaml("/yaml/multiple-docs.yaml"));
   }
@@ -55,7 +55,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_quotedValues() {
+  void parse_quotedValues() {
     parse_quotedValues(parseYaml2("/yaml/quoted-values.yaml"));
     parse_quotedValues(parseYaml("/yaml/quoted-values.yaml"));
   }
@@ -75,7 +75,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_quotedKeys() {
+  void parse_quotedKeys() {
     parse_quotedKeys(parseYaml2("/yaml/quoted-keys.yaml"));
     parse_quotedKeys(parseYaml("/yaml/quoted-keys.yaml"));
   }
@@ -89,7 +89,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_multiLine() {
+  void parse_multiLine() {
     parse_multiLine(parseYaml2("/yaml/multi-line.yaml"));
     parse_multiLine(parseYaml("/yaml/multi-line.yaml"));
   }
@@ -117,7 +117,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_multiLine_empty() {
+  void parse_multiLine_empty() {
     parse_multiLine_empty(parseYaml2("/yaml/multi-line-empty.yaml"));
     parse_multiLine_empty(parseYaml("/yaml/multi-line-empty.yaml"));
   }
@@ -134,7 +134,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_keyComments() {
+  void parse_keyComments() {
     parse_keyComments(parseYaml2("/yaml/key-comment.yaml"));
     parse_keyComments(parseYaml("/yaml/key-comment.yaml"));
   }
@@ -148,7 +148,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_multi_line_implicit() {
+  void parse_multi_line_implicit() {
     parse_multi_line_implicit(parseYaml2("/yaml/multi-line-implicit.yaml"));
     parse_multi_line_implicit(parseYaml("/yaml/multi-line-implicit.yaml"));
   }
@@ -161,7 +161,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_top_vals() {
+  void parse_top_vals() {
     assertThatThrownBy(() -> parseYaml("/yaml/err-top-vals.yaml"))
       .hasMessageContaining("line: 2");
     assertThatThrownBy(() -> parseYaml2("/yaml/err-top-vals.yaml"))
@@ -169,7 +169,7 @@ public class YamlParserTest {
   }
 
   @Test
-  public void parse_err_req_key2() {
+  void parse_err_req_key2() {
     assertThatThrownBy(() -> parseYaml2("/yaml/err-require-topkey.yaml"))
       .hasMessageContaining("line 5");
     assertThatThrownBy(() -> parseYaml("/yaml/err-require-topkey.yaml"))
