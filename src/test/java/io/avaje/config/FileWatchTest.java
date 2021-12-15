@@ -2,6 +2,8 @@ package io.avaje.config;
 
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 class FileWatchTest {
+
+  Logger log = LoggerFactory.getLogger("FileWatchTest");
 
   @Test
   void test_when_notChanged() {
@@ -81,6 +85,8 @@ class FileWatchTest {
   @Test
   void test_check_whenFileWritten() throws Exception {
 
+    log.info("ENV: " + System.getenv());
+    log.info("System Properties: " + System.getProperties());
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
