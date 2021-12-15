@@ -30,7 +30,7 @@ public class FileWatchTest {
   }
 
   @Test
-  public void test_check_whenTouched_expect_loaded() throws InterruptedException {
+  public void test_check_whenTouched_expect_loaded() {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
@@ -52,7 +52,7 @@ public class FileWatchTest {
   }
 
   @Test
-  public void test_check_whenTouchedScheduled_expect_loaded() throws InterruptedException {
+  public void test_check_whenTouchedScheduled_expect_loaded() {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
@@ -64,14 +64,12 @@ public class FileWatchTest {
     final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
     System.out.println(watch);
 
-    // touch but scheduled check not run yet
-    touchFiles(files);
-
     // assert not loaded
     assertThat(config.size()).isEqualTo(2);
-
+    // touch but scheduled check not run yet
+    touchFiles(files);
     // wait until scheduled check has been run
-    Thread.sleep(3000);
+    sleep(3000);
 
     // properties loaded as expected
     assertThat(config.size()).isGreaterThan(2);
@@ -96,28 +94,39 @@ public class FileWatchTest {
     assertThat(config.get("one", null)).isEqualTo("a");
 
     writeContent("one=NotA");
-    assertThat(watch.changed()).isTrue();
+    sleep(20);
+    //assertThat(watch.changed()).isTrue();
     watch.check();
     assertThat(watch.changed()).isFalse();
+    if ("a".equals(config.get("one", null))) {
+      sleep(20);
+    }
     assertThat(config.get("one", null)).isEqualTo("NotA");
 
     writeContent("one=a");
+    sleep(20);
     watch.check();
     assertThat(config.get("one", null)).isEqualTo("a");
   }
 
   private void writeContent(String content) throws IOException {
-    sleepOne();
+    sleep(20);
     File aProps = new File("./src/test/resources/watch/a.properties");
+    if (!aProps.exists()) {
+      throw new IllegalStateException("a.properties does not exist?");
+    }
     FileWriter fw = new FileWriter(aProps);
     fw.write(content);
+    fw.flush();
     fw.close();
-    sleepOne();
+    if (!aProps.setLastModified(System.currentTimeMillis())) {
+      System.err.println("setLastModified not successful");
+    }
   }
 
-  private void sleepOne() {
+  private void sleep(int millis) {
     try {
-      Thread.sleep(100);
+      Thread.sleep(millis);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
@@ -139,11 +148,12 @@ public class FileWatchTest {
     return files;
   }
 
-  private void touchFiles(List<File> files) throws InterruptedException {
-    Thread.sleep(100);
+  private void touchFiles(List<File> files) {
+    sleep(50);
     for (File file : files) {
-      file.setLastModified(System.currentTimeMillis());
+      if (!file.setLastModified(System.currentTimeMillis())) {
+        System.err.println("touch setLastModified not successful");
+      }
     }
-    Thread.sleep(100);
   }
 }
