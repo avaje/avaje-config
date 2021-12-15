@@ -88,24 +88,34 @@ class FileWatchTest {
 
   @Test
   void test_check_whenFileWritten() throws Exception {
+    log.info("test_check_whenFileWritten");
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
     final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
-    touchFiles(files);
-    watch.check();
 
     if (isGithubActions()) {
       File aFile = files.get(0);
       log.info("file change detection in GithubActions via change in length from {}", aFile.length());
-      assertThat(config.get("one", null)).isEqualTo("a");
-      writeContent("one=NotA");
+      assertThat(config.get("one", null)).isNull();
+
+      writeContent("one=NotAReally");
       sleep(20);
       log.info("file length now {}", aFile.length());
       watch.check();
-      assertThat(config.get("one", null)).isEqualTo("NotA");
+      assertThat(config.get("one", null)).isEqualTo("NotAReally");
+
+      writeContent("one=a");
+      sleep(20);
+      log.info("file length now {}", aFile.length());
+      watch.check();
+      assertThat(config.get("one", null)).isEqualTo("a");
       return;
     }
+
+    touchFiles(files);
+    watch.check();
+
     // properties loaded as expected
     final int size0 = config.size();
     assertThat(size0).isGreaterThan(2);
@@ -132,11 +142,10 @@ class FileWatchTest {
     }
     FileWriter fw = new FileWriter(aProps);
     fw.write(content);
-    fw.flush();
     fw.close();
-    if (!aProps.setLastModified(System.currentTimeMillis())) {
-      System.err.println("setLastModified not successful");
-    }
+//    if (!aProps.setLastModified(System.currentTimeMillis())) {
+//      System.err.println("setLastModified not successful");
+//    }
   }
 
   private void sleep(int millis) {
