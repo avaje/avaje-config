@@ -133,9 +133,10 @@ public class FileWatchTest {
   }
 
   private void touchFiles(List<File> files) throws InterruptedException {
-    Thread.sleep(10);
+    Thread.sleep(100);
     for (File file : files) {
       file.setLastModified(System.currentTimeMillis());
     }
+    Thread.sleep(100);
   }
 }
