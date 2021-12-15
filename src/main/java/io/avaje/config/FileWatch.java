@@ -105,6 +105,7 @@ final class FileWatch {
     Entry(File file) {
       this.file = file;
       this.lastMod = file.lastModified();
+      this.lastLength = file.length();
       this.yaml = isYaml(file.getName());
     }
 
