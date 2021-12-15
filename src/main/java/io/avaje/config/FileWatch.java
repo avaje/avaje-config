@@ -100,6 +100,7 @@ final class FileWatch {
     private final File file;
     private final boolean yaml;
     private long lastMod;
+    private long lastLength;
 
     Entry(File file) {
       this.file = file;
@@ -126,11 +127,12 @@ final class FileWatch {
         return false;
       }
       lastMod = file.lastModified();
+      lastLength = file.length();
       return true;
     }
 
     boolean changed() {
-      return file.lastModified() > lastMod;
+      return file.lastModified() > lastMod || file.length() != lastLength;
     }
 
     InputStream inputStream() {

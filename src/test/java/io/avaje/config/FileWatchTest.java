@@ -72,18 +72,18 @@ class FileWatchTest {
     assertThat(config.size()).isEqualTo(2);
     if (isGithubActions()) {
       log.info("file change not detected in GithubActions");
-    } else {
-      // touch but scheduled check not run yet
-      touchFiles(files);
-      // wait until scheduled check has been run
-      sleep(3000);
-
-      // properties loaded as expected
-      assertThat(config.size()).isGreaterThan(2);
-      assertThat(config.get("one", null)).isEqualTo("a");
-      assertThat(config.getInt("my.size", 42)).isEqualTo(17);
-      assertThat(config.getBool("c.active", false)).isTrue();
+      return;
     }
+    // touch but scheduled check not run yet
+    touchFiles(files);
+    // wait until scheduled check has been run
+    sleep(3000);
+
+    // properties loaded as expected
+    assertThat(config.size()).isGreaterThan(2);
+    assertThat(config.get("one", null)).isEqualTo("a");
+    assertThat(config.getInt("my.size", 42)).isEqualTo(17);
+    assertThat(config.getBool("c.active", false)).isTrue();
   }
 
   @Test
@@ -96,7 +96,14 @@ class FileWatchTest {
     watch.check();
 
     if (isGithubActions()) {
-      log.info("file change not detected in GithubActions");
+      File aFile = files.get(0);
+      log.info("file change detection in GithubActions via change in length from {}", aFile.length());
+      assertThat(config.get("one", null)).isEqualTo("a");
+      writeContent("one=NotA");
+      sleep(20);
+      log.info("file length now {}", aFile.length());
+      watch.check();
+      assertThat(config.get("one", null)).isEqualTo("NotA");
       return;
     }
     // properties loaded as expected
