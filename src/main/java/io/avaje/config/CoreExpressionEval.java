@@ -1,25 +1,14 @@
 package io.avaje.config;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.util.Map;
 import java.util.Properties;
 
 /**
  * Helper used to evaluate expressions such as ${CATALINA_HOME}.
  * <p>
- * The expressions can contain environment variables, system properties or JNDI
- * properties. JNDI expressions take the form ${jndi:propertyName} where you
- * substitute propertyName with the name of the jndi property you wish to
- * evaluate.
- * </p>
+ * The expressions can contain environment variables or system properties.
  */
 final class CoreExpressionEval implements Configuration.ExpressionEval {
-
-  /**
-   * Prefix for looking up JNDI Environment variable.
-   */
-  private static final String JAVA_COMP_ENV = "java:comp/env/";
 
   /**
    * Used to detect the start of an expression.
@@ -64,8 +53,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
   }
 
   /**
-   * Convert the expression using JNDI, Environment variables, System Properties
-   * or existing an property in SystemProperties itself.
+   * Convert the expression usingEnvironment variables, System Properties or an existing property.
    */
   private String evaluateExpression(String exp) {
     String val = System.getProperty(exp);
@@ -73,15 +61,6 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
       val = System.getenv(exp);
       if (val == null) {
         val = localLookup(exp);
-      }
-      if (val == null) {
-        if (isJndiExpression(exp)) {
-          // JNDI property lookup...
-          val = getJndiProperty(exp);
-          if (val != null) {
-            return val;
-          }
-        }
       }
     }
     return val;
@@ -98,34 +77,6 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
 
   private String eval(String val, int sp, int ep) {
     return new EvalBuffer(val, sp, ep).process();
-  }
-
-  private boolean isJndiExpression(String exp) {
-    return exp.startsWith("JNDI:") || exp.startsWith("jndi:");
-  }
-
-  /**
-   * Returns null if JNDI is not setup or if the property is not found.
-   *
-   * @param key the key of the JNDI Environment property including a JNDI: prefix.
-   */
-  private String getJndiProperty(String key) {
-    try {
-      // remove the JNDI: prefix
-      key = key.substring(5);
-      return (String) getJndiObject(key);
-    } catch (NamingException ex) {
-      return null;
-    }
-  }
-
-  /**
-   * Similar to getProperty but throws NamingException if JNDI is not setup or
-   * if the property is not found.
-   */
-  private Object getJndiObject(String key) throws NamingException {
-    InitialContext ctx = new InitialContext();
-    return ctx.lookup(JAVA_COMP_ENV + key);
   }
 
   private class EvalBuffer {
