@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class FileWatchTest {
 
@@ -55,6 +56,11 @@ public class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
+    for (File file : files) {
+      if (!file.exists()) {
+        fail("File " + file.getAbsolutePath() + " does not exist?");
+      }
+    }
     final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
     System.out.println(watch);
 
@@ -110,10 +116,10 @@ public class FileWatchTest {
 
   private void sleepOne() {
     try {
-      Thread.sleep(10);
+      Thread.sleep(100);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw  new RuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 
