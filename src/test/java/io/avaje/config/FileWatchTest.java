@@ -112,6 +112,7 @@ public class FileWatchTest {
     FileWriter fw = new FileWriter(aProps);
     fw.write(content);
     fw.close();
+    sleepOne();
   }
 
   private void sleepOne() {
