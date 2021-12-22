@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -219,6 +220,16 @@ final class CoreConfiguration implements Configuration {
   @Override
   public URI getURI(String key, String defaultValue) {
     return URI.create(get(key, defaultValue));
+  }
+
+  @Override
+  public Duration getDuration(String key) {
+    return Duration.parse(get(key));
+  }
+
+  @Override
+  public Duration getDuration(String key, String defaultValue) {
+    return Duration.parse(get(key, defaultValue));
   }
 
   @Override

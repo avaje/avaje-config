@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -279,6 +280,32 @@ public class Config {
   public static URI getURI(String key, String defaultValue) {
     return data.getURI(key, defaultValue);
   }
+
+
+  /**
+   * Return a Duration configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  public static Duration getDuration(String key) {
+    return data.getDuration(key);
+  }
+
+  /**
+   * Return a Duration configuration value with a default value.
+   *
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  public static Duration getDuration(String key, String defaultValue) {
+    return data.getDuration(key, defaultValue);
+  }
+
 
   /**
    * Return the enum configuration value.

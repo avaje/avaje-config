@@ -3,6 +3,7 @@ package io.avaje.config;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -178,6 +179,26 @@ public interface Configuration {
    * @return The configured value
    */
   URI getURI(String key, String defaultValue);
+
+  /**
+   * Return a Duration configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  Duration getDuration(String key);
+
+  /**
+   * Return a Duration configuration value with a default value.
+   *
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  Duration getDuration(String key, String defaultValue);
 
   /**
    * Return the enum configuration value.

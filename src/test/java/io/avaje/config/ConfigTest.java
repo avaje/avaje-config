@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -243,6 +244,14 @@ class ConfigTest {
     assertThat(Config.getURI("myConfigUrl")).isEqualTo(URI.create("http://bana"));
     assertThat(Config.getURI("myConfigUrl", "http://two")).isEqualTo(URI.create("http://bana"));
     Config.setProperty("myConfigUrl", null);
+  }
+
+  @Test
+  void getDuration() {
+    Config.setProperty("myConfigDuration", "PT10H");
+    assertThat(Config.getDuration("myConfigDuration")).isEqualTo(Duration.parse("PT10H"));
+    assertThat(Config.getDuration("myConfigDuration", "PT10H")).isEqualTo(Duration.parse("PT10H"));
+    Config.setProperty("myConfigDuration", null);
   }
 
   @Test
