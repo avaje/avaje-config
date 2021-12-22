@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>3.2</version>
+    <version>3.3</version>
   </parent>
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
@@ -18,6 +18,7 @@
 
   <properties>
     <snakeyaml.version>1.29</snakeyaml.version>
+    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
   </properties>
 
   <dependencies>
