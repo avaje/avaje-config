@@ -9,7 +9,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.7</version>
+  <version>1.8</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.9</version>
       <scope>test</scope>
     </dependency>
 
