@@ -114,12 +114,12 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public ListValue getList() {
+  public ListValue list() {
     return listValue;
   }
 
   @Override
-  public SetValue getSet() {
+  public SetValue set() {
     return setValue;
   }
 

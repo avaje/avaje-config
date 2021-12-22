@@ -286,12 +286,20 @@ public class Config {
    *
    * <pre>{@code
    *
-   *  List<Integer> codes = Config.getList().ofInt("my.codes", 97, 45);
+   *  List<Integer> codes = Config.list().ofInt("my.codes", 97, 45);
    *
    * }</pre>
    */
+  public static Configuration.ListValue list() {
+    return data.list();
+  }
+
+  /**
+   * Deprecated migrate to list().
+   */
+  @Deprecated
   public static Configuration.ListValue getList() {
-    return data.getList();
+    return list();
   }
 
   /**
@@ -299,12 +307,20 @@ public class Config {
    *
    * <pre>{@code
    *
-   *  Set<String> operations = Config.getSet().of("my.operations", "put","delete");
+   *  Set<String> operations = Config.set().of("my.operations", "put","delete");
    *
    * }</pre>
    */
+  public static Configuration.SetValue set() {
+    return data.set();
+  }
+
+  /**
+   * Deprecated migrate to set().
+   */
+  @Deprecated
   public static Configuration.SetValue getSet() {
-    return data.getSet();
+    return set();
   }
 
   /**

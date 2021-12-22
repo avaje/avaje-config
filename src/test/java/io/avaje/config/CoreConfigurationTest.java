@@ -136,38 +136,38 @@ class CoreConfigurationTest {
 
   @Test
   void getList() {
-    assertThat(data.getList().of("someValues")).contains("13", "42", "55");
-    assertThat(data.getList().of("someValues", "a", "b")).contains("13", "42", "55");
-    assertThat(data.getList().of("list.notThere", "a", "b")).contains("a", "b");
-    assertThat(data.getList().of("list.notThere2")).isEmpty();
+    assertThat(data.list().of("someValues")).contains("13", "42", "55");
+    assertThat(data.list().of("someValues", "a", "b")).contains("13", "42", "55");
+    assertThat(data.list().of("list.notThere", "a", "b")).contains("a", "b");
+    assertThat(data.list().of("list.notThere2")).isEmpty();
 
-    assertThat(data.getList().ofInt("someValues")).contains(13, 42, 55);
-    assertThat(data.getList().ofInt("someValues", 22)).contains(13, 42, 55);
-    assertThat(data.getList().ofInt("list.int.notThere", 51, 52)).contains(51, 52);
-    assertThat(data.getList().ofInt("list.int.notThere2")).isEmpty();
+    assertThat(data.list().ofInt("someValues")).contains(13, 42, 55);
+    assertThat(data.list().ofInt("someValues", 22)).contains(13, 42, 55);
+    assertThat(data.list().ofInt("list.int.notThere", 51, 52)).contains(51, 52);
+    assertThat(data.list().ofInt("list.int.notThere2")).isEmpty();
 
-    assertThat(data.getList().ofLong("someValues")).contains(13L, 42L, 55L);
-    assertThat(data.getList().ofLong("someValues", 22L)).contains(13L, 42L, 55L);
-    assertThat(data.getList().ofLong("list.long.notThere", 51L, 52L)).contains(51L, 52L);
-    assertThat(data.getList().ofLong("list.long.notThere2")).isEmpty();
+    assertThat(data.list().ofLong("someValues")).contains(13L, 42L, 55L);
+    assertThat(data.list().ofLong("someValues", 22L)).contains(13L, 42L, 55L);
+    assertThat(data.list().ofLong("list.long.notThere", 51L, 52L)).contains(51L, 52L);
+    assertThat(data.list().ofLong("list.long.notThere2")).isEmpty();
   }
 
   @Test
   void getSet() {
-    assertThat(data.getSet().of("1someValues")).contains("13", "42", "55");
-    assertThat(data.getSet().of("1someValues", "a", "b")).contains("13", "42", "55");
-    assertThat(data.getSet().of("1set.notThere", "a", "b")).contains("a", "b");
-    assertThat(data.getSet().of("1set.notThere2")).isEmpty();
+    assertThat(data.set().of("1someValues")).contains("13", "42", "55");
+    assertThat(data.set().of("1someValues", "a", "b")).contains("13", "42", "55");
+    assertThat(data.set().of("1set.notThere", "a", "b")).contains("a", "b");
+    assertThat(data.set().of("1set.notThere2")).isEmpty();
 
-    assertThat(data.getSet().ofInt("1someValues")).contains(13, 42, 55);
-    assertThat(data.getSet().ofInt("1someValues", 22)).contains(13, 42, 55);
-    assertThat(data.getSet().ofInt("1set.int.notThere", 51, 52)).contains(51, 52);
-    assertThat(data.getSet().ofInt("1set.int.notThere2")).isEmpty();
+    assertThat(data.set().ofInt("1someValues")).contains(13, 42, 55);
+    assertThat(data.set().ofInt("1someValues", 22)).contains(13, 42, 55);
+    assertThat(data.set().ofInt("1set.int.notThere", 51, 52)).contains(51, 52);
+    assertThat(data.set().ofInt("1set.int.notThere2")).isEmpty();
 
-    assertThat(data.getSet().ofLong("1someValues")).contains(13L, 42L, 55L);
-    assertThat(data.getSet().ofLong("1someValues", 22L)).contains(13L, 42L, 55L);
-    assertThat(data.getSet().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
-    assertThat(data.getSet().ofLong("1set.long.notThere2")).isEmpty();
+    assertThat(data.set().ofLong("1someValues")).contains(13L, 42L, 55L);
+    assertThat(data.set().ofLong("1someValues", 22L)).contains(13L, 42L, 55L);
+    assertThat(data.set().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
+    assertThat(data.set().ofLong("1set.long.notThere2")).isEmpty();
   }
 
   enum MyEnum {

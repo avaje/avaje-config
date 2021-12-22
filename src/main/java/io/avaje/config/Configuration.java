@@ -188,7 +188,15 @@ public interface Configuration {
    *
    * }</pre>
    */
-  ListValue getList();
+  ListValue list();
+
+  /**
+   * Deprecated migrate to list().
+   */
+  @Deprecated
+  default ListValue getList() {
+    return list();
+  }
 
   /**
    * Return a Set of values configured.
@@ -199,7 +207,15 @@ public interface Configuration {
    *
    * }</pre>
    */
-  SetValue getSet();
+  SetValue set();
+
+  /**
+   * Deprecated migrate to set().
+   */
+  @Deprecated
+  default SetValue getSet() {
+    return set();
+  }
 
   /**
    * Set a configuration value.

@@ -26,8 +26,8 @@ class ConfigTest {
     Config.setProperty("MySystemProp0", "caz");
     assertThat(Config.get("MySystemProp0")).isEqualTo("caz");
 
-    assertThat(Config.getList().of("MySystemProp0")).contains("caz");
-    assertThat(Config.getSet().of("MySystemProp0")).contains("caz");
+    assertThat(Config.list().of("MySystemProp0")).contains("caz");
+    assertThat(Config.set().of("MySystemProp0")).contains("caz");
   }
 
   @Test
