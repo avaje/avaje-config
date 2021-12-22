@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -208,6 +209,16 @@ final class CoreConfiguration implements Configuration {
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Invalid url for " + key, e);
     }
+  }
+
+  @Override
+  public URI getURI(String key) {
+    return URI.create(get(key));
+  }
+
+  @Override
+  public URI getURI(String key, String defaultValue) {
+    return URI.create(get(key, defaultValue));
   }
 
   @Override

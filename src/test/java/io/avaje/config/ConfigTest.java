@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
@@ -233,6 +234,14 @@ class ConfigTest {
     Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
     assertThat(Config.getURL("myConfigUrl", "http://two")).isEqualTo(new URL("http://bana"));
+    Config.setProperty("myConfigUrl", null);
+  }
+
+  @Test
+  void getURI() {
+    Config.setProperty("myConfigUrl", "http://bana");
+    assertThat(Config.getURI("myConfigUrl")).isEqualTo(URI.create("http://bana"));
+    assertThat(Config.getURI("myConfigUrl", "http://two")).isEqualTo(URI.create("http://bana"));
     Config.setProperty("myConfigUrl", null);
   }
 

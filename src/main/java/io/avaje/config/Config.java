@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Properties;
@@ -233,6 +234,9 @@ public class Config {
 
   /**
    * Return a URL configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
    *
    * @param key The configuration key
    * @return The configured value
@@ -243,9 +247,6 @@ public class Config {
 
   /**
    * Return a URL configuration value with a default value.
-   * <p>
-   * IllegalStateException is thrown if the value is not defined in configuration.
-   * </p>
    *
    * @param key          The configuration key
    * @param defaultValue The default value
@@ -253,6 +254,30 @@ public class Config {
    */
   public static URL getURL(String key, String defaultValue) {
     return data.getURL(key, defaultValue);
+  }
+
+  /**
+   * Return a URI configuration value.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   * </p>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  public static URI getURI(String key) {
+    return data.getURI(key);
+  }
+
+  /**
+   * Return a URI configuration value with a default value.
+   *
+   * @param key          The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  public static URI getURI(String key, String defaultValue) {
+    return data.getURI(key, defaultValue);
   }
 
   /**
