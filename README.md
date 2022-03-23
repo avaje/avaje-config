@@ -1,4 +1,7 @@
 [![Build](https://github.com/avaje/avaje-config/actions/workflows/build.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/build.yml)
+[![Maven Central : avaje-config](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/avaje/avaje-config/blob/master/LICENSE)
+
 
 # Application configuration
 This library loads properties files that can be used to configure
@@ -9,7 +12,7 @@ dynamic configuration (changes to configuration properties at runtime).
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.4</version>
+  <version>1.8</version>
 </dependency>
 ```
 
