@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -53,7 +54,7 @@ final class CoreConfiguration implements Configuration {
   private void logMessage(InitialLoader loader) {
     String watchMsg = watcher == null ? "" : watcher.toString();
     String intoMsg = loadedSystemProperties ? " into System properties" : "";
-    Config.log.info("Loaded properties from {}{} {}", loader.loadedFrom(), intoMsg, watchMsg);
+    Config.log.log(Level.INFO, "Loaded properties from {0}{1} {2}", loader.loadedFrom(), intoMsg, watchMsg);
   }
 
   void initSystemProperties() {
@@ -377,7 +378,7 @@ final class CoreConfiguration implements Configuration {
         oldValue = properties.put(key, newValue);
       }
       if (!Objects.equals(newValue, oldValue)) {
-        Config.log.trace("setProperty key:{} value:{}", key, newValue);
+        Config.log.log(Level.TRACE, "setProperty key:{0} value:{1}", key, newValue);
         propertiesBoolCache.remove(key);
         config.fireOnChange(key, newValue);
       }
@@ -455,7 +456,7 @@ final class CoreConfiguration implements Configuration {
       try {
         runnable.run();
       } catch (Exception e) {
-        Config.log.error("Error executing timer task", e);
+        Config.log.log(Level.ERROR, "Error executing timer task", e);
       }
     }
   }

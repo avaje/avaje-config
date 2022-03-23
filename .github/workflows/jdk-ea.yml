@@ -1,5 +1,5 @@
 
-name: avave-inject EA
+name: avaje-inject EA
 
 on:
   workflow_dispatch:

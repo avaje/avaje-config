@@ -3,6 +3,7 @@ package io.avaje.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System.Logger.Level;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -178,10 +179,10 @@ final class InitialLoader {
     loadProperties("application-test.properties", RESOURCE);
     loadYaml("application-test.yaml", RESOURCE);
     if (loadYaml("application-test.yml", RESOURCE)) {
-      Config.log.warn("Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
+      Config.log.log(Level.WARNING, "Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
     }
     if (loadProperties("test-ebean.properties", RESOURCE)) {
-      Config.log.warn("Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
+      Config.log.log(Level.WARNING,"Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
     return loadContext.size() > before;
   }
@@ -216,11 +217,11 @@ final class InitialLoader {
   private void loadMain(Source source) {
     loadYaml("application.yaml", source);
     if (loadYaml("application.yml", source)) {
-      Config.log.warn("Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
+      Config.log.log(Level.WARNING,"Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
     }
     loadProperties("application.properties", source);
     if (loadProperties("ebean.properties", source)) {
-      Config.log.warn("Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
+      Config.log.log(Level.WARNING,"Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
     }
   }
 

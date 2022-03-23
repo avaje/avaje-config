@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -123,7 +124,7 @@ final class InitialLoadContext {
    * Evaluate all the expressions and return as a Properties object.
    */
   Properties evalAll() {
-    Config.log.trace("load from {}", loadedResources);
+    Config.log.log(Level.TRACE, "load from {0}", loadedResources);
     Properties properties = new Properties();
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();

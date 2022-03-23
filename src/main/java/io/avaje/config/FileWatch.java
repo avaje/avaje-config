@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -24,7 +25,7 @@ final class FileWatch {
     this.yamlLoader = yamlLoader;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
-      Config.log.error("No files to watch?");
+      Config.log.log(Level.ERROR, "No files to watch?");
     } else {
       configuration.schedule(delay * 1000, period * 1000, this::check);
     }
@@ -55,7 +56,7 @@ final class FileWatch {
   void check() {
     for (Entry file : files) {
       if (file.reload()) {
-        Config.log.debug("reloading configuration from {}", file);
+        Config.log.log(Level.DEBUG, "reloading configuration from {0}", file);
         if (file.isYaml()) {
           reloadYaml(file);
         } else {
@@ -71,7 +72,7 @@ final class FileWatch {
       properties.load(is);
       put(properties);
     } catch (Exception e) {
-      Config.log.error("Unexpected error reloading config file " + file, e);
+      Config.log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
     }
   }
 
@@ -86,12 +87,12 @@ final class FileWatch {
 
   private void reloadYaml(Entry file) {
     if (yamlLoader == null) {
-      Config.log.error("Unexpected - no yamlLoader to reload config file " + file);
+      Config.log.log(Level.ERROR, "Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
         yamlLoader.load(is).forEach(configuration::setProperty);
       } catch (Exception e) {
-        Config.log.error("Unexpected error reloading config file " + file, e);
+        Config.log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
       }
     }
   }

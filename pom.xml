@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
+    <artifactId>java11-oss</artifactId>
     <version>3.6</version>
   </parent>
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.9-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
@@ -19,6 +19,7 @@
   <properties>
     <snakeyaml.version>1.30</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+    <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
   <dependencies>
@@ -29,12 +30,6 @@
       <artifactId>snakeyaml</artifactId>
       <version>${snakeyaml.version}</version>
       <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
     </dependency>
 
     <dependency>
@@ -51,31 +46,13 @@
       <scope>test</scope>
     </dependency>
 
-  </dependencies>
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-slf4j-jpl</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
-        <version>1.0.0.RC1</version>
-        <executions>
-          <execution>
-            <id>add-module-infos</id>
-            <phase>package</phase>
-            <goals>
-              <goal>add-module-info</goal>
-            </goals>
-            <configuration>
-              <jvmVersion>9</jvmVersion>
-              <module>
-                <moduleInfoFile>src/main/java9/module-info.java</moduleInfoFile>
-              </module>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  </dependencies>
 
 </project>

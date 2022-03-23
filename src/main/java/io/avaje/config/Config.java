@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
@@ -33,7 +30,7 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  static final Logger log = LoggerFactory.getLogger("io.avaje.config");
+  static final System.Logger log = System.getLogger("io.avaje.config");
 
   private static final Configuration data = CoreConfiguration.initialise();
 
