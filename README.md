@@ -16,6 +16,10 @@ dynamic configuration (changes to configuration properties at runtime).
 </dependency>
 ```
 
+## Documentation
+
+Go to [avaje.io/config](https://avaje.io/config/) for user documentation.
+
 ## Typical use
 
 - Put application.yaml into src/main/resources for properties that have reasonable defaults
