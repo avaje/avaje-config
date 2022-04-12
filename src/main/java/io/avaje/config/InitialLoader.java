@@ -230,16 +230,18 @@ final class InitialLoader {
     if (fileName == null) {
       fileName = System.getProperty("props.file");
       if (fileName != null) {
-        loadFileWithExtensionCheck(fileName);
+        if (!loadFileWithExtensionCheck(fileName)) {
+          Config.log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
+        }
       }
     }
   }
 
-  void loadFileWithExtensionCheck(String fileName) {
+  boolean loadFileWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
-      loadYaml(fileName, FILE);
+      return loadYaml(fileName, FILE);
     } else if (fileName.endsWith("properties")) {
-      loadProperties(fileName, FILE);
+      return loadProperties(fileName, FILE);
     } else {
       throw new IllegalArgumentException("Expecting only yaml or properties file but got [" + fileName + "]");
     }
