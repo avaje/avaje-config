@@ -326,6 +326,11 @@ public interface Configuration {
   Properties eval(Properties properties);
 
   /**
+   * Run eval of the given properties modifying the values if changed.
+   */
+  void evalModify(Properties properties);
+
+  /**
    * Expression evaluation.
    */
   interface ExpressionEval {

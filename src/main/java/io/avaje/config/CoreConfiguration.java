@@ -94,15 +94,29 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public Properties eval(Properties properties) {
+  public Properties eval(Properties source) {
+    final ExpressionEval exprEval = InitialLoader.evalFor(source);
+    Properties dest = new Properties();
+    Enumeration<?> names = source.propertyNames();
+    while (names.hasMoreElements()) {
+      String name = (String) names.nextElement();
+      dest.setProperty(name, exprEval.eval(source.getProperty(name)));
+    }
+    return dest;
+  }
+
+  @Override
+  public void evalModify(Properties properties) {
     final ExpressionEval exprEval = InitialLoader.evalFor(properties);
-    Properties evalCopy = new Properties();
     Enumeration<?> names = properties.propertyNames();
     while (names.hasMoreElements()) {
       String name = (String) names.nextElement();
-      evalCopy.setProperty(name, exprEval.eval(properties.getProperty(name)));
+      String origValue = properties.getProperty(name);
+      String newValue = exprEval.eval(origValue);
+      if (!Objects.equals(newValue, origValue)) {
+        properties.setProperty(name, newValue);
+      }
     }
-    return evalCopy;
   }
 
   @Override

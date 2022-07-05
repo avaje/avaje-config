@@ -279,4 +279,22 @@ class CoreConfigurationTest {
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
   }
+
+  @Test
+  void evalModify() {
+    final Properties properties = basicProperties();
+    properties.setProperty("someA", "before-${foo.bar}-after");
+    properties.setProperty("yeahNah", "before-${no-eval-for-this}-after");
+
+    String beforeYeahNahValue = properties.getProperty("yeahNah");
+
+    final CoreConfiguration config = new CoreConfiguration(new Properties());
+    config.evalModify(properties);
+
+    String someAValue = properties.getProperty("someA");
+    assertThat(someAValue).isEqualTo("before-42-after");
+
+    String afterYeahNahValue = properties.getProperty("yeahNah");
+    assertThat(beforeYeahNahValue).isSameAs(afterYeahNahValue);
+  }
 }
