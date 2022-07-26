@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import io.avaje.applog.AppLog;
 
 /**
  * Provides application Configuration based on loading properties and yaml files
@@ -30,7 +31,7 @@ import java.util.function.Consumer;
  */
 public class Config {
 
-  static final System.Logger log = System.getLogger("io.avaje.config");
+  static final System.Logger log = AppLog.getLogger("io.avaje.config");
 
   private static final Configuration data = CoreConfiguration.initialise();
 
