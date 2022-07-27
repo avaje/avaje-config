@@ -12,7 +12,7 @@ dynamic configuration (changes to configuration properties at runtime).
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>1.8</version>
+  <version>2.2</version>
 </dependency>
 ```
 
