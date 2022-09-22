@@ -175,16 +175,13 @@ final class InitialLoader {
    * @return true if test properties have been loaded.
    */
   private boolean loadTest() {
-
     if (Boolean.getBoolean("suppressTestResource")) {
       return false;
     }
     int before = loadContext.size();
     loadProperties("application-test.properties", RESOURCE);
     loadYaml("application-test.yaml", RESOURCE);
-    if (loadYaml("application-test.yml", RESOURCE)) {
-      Config.log.log(Level.WARNING, "Please rename application-test.yml to application-test.yaml - Using yml suffix (rather than yaml) is deprecated.");
-    }
+    loadYaml("application-test.yml", RESOURCE);
     if (loadProperties("test-ebean.properties", RESOURCE)) {
       Config.log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
@@ -220,9 +217,7 @@ final class InitialLoader {
    */
   private void loadMain(Source source) {
     loadYaml("application.yaml", source);
-    if (loadYaml("application.yml", source)) {
-      Config.log.log(Level.WARNING, "Please rename application.yml to application.yaml - Using yml suffix (rather than yaml) is deprecated.");
-    }
+    loadYaml("application.yml", source);
     loadProperties("application.properties", source);
     if (loadProperties("ebean.properties", source)) {
       Config.log.log(Level.WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
