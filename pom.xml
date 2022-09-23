@@ -9,11 +9,11 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>2.3-SNAPSHOT</version>
+  <version>2.3</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>avaje-config-2.3</tag>
   </scm>
 
   <properties>
