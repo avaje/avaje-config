@@ -117,8 +117,8 @@ final class InitialLoader {
     // we should only find these resources when running tests
     if (!loadTest()) {
       loadLocalDev();
-      loadViaCommandLineArgs();
     }
+    loadViaCommandLineArgs();
   }
 
   private void loadViaCommandLineArgs() {
