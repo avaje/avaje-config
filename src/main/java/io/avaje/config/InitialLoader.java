@@ -238,9 +238,9 @@ final class InitialLoader {
 
   boolean loadFileWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
-      return loadYaml(fileName, FILE);
+      return loadYaml(fileName, RESOURCE) || loadYaml(fileName, FILE);
     } else if (fileName.endsWith("properties")) {
-      return loadProperties(fileName, FILE);
+      return loadProperties(fileName, RESOURCE) || loadProperties(fileName, FILE);
     } else {
       throw new IllegalArgumentException("Expecting only yaml or properties file but got [" + fileName + "]");
     }
