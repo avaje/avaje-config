@@ -88,7 +88,7 @@ We can define a `load.properties` property which has name of property file in re
 Example application.properties:
 ```
 common.property=value
-load.properties=application-extra.properties,path/to/prop/application-extra.properties
+load.properties=application-extra.properties,path/to/prop/application-extra2.properties
 ```
 
 - loads test resources (if they exist, nb: Test resources are only visible when running tests)
