@@ -12,7 +12,7 @@ dynamic configuration (changes to configuration properties at runtime).
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>2.2</version>
+  <version>${avaje.config.version}</version>
 </dependency>
 ```
 
@@ -83,7 +83,13 @@ Below is the how it looks for configuration properties.
 
 - loads via `load.properties` property.
 
-We can define a `load.properties` property which has path locations for other properties/yaml files to load
+We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load
+
+Example application.properties:
+```
+common.property=value
+load.properties=application-extra.properties,path/to/prop/application-extra.properties
+```
 
 - loads test resources (if they exist, nb: Test resources are only visible when running tests)
     - application-test.properties
