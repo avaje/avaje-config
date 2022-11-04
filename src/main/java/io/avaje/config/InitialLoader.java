@@ -201,7 +201,7 @@ final class InitialLoader {
 
   private void loadViaPaths(String paths) {
     for (String path : splitPaths(paths)) {
-      loadFileWithExtensionCheck(loadContext.eval(path));
+      loadWithExtensionCheck(loadContext.eval(path));
     }
   }
 
@@ -230,14 +230,14 @@ final class InitialLoader {
     if (fileName == null) {
       fileName = System.getProperty("props.file");
       if (fileName != null) {
-        if (!loadFileWithExtensionCheck(fileName)) {
+        if (!loadWithExtensionCheck(fileName)) {
           Config.log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
         }
       }
     }
   }
 
-  boolean loadFileWithExtensionCheck(String fileName) {
+  boolean loadWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
       return loadYaml(fileName, RESOURCE) || loadYaml(fileName, FILE);
     } else if (fileName.endsWith("properties")) {

@@ -38,9 +38,9 @@ class InitialLoaderTest {
   @Test
   void loadWithExtensionCheck() {
     InitialLoader loader = new InitialLoader();
-    loader.loadFileWithExtensionCheck("test-dummy.properties");
-    loader.loadFileWithExtensionCheck("test-dummy.yml");
-    loader.loadFileWithExtensionCheck("test-dummy2.yaml");
+    loader.loadWithExtensionCheck("test-dummy.properties");
+    loader.loadWithExtensionCheck("test-dummy.yml");
+    loader.loadWithExtensionCheck("test-dummy2.yaml");
 
     Properties properties = loader.eval();
     assertThat(properties.getProperty("dummy.yaml.bar")).isEqualTo("baz");
