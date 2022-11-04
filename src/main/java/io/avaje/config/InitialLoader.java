@@ -163,8 +163,9 @@ final class InitialLoader {
       final String appName = loadContext.getAppName();
       if (appName != null) {
         final String prefix = localDev.getAbsolutePath() + File.separator + appName;
-        loadFileWithExtensionCheck(prefix + ".yaml");
-        loadFileWithExtensionCheck(prefix + ".properties");
+        loadYaml(prefix + ".yaml", FILE);
+        loadYaml(prefix + ".yml", FILE);
+        loadProperties(prefix + ".properties", FILE);
       }
     }
   }
