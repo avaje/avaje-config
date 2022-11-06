@@ -18,7 +18,7 @@
 
   <properties>
     <snakeyaml.version>1.32</snakeyaml.version>
-    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+    <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
