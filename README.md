@@ -83,13 +83,16 @@ Below is the how it looks for configuration properties.
 
 - loads via `load.properties` property.
 
-We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load
+We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load.
+
+`load.properties` is pretty versatile and can even be chained. For example, in your main application properties, you can have `load.properties=application-${profile:local}.properties` to load based on the profile environment variable/-Dprofile JVM arg, and in the loaded properties you can add `load.properties` there to load more properties and so on.
 
 Example application.properties:
 ```
 common.property=value
-load.properties=application-extra.properties,path/to/prop/application-extra2.properties
+load.properties=application-${profile:local}.properties,path/to/prop/application-extra2.properties
 ```
+
 
 - loads test resources (if they exist, nb: Test resources are only visible when running tests)
     - application-test.properties
