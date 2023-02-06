@@ -113,3 +113,5 @@ Command line arguments starting with `-P` can specify properties/yaml files to l
 
 When properties are loaded they are merged/overlayed.
 
+### config.load.systemProperties
+If we set `config.load.systemProperties` to true then all the properties that have been loaded are then set into system properties.
