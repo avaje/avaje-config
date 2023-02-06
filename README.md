@@ -2,8 +2,8 @@
 [![Maven Central : avaje-config](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/avaje/avaje-config/blob/master/LICENSE)
 
+# [Avaje Config](https://avaje.io/config/)
 
-# Application configuration
 This library loads properties files that can be used to configure
 an application including "testing" and "local development" and
 dynamic configuration (changes to configuration properties at runtime).
@@ -15,10 +15,6 @@ dynamic configuration (changes to configuration properties at runtime).
   <version>${avaje.config.version}</version>
 </dependency>
 ```
-
-## Documentation
-
-Go to [avaje.io/config](https://avaje.io/config/) for user documentation.
 
 ## Typical use
 
