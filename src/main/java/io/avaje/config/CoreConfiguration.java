@@ -441,7 +441,7 @@ final class CoreConfiguration implements Configuration {
 
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         final String value = entry.getValue();
-        if (!excludedSet.contains(value) && !Objects.equals(value, NULL_PLACEHOLDER)) {
+        if (!excludedSet.contains(entry.getKey()) && !Objects.equals(value, NULL_PLACEHOLDER)) {
           System.setProperty(entry.getKey(), value);
         }
       }
