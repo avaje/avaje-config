@@ -7,4 +7,5 @@ myapp:
     barDouble: 33.3
 
 config.load.systemProperties: true
+system.excluded.properties: myapp.bar.barRules,myapp.fooName
 
