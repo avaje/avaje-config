@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,7 +122,7 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public void loadIntoSystemProperties() {
-    properties.loadIntoSystemProperties();
+    properties.loadIntoSystemProperties(set().of("system.excluded.properties", ""));
     loadedSystemProperties = true;
   }
 
@@ -433,13 +434,14 @@ final class CoreConfiguration implements Configuration {
         // cache in concurrent map to provide higher concurrent use
         properties.put(key, val);
       }
-      return (val != NULL_PLACEHOLDER) ? val : defaultValue;
+      return (!Objects.equals(val, NULL_PLACEHOLDER)) ? val : defaultValue;
     }
 
-    void loadIntoSystemProperties() {
+    void loadIntoSystemProperties(Set<String> excludedSet) {
+
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         final String value = entry.getValue();
-        if (value != NULL_PLACEHOLDER) {
+        if (!excludedSet.contains(entry.getKey()) && !Objects.equals(value, NULL_PLACEHOLDER)) {
           System.setProperty(entry.getKey(), value);
         }
       }
@@ -449,7 +451,7 @@ final class CoreConfiguration implements Configuration {
       Properties props = new Properties();
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         final String value = entry.getValue();
-        if (value != NULL_PLACEHOLDER) {
+        if (!Objects.equals(value, NULL_PLACEHOLDER)) {
           props.setProperty(entry.getKey(), value);
         }
       }
