@@ -6,20 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 /**
  * Core implementation of Configuration.
@@ -134,15 +123,17 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public Configuration forPath(String pathPrefix) {
+    final String dotPrefix = pathPrefix + '.';
+    final int dotLength = dotPrefix.length();
     final var newProps = new Properties();
-
-    properties.properties.entrySet().stream()
-        .filter(e -> e.getKey().startsWith(pathPrefix))
-        .forEach(
-            e -> {
-              newProps.put(e.getKey().replaceFirst(Pattern.quote(pathPrefix + "."), ""), e.getValue());
-            });
-
+    for (Map.Entry<String, String> entry : properties.properties.entrySet()) {
+      String key = entry.getKey();
+      if (key.startsWith(dotPrefix) ) {
+        newProps.put(key.substring(dotLength), entry.getValue());
+      } else if (key.equals(pathPrefix)) {
+        newProps.put("", entry.getValue());
+      }
+    }
     return new CoreConfiguration(newProps);
   }
 
