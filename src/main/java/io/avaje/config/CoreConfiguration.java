@@ -18,6 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * Core implementation of Configuration.
@@ -129,6 +130,21 @@ final class CoreConfiguration implements Configuration {
   public Properties asProperties() {
     return properties.asProperties();
   }
+
+  @Override
+  public Configuration forPath(String pathPrefix) {
+    final var newProps = new Properties();
+
+    properties.properties.entrySet().stream()
+        .filter(e -> e.getKey().startsWith(pathPrefix))
+        .forEach(
+            e -> {
+              newProps.put(e.getKey().replaceFirst(Pattern.quote(pathPrefix + "."), ""), e.getValue());
+            });
+
+    return new CoreConfiguration(newProps);
+  }
+
 
   @Override
   public ListValue list() {

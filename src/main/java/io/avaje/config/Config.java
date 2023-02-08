@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+
 import io.avaje.applog.AppLog;
 
 /**
@@ -46,6 +47,29 @@ public class Config {
    */
   public static Properties asProperties() {
     return data.asProperties();
+  }
+
+  /**
+   * Return the configuration for a path.
+   *
+   * <h3>Examples</h3>
+   *
+   * <p>Say you have a set of properties like this <br>
+   * <br>
+   * example.path.prefix1=1<br>
+   * example.path.prefix2=2<br>
+   *
+   * <pre>{@code
+   * Configuration config = Config.forPath("example.path");
+   * Configuration config2 = Config.forPath("example").forPath("path");
+   * // will output "1"
+   * int number = config.getInt("prefix1");
+   * // will output "2"
+   * number = config2.getInt("prefix2");
+   * }</pre>
+   */
+  public static Configuration forPath(String pathPrefix) {
+    return data.forPath(pathPrefix);
   }
 
   /**
