@@ -2,8 +2,8 @@
 [![Maven Central : avaje-config](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/avaje/avaje-config/blob/master/LICENSE)
 
+# [Avaje Config](https://avaje.io/config/)
 
-# Application configuration
 This library loads properties files that can be used to configure
 an application including "testing" and "local development" and
 dynamic configuration (changes to configuration properties at runtime).
@@ -15,10 +15,6 @@ dynamic configuration (changes to configuration properties at runtime).
   <version>${avaje.config.version}</version>
 </dependency>
 ```
-
-## Documentation
-
-Go to [avaje.io/config](https://avaje.io/config/) for user documentation.
 
 ## Typical use
 
@@ -83,13 +79,16 @@ Below is the how it looks for configuration properties.
 
 - loads via `load.properties` property.
 
-We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load
+We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load.
+
+`load.properties` is pretty versatile and can even be chained. For example, in your main application properties, you can have `load.properties=application-${profile:local}.properties` to load based on the profile environment variable/-Dprofile JVM arg, and in the loaded properties you can add `load.properties` there to load more properties and so on.
 
 Example application.properties:
 ```
 common.property=value
-load.properties=application-extra.properties,path/to/prop/application-extra2.properties
+load.properties=application-${profile:local}.properties,path/to/prop/application-extra2.properties
 ```
+
 
 - loads test resources (if they exist, nb: Test resources are only visible when running tests)
     - application-test.properties
@@ -110,3 +109,5 @@ Command line arguments starting with `-P` can specify properties/yaml files to l
 
 When properties are loaded they are merged/overlayed.
 
+### config.load.systemProperties
+If we set `config.load.systemProperties` to true then all the properties that have been loaded are then set into system properties.
