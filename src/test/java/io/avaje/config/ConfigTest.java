@@ -70,8 +70,11 @@ class ConfigTest {
     assertThat(System.getProperty("config.load.systemProperties")).isEqualTo("true");
     assertThat(System.getProperty("myExternalLoader")).isEqualTo("wasExecuted");
     assertThat(Config.getBool("config.load.systemProperties")).isTrue();
+    assertThat(System.getProperty("myapp.fooName")).isNull();
+    assertThat(System.getProperty("myapp.bar.barRules")).isNull();
+    assertThat(System.getProperty("myapp.bar.barDouble")).isEqualTo("33.3");
 
-    assertThat(properties).hasSize(7);
+    assertThat(properties).hasSize(8);
   }
 
   @Test

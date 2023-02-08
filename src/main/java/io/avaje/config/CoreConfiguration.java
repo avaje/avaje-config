@@ -122,7 +122,7 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public void loadIntoSystemProperties() {
-    properties.loadIntoSystemProperties(set().of("system.excluded.properties", ""));
+    properties.loadIntoSystemProperties(set().of("system.excluded.properties"));
     loadedSystemProperties = true;
   }
 
@@ -424,24 +424,23 @@ final class CoreConfiguration implements Configuration {
      * Get property with caching taking into account defaultValue and "null".
      */
     String getProperty(String key, String defaultValue) {
-      String val = properties.get(key);
-      if (val == null) {
+      String value = properties.get(key);
+      if (value == null) {
         // defining property at runtime with System property backing
-        val = System.getProperty(key);
-        if (val == null) {
-          val = (defaultValue == null) ? NULL_PLACEHOLDER : defaultValue;
+        value = System.getProperty(key);
+        if (value == null) {
+          value = (defaultValue == null) ? NULL_PLACEHOLDER : defaultValue;
         }
         // cache in concurrent map to provide higher concurrent use
-        properties.put(key, val);
+        properties.put(key, value);
       }
-      return (!Objects.equals(val, NULL_PLACEHOLDER)) ? val : defaultValue;
+      return value != NULL_PLACEHOLDER ? value : defaultValue;
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
-
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         final String value = entry.getValue();
-        if (!excludedSet.contains(entry.getKey()) && !Objects.equals(value, NULL_PLACEHOLDER)) {
+        if (!excludedSet.contains(entry.getKey()) && (value != NULL_PLACEHOLDER)) {
           System.setProperty(entry.getKey(), value);
         }
       }
@@ -451,7 +450,7 @@ final class CoreConfiguration implements Configuration {
       Properties props = new Properties();
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         final String value = entry.getValue();
-        if (!Objects.equals(value, NULL_PLACEHOLDER)) {
+        if (value != NULL_PLACEHOLDER) {
           props.setProperty(entry.getKey(), value);
         }
       }
