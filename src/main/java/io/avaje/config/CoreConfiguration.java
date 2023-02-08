@@ -123,12 +123,12 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public Configuration forPath(String pathPrefix) {
-    final String dotPrefix = pathPrefix + '.';
-    final int dotLength = dotPrefix.length();
+    final var dotPrefix = pathPrefix + '.';
+    final var dotLength = dotPrefix.length();
     final var newProps = new Properties();
     for (Map.Entry<String, String> entry : properties.properties.entrySet()) {
-      String key = entry.getKey();
-      if (key.startsWith(dotPrefix) ) {
+      final var key = entry.getKey();
+      if (key.startsWith(dotPrefix)) {
         newProps.put(key.substring(dotLength), entry.getValue());
       } else if (key.equals(pathPrefix)) {
         newProps.put("", entry.getValue());
@@ -136,7 +136,6 @@ final class CoreConfiguration implements Configuration {
     }
     return new CoreConfiguration(newProps);
   }
-
 
   @Override
   public ListValue list() {
