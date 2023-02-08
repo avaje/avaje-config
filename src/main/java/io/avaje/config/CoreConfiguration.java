@@ -6,17 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -129,6 +119,22 @@ final class CoreConfiguration implements Configuration {
   @Override
   public Properties asProperties() {
     return properties.asProperties();
+  }
+
+  @Override
+  public Configuration forPath(String pathPrefix) {
+    final var dotPrefix = pathPrefix + '.';
+    final var dotLength = dotPrefix.length();
+    final var newProps = new Properties();
+    for (Map.Entry<String, String> entry : properties.properties.entrySet()) {
+      final var key = entry.getKey();
+      if (key.startsWith(dotPrefix)) {
+        newProps.put(key.substring(dotLength), entry.getValue());
+      } else if (key.equals(pathPrefix)) {
+        newProps.put("", entry.getValue());
+      }
+    }
+    return new CoreConfiguration(newProps);
   }
 
   @Override

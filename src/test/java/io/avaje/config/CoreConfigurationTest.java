@@ -50,6 +50,49 @@ class CoreConfigurationTest {
   }
 
   @Test
+  void forPath() {
+    CoreConfiguration base = createSample();
+    Configuration foo = base.forPath("foo");
+
+    assertThat(foo.size()).isEqualTo(3);
+    assertThat(foo.getInt("bar")).isEqualTo(42);
+    assertThat(foo.getBool("t")).isTrue();
+    assertThat(foo.get("f")).isEqualTo("false");
+    assertThat(foo.getOptional("a")).isEmpty();
+  }
+
+  @Test
+  void forPath_nested() {
+    Properties properties = new Properties();
+    properties.setProperty("one.greet", "hi");
+    properties.setProperty("one.nested", "n");
+    properties.setProperty("one.nested.num", "42");
+    properties.setProperty("one.nested.active", "true");
+    properties.setProperty("one.nested.again.more", "other");
+    properties.setProperty("one.nested2.b", "b");
+    properties.setProperty("one", "spud");
+    properties.setProperty("oneNot", "fried");
+    properties.setProperty("modify", "me");
+
+    CoreConfiguration base = new CoreConfiguration(properties);
+    assertThat(base.size()).isEqualTo(9);
+
+    Configuration one = base.forPath("one");
+    assertThat(one.size()).isEqualTo(7);
+    assertThat(one.asProperties()).containsOnlyKeys("greet", "nested", "nested.num", "nested.active", "nested.again.more", "", "nested2.b");
+    assertThat(one.get("")).isEqualTo("spud");
+
+    Configuration nested = one.forPath("nested");
+    assertThat(nested.size()).isEqualTo(4);
+    assertThat(nested.asProperties()).containsOnlyKeys("", "num", "active", "again.more");
+    assertThat(nested.get("")).isEqualTo("n");
+
+    Configuration nested2 = base.forPath("one.nested");
+    assertThat(nested2.size()).isEqualTo(4);
+    assertThat(nested2.asProperties()).containsOnlyKeys("", "num", "active", "again.more");
+  }
+
+  @Test
   void test_toString() {
     assertThat(data.toString()).isNotEmpty();
     data.setWatcher(new FileWatch( Mockito.mock(Configuration.class), Collections.emptyList(), null));

@@ -32,6 +32,27 @@ public interface Configuration {
   Properties asProperties();
 
   /**
+   * Return the configuration for a path.
+   *
+   * <h3>Examples</h3>
+   *
+   * <p>Say you have a set of properties like this <br>
+   * <br>
+   * example.path.prefix1=1<br>
+   * example.path.prefix2=2<br>
+   *
+   * <pre>{@code
+   * Configuration config = Config.forPath("example.path");
+   * Configuration config2 = Config.forPath("example").forPath("path");
+   * // will output "1"
+   * int number = config.getInt("prefix1");
+   * // will output "2"
+   * number = config2.getInt("prefix2");
+   * }</pre>
+   */
+  Configuration forPath(String pathPrefix);
+
+  /**
    * Return a required configuration value as String.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
