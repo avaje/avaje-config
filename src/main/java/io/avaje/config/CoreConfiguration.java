@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Core implementation of Configuration.
@@ -22,11 +23,17 @@ final class CoreConfiguration implements Configuration {
   private boolean loadedSystemProperties;
   private FileWatch watcher;
   private Timer timer;
-
+  private final String pathPrefix;
+  
   CoreConfiguration(Properties source) {
+	  this(source, "");
+  }
+
+  CoreConfiguration(Properties source, String prefix) {
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
+    this.pathPrefix = prefix;
   }
 
   /**
@@ -134,7 +141,7 @@ final class CoreConfiguration implements Configuration {
         newProps.put("", entry.getValue());
       }
     }
-    return new CoreConfiguration(newProps);
+    return new CoreConfiguration(newProps, dotPrefix);
   }
 
   @Override
@@ -154,7 +161,7 @@ final class CoreConfiguration implements Configuration {
   private String getRequired(String key) {
     String value = getProperty(key);
     if (value == null) {
-      throw new IllegalStateException("Missing required configuration parameter [" + key + "]");
+      throw new IllegalStateException("Missing required configuration parameter [" + pathPrefix + key + "]");
     }
     return value;
   }
@@ -221,7 +228,7 @@ final class CoreConfiguration implements Configuration {
     try {
       return new URL(get(key));
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for " + key, e);
+      throw new IllegalStateException("Invalid url for " + pathPrefix + key, e);
     }
   }
 
@@ -230,7 +237,7 @@ final class CoreConfiguration implements Configuration {
     try {
       return new URL(get(key, defaultValue));
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for " + key, e);
+      throw new IllegalStateException("Invalid url for " + pathPrefix + key, e);
     }
   }
 

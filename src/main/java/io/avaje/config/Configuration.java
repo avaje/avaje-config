@@ -161,7 +161,7 @@ public interface Configuration {
   BigDecimal getDecimal(String key, String defaultValue);
 
   /**
-   * Return a URL configuration value.
+   * Return a URL configuration value. Deprecated, it's better to use URI over URL
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
    * </p>
@@ -169,16 +169,18 @@ public interface Configuration {
    * @param key The configuration key
    * @return The configured value
    */
+  @Deprecated
   URL getURL(String key);
 
   /**
-   * Return a URL configuration value with a default value.
+   * Return a URL configuration value with a default value. Deprecated, it's better to use URI over URL
 
    *
    * @param key          The configuration key
    * @param defaultValue The default value
    * @return The configured value
    */
+  @Deprecated
   URL getURL(String key, String defaultValue);
 
   /**
