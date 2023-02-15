@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 /**
  * Core implementation of Configuration.
@@ -24,9 +23,9 @@ final class CoreConfiguration implements Configuration {
   private FileWatch watcher;
   private Timer timer;
   private final String pathPrefix;
-  
+
   CoreConfiguration(Properties source) {
-	  this(source, "");
+    this(source, "");
   }
 
   CoreConfiguration(Properties source, String prefix) {
@@ -271,24 +270,28 @@ final class CoreConfiguration implements Configuration {
     return Enum.valueOf(cls, get(key, defaultValue.name()));
   }
 
+  private OnChangeListener onChange(String key) {
+    return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
+  }
+
   @Override
   public void onChange(String key, Consumer<String> callback) {
-    onChangeRegister(DataType.STRING, key, callback);
+    onChange(key).register(callback::accept);
   }
 
   @Override
   public void onChangeInt(String key, Consumer<Integer> callback) {
-    onChangeRegister(DataType.INT, key, callback);
+    onChange(key).register(newValue -> callback.accept(Integer.parseInt(newValue)));
   }
 
   @Override
   public void onChangeLong(String key, Consumer<Long> callback) {
-    onChangeRegister(DataType.LONG, key, callback);
+    onChange(key).register(newValue -> callback.accept(Long.parseLong(newValue)));
   }
 
   @Override
   public void onChangeBool(String key, Consumer<Boolean> callback) {
-    onChangeRegister(DataType.BOOL, key, callback);
+    onChange(key).register(newValue -> callback.accept(Boolean.parseBoolean(newValue)));
   }
 
   private void fireOnChange(String key, String value) {
@@ -298,10 +301,6 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
-  private void onChangeRegister(DataType type, String key, Consumer<?> callback) {
-    callbacks.computeIfAbsent(key, s -> new OnChangeListener()).register(new Callback(type, callback));
-  }
-
   @Override
   public void setProperty(String key, String newValue) {
     properties.setProperty(key, newValue);
@@ -309,53 +308,15 @@ final class CoreConfiguration implements Configuration {
 
   private static class OnChangeListener {
 
-    private final List<Callback> callbacks = new ArrayList<>();
+    private final List<Consumer<String>> callbacks = new ArrayList<>();
 
-    void register(Callback callback) {
+    void register(Consumer<String> callback) {
       callbacks.add(callback);
     }
 
     void fireOnChange(String value) {
-      for (Callback callback : callbacks) {
-        callback.fireOnChange(value);
-      }
-    }
-  }
-
-  private enum DataType {
-    INT,
-    LONG,
-    BOOL,
-    STRING
-  }
-
-  @SuppressWarnings("rawtypes")
-  private static class Callback {
-
-    private final DataType type;
-
-    private final Consumer consumer;
-
-    Callback(DataType type, Consumer consumer) {
-      this.type = type;
-      this.consumer = consumer;
-    }
-
-    @SuppressWarnings("unchecked")
-    void fireOnChange(String value) {
-      consumer.accept(convert(value));
-    }
-
-    private Object convert(String value) {
-      switch (type) {
-        case INT:
-          return Integer.valueOf(value);
-        case LONG:
-          return Long.valueOf(value);
-        case BOOL:
-          return Boolean.valueOf(value);
-        default:
-          return value;
+      for (Consumer<String> callback : callbacks) {
+        callback.accept(value);
       }
     }
   }
