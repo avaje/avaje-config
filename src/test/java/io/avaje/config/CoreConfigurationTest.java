@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CoreConfigurationTest {
@@ -59,6 +60,16 @@ class CoreConfigurationTest {
     assertThat(foo.getBool("t")).isTrue();
     assertThat(foo.get("f")).isEqualTo("false");
     assertThat(foo.getOptional("a")).isEmpty();
+  }
+
+  @Test
+  void forPathUnknown_expect_fullPathInMessage() {
+    CoreConfiguration base = createSample();
+    Configuration foo = base.forPath("foo");
+
+    assertThatThrownBy(() -> foo.get("iDoNotExistSoIthrow"))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("foo.iDoNotExistSoIthrow");
   }
 
   @Test
