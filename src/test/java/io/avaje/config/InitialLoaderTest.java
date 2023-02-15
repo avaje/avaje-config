@@ -109,15 +109,19 @@ class InitialLoaderTest {
   @Test
   void load_withSuppressTestResource() {
     //application-test.yaml is loaded when suppressTestResource is not set to true
-    System.setProperty("suppressTestResource", "");
-    InitialLoader loader = new InitialLoader(new DefaultEventLog());
-    Properties properties = loader.load();
-    assertThat(properties.getProperty("myapp.activateFoo")).isEqualTo("true");
+    try {
+      System.setProperty("suppressTestResource", "");
+      InitialLoader loader = new InitialLoader(new DefaultEventLog());
+      Properties properties = loader.load();
+      assertThat(properties.getProperty("myapp.activateFoo")).isEqualTo("true");
 
-    //application-test.yaml is not loaded when suppressTestResource is set to true
-    System.setProperty("suppressTestResource", "true");
-    InitialLoader loaderWithSuppressTestResource = new InitialLoader(new DefaultEventLog());
-    Properties propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
-    assertThat(propertiesWithoutTestResource.getProperty("myapp.activateFoo")).isNull();
+      //application-test.yaml is not loaded when suppressTestResource is set to true
+      System.setProperty("suppressTestResource", "true");
+      InitialLoader loaderWithSuppressTestResource = new InitialLoader(new DefaultEventLog());
+      Properties propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
+      assertThat(propertiesWithoutTestResource.getProperty("myapp.activateFoo")).isNull();
+    } finally {
+      System.clearProperty("suppressTestResource");
+    }
   }
 }

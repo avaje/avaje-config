@@ -106,7 +106,7 @@ class CoreConfigurationTest {
   @Test
   void test_toString() {
     assertThat(data.toString()).isNotEmpty();
-    data.setWatcher(new FileWatch( Mockito.mock(CoreConfiguration.class), Collections.emptyList(), null));
+    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), new Properties()) , Collections.emptyList(), null));
     data.loadIntoSystemProperties();
   }
 
