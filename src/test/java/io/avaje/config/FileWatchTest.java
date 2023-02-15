@@ -41,7 +41,7 @@ class FileWatchTest {
     final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
 
     assertThat(config.size()).isEqualTo(2);
-    assertThat(config.get("one", null)).isNull();
+    assertThat(config.getOptional("one")).isEmpty();
 
     touchFiles(files);
     // check after touch means files loaded
@@ -50,7 +50,7 @@ class FileWatchTest {
     // properties loaded as expected
     final int size0 = config.size();
     assertThat(size0).isGreaterThan(2);
-    assertThat(config.get("one", null)).isEqualTo("a");
+    assertThat(config.get("one")).isEqualTo("a");
     assertThat(config.getInt("my.size", 42)).isEqualTo(17);
     assertThat(config.getBool("c.active", false)).isTrue();
   }
@@ -81,7 +81,7 @@ class FileWatchTest {
 
     // properties loaded as expected
     assertThat(config.size()).isGreaterThan(2);
-    assertThat(config.get("one", null)).isEqualTo("a");
+    assertThat(config.get("one")).isEqualTo("a");
     assertThat(config.getInt("my.size", 42)).isEqualTo(17);
     assertThat(config.getBool("c.active", false)).isTrue();
   }
@@ -97,19 +97,19 @@ class FileWatchTest {
     if (isGithubActions()) {
       File aFile = files.get(0);
       log.info("file change detection in GithubActions via change in length from {}", aFile.length());
-      assertThat(config.get("one", null)).isNull();
+      assertThat(config.getOptional("one")).isEmpty();
 
       writeContent("one=NotAReally");
       sleep(20);
       log.info("file length now {}", aFile.length());
       watch.check();
-      assertThat(config.get("one", null)).isEqualTo("NotAReally");
+      assertThat(config.get("one")).isEqualTo("NotAReally");
 
       writeContent("one=a");
       sleep(20);
       log.info("file length now {}", aFile.length());
       watch.check();
-      assertThat(config.get("one", null)).isEqualTo("a");
+      assertThat(config.get("one")).isEqualTo("a");
       return;
     }
 
@@ -119,7 +119,7 @@ class FileWatchTest {
     // properties loaded as expected
     final int size0 = config.size();
     assertThat(size0).isGreaterThan(2);
-    assertThat(config.get("one", null)).isEqualTo("a");
+    assertThat(config.get("one")).isEqualTo("a");
 
     writeContent("one=NotA");
     sleep(20);
@@ -127,11 +127,11 @@ class FileWatchTest {
     watch.check();
     assertThat(watch.changed()).isFalse();
 
-    assertThat(config.get("one", null)).isEqualTo("NotA");
+    assertThat(config.get("one")).isEqualTo("NotA");
     writeContent("one=a");
     sleep(20);
     watch.check();
-    assertThat(config.get("one", null)).isEqualTo("a");
+    assertThat(config.get("one")).isEqualTo("a");
   }
 
   private void writeContent(String content) throws IOException {

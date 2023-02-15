@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
@@ -26,6 +28,7 @@ import java.util.function.LongConsumer;
  *
  * }</pre>
  */
+@NonNullApi
 public interface Configuration {
 
   /**
@@ -288,11 +291,16 @@ public interface Configuration {
   /**
    * Set a configuration value.
    * <p>
-   * This will fire an configuration callback listeners that are registered
-   * for this key.
-   * </p>
+   * This will fire configuration callback listeners that are registered for this key.
    */
   void setProperty(String key, String value);
+
+  /**
+   * Remove a configuration value for the given key.
+   * <p>
+   * This will fire configuration callback listeners that are registered for this key.
+   */
+  void clearProperty(String key);
 
   /**
    * Register a callback for a change to the given configuration key.

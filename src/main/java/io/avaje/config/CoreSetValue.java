@@ -15,7 +15,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<String> of(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptySet();
     }
@@ -24,7 +24,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<String> of(String key, String... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       Set<String> values = new LinkedHashSet<>();
       Collections.addAll(values, defaultValues);
@@ -35,7 +35,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<Integer> ofInt(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptySet();
     }
@@ -44,7 +44,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<Integer> ofInt(String key, int... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       Set<Integer> ints = new LinkedHashSet<>();
       for (int defaultVal : defaultValues) {
@@ -57,7 +57,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<Long> ofLong(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptySet();
     }
@@ -66,7 +66,7 @@ final class CoreSetValue implements Configuration.SetValue {
 
   @Override
   public Set<Long> ofLong(String key, long... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       Set<Long> ints = new LinkedHashSet<>();
       for (long defaultVal : defaultValues) {

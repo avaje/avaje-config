@@ -147,7 +147,7 @@ class CoreConfigurationTest {
   @Test
   void getDecimal_default() {
     assertThat(data.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
-    data.setProperty("myTestDecimal.doesNotExist", null);
+    data.clearProperty("myTestDecimal.doesNotExist");
   }
 
   @Test
@@ -155,7 +155,7 @@ class CoreConfigurationTest {
     data.setProperty("myTestDecimal", "14.3");
     assertThat(data.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
-    data.setProperty("myTestDecimal", null);
+    data.clearProperty("myTestDecimal");
   }
 
   @Test
@@ -177,7 +177,7 @@ class CoreConfigurationTest {
   @Test
   void getURL_default() throws MalformedURLException {
     assertThat(data.getURL("myUrl.doesNotExist", "http://foo")).isEqualTo(new URL("http://foo"));
-    data.setProperty("myUrl.doesNotExist", null);
+    data.clearProperty("myUrl.doesNotExist");
   }
 
   @Test
@@ -185,7 +185,7 @@ class CoreConfigurationTest {
     data.setProperty("myUrl", "http://bar");
     assertThat(data.getURL("myUrl")).isEqualTo(new URL("http://bar"));
     assertThat(data.getURL("myUrl", "http://baz")).isEqualTo(new URL("http://bar"));
-    data.setProperty("myUrl", null);
+    data.clearProperty("myUrl");
   }
 
   @Test
@@ -258,7 +258,7 @@ class CoreConfigurationTest {
     data.setProperty("modify", "change");
     assertThat(count.get()).isEqualTo(1);
 
-    data.setProperty("modify", null);
+    data.clearProperty("modify");
     assertThat(count.get()).isEqualTo(2);
     assertThat(sb.toString()).isEqualTo("change,null,");
 
@@ -269,10 +269,10 @@ class CoreConfigurationTest {
 
   @Test
   void setProperty_withEval() {
-    assertThat(data.get("ThisIsNotSet", null)).isNull();
+    assertThat(data.getOptional("ThisIsNotSet")).isEmpty();
     data.setProperty("ThisIsNotSet", "A|${user.home}|B");
     String expected = "A|" + System.getProperty("user.home") + "|B";
-    assertThat(data.get("ThisIsNotSet", null)).isEqualTo(expected);
+    assertThat(data.get("ThisIsNotSet")).isEqualTo(expected);
   }
 
   @Test

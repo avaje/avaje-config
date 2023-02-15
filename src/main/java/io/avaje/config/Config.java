@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
@@ -30,6 +32,7 @@ import java.util.function.LongConsumer;
  *
  * }</pre>
  */
+@NonNullApi
 public class Config {
 
   private static final Configuration data = CoreConfiguration.initialise();
@@ -404,6 +407,15 @@ public class Config {
    */
   public static void setProperty(String key, String value) {
     data.setProperty(key, value);
+  }
+
+  /**
+   * Clear the value for the given key.
+   *
+   * @param key The configuration key we want to clear
+   */
+  public static void clearProperty(String key) {
+    data.clearProperty(key);
   }
 
   /**
