@@ -15,7 +15,7 @@ class InitialLoaderTest {
     String userName = System.getProperty("user.name");
     String userHome = System.getProperty("user.home");
 
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadProperties("test-properties/application.properties", RESOURCE);
     loader.loadYaml("test-properties/application.yaml", RESOURCE);
 
@@ -37,7 +37,7 @@ class InitialLoaderTest {
 
   @Test
   void loadWithExtensionCheck() {
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadWithExtensionCheck("test-dummy.properties");
     loader.loadWithExtensionCheck("test-dummy.yml");
     loader.loadWithExtensionCheck("test-dummy2.yaml");
@@ -50,7 +50,7 @@ class InitialLoaderTest {
 
   @Test
   void loadYaml() {
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadYaml("test-properties/foo.yml", RESOURCE);
     Properties properties = loader.eval();
 
@@ -62,7 +62,7 @@ class InitialLoaderTest {
     System.setProperty("eureka.instance.hostname", "host1");
     System.setProperty("server.port", "9876");
 
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     Properties properties = loader.eval();
 
@@ -76,7 +76,7 @@ class InitialLoaderTest {
 
   @Test
   void splitPaths() {
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     assertThat(loader.splitPaths("one two three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one,two,three")).contains("one", "two", "three");
     assertThat(loader.splitPaths("one;two;three")).contains("one", "two", "three");
@@ -85,7 +85,7 @@ class InitialLoaderTest {
 
   @Test
   void loadViaCommandLine_whenNotValid() {
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadViaCommandLine(new String[]{"-p", "8765"});
     assertEquals(0, loader.size());
     loader.loadViaCommandLine(new String[]{"-port", "8765"});
@@ -101,7 +101,7 @@ class InitialLoaderTest {
 
   @Test
   void loadViaCommandLine_localFile() {
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadViaCommandLine(new String[]{"-p", "test-dummy2.yaml"});
     assertEquals(1, loader.size());
   }
@@ -110,13 +110,13 @@ class InitialLoaderTest {
   void load_withSuppressTestResource() {
     //application-test.yaml is loaded when suppressTestResource is not set to true
     System.setProperty("suppressTestResource", "");
-    InitialLoader loader = new InitialLoader();
+    InitialLoader loader = new InitialLoader(new DefaultEventLog());
     Properties properties = loader.load();
     assertThat(properties.getProperty("myapp.activateFoo")).isEqualTo("true");
 
     //application-test.yaml is not loaded when suppressTestResource is set to true
     System.setProperty("suppressTestResource", "true");
-    InitialLoader loaderWithSuppressTestResource = new InitialLoader();
+    InitialLoader loaderWithSuppressTestResource = new InitialLoader(new DefaultEventLog());
     Properties propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
     assertThat(propertiesWithoutTestResource.getProperty("myapp.activateFoo")).isNull();
   }

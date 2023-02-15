@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import io.avaje.applog.AppLog;
-
 /**
  * Provides application Configuration based on loading properties and yaml files
  * as well as plugins that supply properties (like dynamic configuration loaded from a db).
@@ -31,8 +29,6 @@ import io.avaje.applog.AppLog;
  * }</pre>
  */
 public class Config {
-
-  static final System.Logger log = AppLog.getLogger("io.avaje.config");
 
   private static final Configuration data = CoreConfiguration.initialise();
 

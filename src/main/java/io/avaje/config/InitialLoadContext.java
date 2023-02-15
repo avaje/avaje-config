@@ -18,6 +18,7 @@ import java.util.Set;
  */
 final class InitialLoadContext {
 
+  private final EventLog log;
   /**
    * Map we are loading the properties into.
    */
@@ -30,7 +31,8 @@ final class InitialLoadContext {
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
-  InitialLoadContext() {
+  InitialLoadContext(EventLog log) {
+    this.log = log;
     this.exprEval = new CoreExpressionEval(map);
   }
 
@@ -124,7 +126,7 @@ final class InitialLoadContext {
    * Evaluate all the expressions and return as a Properties object.
    */
   Properties evalAll() {
-    Config.log.log(Level.TRACE, "load from {0}", loadedResources);
+    log.log(Level.TRACE, "load from {0}", loadedResources);
     Properties properties = new Properties();
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();
