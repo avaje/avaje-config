@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 import io.avaje.applog.AppLog;
 
@@ -424,7 +426,7 @@ public class Config {
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
    */
-  public static void onChangeInt(String key, Consumer<Integer> callback) {
+  public static void onChangeInt(String key, IntConsumer callback) {
     data.onChangeInt(key, callback);
   }
 
@@ -434,7 +436,7 @@ public class Config {
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
    */
-  public static void onChangeLong(String key, Consumer<Long> callback) {
+  public static void onChangeLong(String key, LongConsumer callback) {
     data.onChangeLong(key, callback);
   }
 
