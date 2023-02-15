@@ -33,11 +33,13 @@ final class InitialLoader {
     FILE
   }
 
-  private final InitialLoadContext loadContext = new InitialLoadContext();
-
+  private final EventLog log;
+  private final InitialLoadContext loadContext;
   private YamlLoader yamlLoader;
 
-  InitialLoader() {
+  InitialLoader(EventLog log) {
+    this.log = log;
+    this.loadContext = new InitialLoadContext(log);
     initYamlLoader();
   }
 
@@ -184,7 +186,7 @@ final class InitialLoader {
     loadYaml("application-test.yaml", RESOURCE);
     loadYaml("application-test.yml", RESOURCE);
     if (loadProperties("test-ebean.properties", RESOURCE)) {
-      Config.log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
+      log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
     return loadContext.size() > before;
   }
@@ -221,7 +223,7 @@ final class InitialLoader {
     loadYaml("application.yml", source);
     loadProperties("application.properties", source);
     if (loadProperties("ebean.properties", source)) {
-      Config.log.log(Level.WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
+      log.log(Level.WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
     }
   }
 
@@ -231,7 +233,7 @@ final class InitialLoader {
       fileName = System.getProperty("props.file");
       if (fileName != null) {
         if (!loadWithExtensionCheck(fileName)) {
-          Config.log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
+          log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
         }
       }
     }

@@ -17,6 +17,7 @@ import java.util.function.LongConsumer;
  */
 final class CoreConfiguration implements Configuration {
 
+  private final EventLog log;
   private final ModifyAwareProperties properties;
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
@@ -26,11 +27,12 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(Properties source) {
-    this(source, "");
+  CoreConfiguration(EventLog log, Properties source) {
+    this(log, source, "");
   }
 
-  CoreConfiguration(Properties source, String prefix) {
+  CoreConfiguration(EventLog log, Properties source, String prefix) {
+    this.log = log;
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -41,19 +43,26 @@ final class CoreConfiguration implements Configuration {
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    final InitialLoader loader = new InitialLoader();
-    CoreConfiguration configuration = new CoreConfiguration(loader.load());
+    EventLog log = ServiceLoader.load(EventLog.class).findFirst().orElseGet(DefaultEventLog::new);
+    log.preInitialisation();
+    final InitialLoader loader = new InitialLoader(log);
+    CoreConfiguration configuration = new CoreConfiguration(log, loader.load());
     configuration.loadSources();
     loader.initWatcher(configuration);
     configuration.initSystemProperties();
     configuration.logMessage(loader);
+    log.postInitialisation();
     return configuration;
+  }
+
+  EventLog log() {
+    return log;
   }
 
   private void logMessage(InitialLoader loader) {
     String watchMsg = watcher == null ? "" : watcher.toString();
     String intoMsg = loadedSystemProperties ? " into System properties" : "";
-    Config.log.log(Level.INFO, "Loaded properties from {0}{1} {2}", loader.loadedFrom(), intoMsg, watchMsg);
+    log.log(Level.INFO, "Loaded properties from {0}{1} {2}", loader.loadedFrom(), intoMsg, watchMsg);
   }
 
   void initSystemProperties() {
@@ -88,7 +97,7 @@ final class CoreConfiguration implements Configuration {
       if (timer == null) {
         timer = new Timer("ConfigTimer", true);
       }
-      timer.schedule(new Task(runnable), delayMillis, periodMillis);
+      timer.schedule(new Task(log, runnable), delayMillis, periodMillis);
     }
   }
 
@@ -142,7 +151,7 @@ final class CoreConfiguration implements Configuration {
         newProps.put("", entry.getValue());
       }
     }
-    return new CoreConfiguration(newProps, dotPrefix);
+    return new CoreConfiguration(log, newProps, dotPrefix);
   }
 
   @Override
@@ -369,7 +378,6 @@ final class CoreConfiguration implements Configuration {
         oldValue = properties.put(key, newValue);
       }
       if (!Objects.equals(newValue, oldValue)) {
-        Config.log.log(Level.TRACE, "setProperty key:{0} value:{1}", key, newValue);
         propertiesBoolCache.remove(key);
         config.fireOnChange(key, newValue);
       }
@@ -436,9 +444,11 @@ final class CoreConfiguration implements Configuration {
 
   private static class Task extends TimerTask {
 
+    private final EventLog log;
     private final Runnable runnable;
 
-    private Task(Runnable runnable) {
+    private Task(EventLog log, Runnable runnable) {
+      this.log = log;
       this.runnable = runnable;
     }
 
@@ -447,7 +457,7 @@ final class CoreConfiguration implements Configuration {
       try {
         runnable.run();
       } catch (Exception e) {
-        Config.log.log(Level.ERROR, "Error executing timer task", e);
+        log.log(Level.ERROR, "Error executing timer task", e);
       }
     }
   }

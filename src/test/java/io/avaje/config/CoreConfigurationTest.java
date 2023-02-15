@@ -32,7 +32,7 @@ class CoreConfigurationTest {
   }
 
   private CoreConfiguration createSample() {
-    return new CoreConfiguration(basicProperties());
+    return new CoreConfiguration(new DefaultEventLog(), basicProperties());
   }
 
   @Test
@@ -40,7 +40,7 @@ class CoreConfigurationTest {
     final Properties properties = basicProperties();
     System.setProperty("SetViaSystemProperty", "FooBar");
 
-    final CoreConfiguration configuration = new CoreConfiguration(properties);
+    final CoreConfiguration configuration = new CoreConfiguration(new DefaultEventLog(), properties);
     configuration.initSystemProperties();
 
     final Properties loaded = configuration.asProperties();
@@ -85,7 +85,7 @@ class CoreConfigurationTest {
     properties.setProperty("oneNot", "fried");
     properties.setProperty("modify", "me");
 
-    CoreConfiguration base = new CoreConfiguration(properties);
+    CoreConfiguration base = new CoreConfiguration(new DefaultEventLog(), properties);
     assertThat(base.size()).isEqualTo(9);
 
     Configuration one = base.forPath("one");
@@ -106,7 +106,7 @@ class CoreConfigurationTest {
   @Test
   void test_toString() {
     assertThat(data.toString()).isNotEmpty();
-    data.setWatcher(new FileWatch( Mockito.mock(Configuration.class), Collections.emptyList(), null));
+    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), new Properties()) , Collections.emptyList(), null));
     data.loadIntoSystemProperties();
   }
 
@@ -328,7 +328,7 @@ class CoreConfigurationTest {
     final Properties properties = basicProperties();
     properties.setProperty("someA", "before-${foo.bar}-after");
 
-    final CoreConfiguration config = new CoreConfiguration(new Properties());
+    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), new Properties());
     final Properties copy = config.eval(properties);
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
@@ -342,7 +342,7 @@ class CoreConfigurationTest {
 
     String beforeYeahNahValue = properties.getProperty("yeahNah");
 
-    final CoreConfiguration config = new CoreConfiguration(new Properties());
+    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), new Properties());
     config.evalModify(properties);
 
     String someAValue = properties.getProperty("someA");

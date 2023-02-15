@@ -12,20 +12,22 @@ import java.util.Properties;
 
 final class FileWatch {
 
+  private final EventLog log;
   private final Configuration configuration;
   private final YamlLoader yamlLoader;
   private final List<Entry> files;
   private final long delay;
   private final long period;
 
-  FileWatch(Configuration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
+  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
+    this.log = configuration.log();
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);
     this.period = configuration.getInt("config.watch.period", 10);
     this.yamlLoader = yamlLoader;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
-      Config.log.log(Level.ERROR, "No files to watch?");
+      log.log(Level.ERROR, "No files to watch?");
     } else {
       configuration.schedule(delay * 1000, period * 1000, this::check);
     }
@@ -56,7 +58,7 @@ final class FileWatch {
   void check() {
     for (Entry file : files) {
       if (file.reload()) {
-        Config.log.log(Level.DEBUG, "reloading configuration from {0}", file);
+        log.log(Level.DEBUG, "reloading configuration from {0}", file);
         if (file.isYaml()) {
           reloadYaml(file);
         } else {
@@ -72,7 +74,7 @@ final class FileWatch {
       properties.load(is);
       put(properties);
     } catch (Exception e) {
-      Config.log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
+      log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
     }
   }
 
@@ -87,12 +89,12 @@ final class FileWatch {
 
   private void reloadYaml(Entry file) {
     if (yamlLoader == null) {
-      Config.log.log(Level.ERROR, "Unexpected - no yamlLoader to reload config file " + file);
+      log.log(Level.ERROR, "Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
         yamlLoader.load(is).forEach(configuration::setProperty);
       } catch (Exception e) {
-        Config.log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
+        log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
       }
     }
   }

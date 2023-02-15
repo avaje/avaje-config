@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
-import io.avaje.applog.AppLog;
-
 /**
  * Provides application Configuration based on loading properties and yaml files
  * as well as plugins that supply properties (like dynamic configuration loaded from a db).
@@ -33,8 +31,6 @@ import io.avaje.applog.AppLog;
  * }</pre>
  */
 public class Config {
-
-  static final System.Logger log = AppLog.getLogger("io.avaje.config");
 
   private static final Configuration data = CoreConfiguration.initialise();
 
