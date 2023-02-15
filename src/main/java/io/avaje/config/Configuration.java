@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
@@ -306,7 +308,7 @@ public interface Configuration {
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
    */
-  void onChangeInt(String key, Consumer<Integer> callback);
+  void onChangeInt(String key, IntConsumer callback);
 
   /**
    * Register a callback for a change to the given configuration key as an Long value.
@@ -314,7 +316,7 @@ public interface Configuration {
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
    */
-  void onChangeLong(String key, Consumer<Long> callback);
+  void onChangeLong(String key, LongConsumer callback);
 
   /**
    * Register a callback for a change to the given configuration key as an Boolean value.
@@ -498,4 +500,5 @@ public interface Configuration {
      */
     Set<Long> ofLong(String key, long... defaultValues);
   }
+
 }

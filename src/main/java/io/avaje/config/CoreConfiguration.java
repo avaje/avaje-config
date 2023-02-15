@@ -9,6 +9,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 /**
  * Core implementation of Configuration.
@@ -280,12 +282,12 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public void onChangeInt(String key, Consumer<Integer> callback) {
+  public void onChangeInt(String key, IntConsumer callback) {
     onChange(key).register(newValue -> callback.accept(Integer.parseInt(newValue)));
   }
 
   @Override
-  public void onChangeLong(String key, Consumer<Long> callback) {
+  public void onChangeLong(String key, LongConsumer callback) {
     onChange(key).register(newValue -> callback.accept(Long.parseLong(newValue)));
   }
 
