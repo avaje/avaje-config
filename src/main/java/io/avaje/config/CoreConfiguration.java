@@ -1,5 +1,8 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+
 import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -12,9 +15,12 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Core implementation of Configuration.
  */
+@NonNullApi
 final class CoreConfiguration implements Configuration {
 
   private final EventLog log;
@@ -164,12 +170,13 @@ final class CoreConfiguration implements Configuration {
     return setValue;
   }
 
-  private String getProperty(String key) {
-    return properties.getProperty(key);
+  @Nullable
+  String value(String key) {
+    return properties.value(key);
   }
 
-  private String getRequired(String key) {
-    String value = getProperty(key);
+  private String required(String key) {
+    String value = value(key);
     if (value == null) {
       throw new IllegalStateException("Missing required configuration parameter [" + pathPrefix + key + "]");
     }
@@ -178,22 +185,24 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public String get(String key) {
-    return getRequired(key);
+    return required(key);
   }
 
   @Override
   public String get(String key, String defaultValue) {
-    return properties.getProperty(key, defaultValue);
+    requireNonNull(key, "key is required");
+    requireNonNull(defaultValue, "defaultValue is required, use getOptional() instead");
+    return properties.value(key, defaultValue);
   }
 
   @Override
   public Optional<String> getOptional(String key) {
-    return Optional.ofNullable(getProperty(key));
+    return Optional.ofNullable(value(key));
   }
 
   @Override
   public boolean getBool(String key) {
-    return Boolean.parseBoolean(getRequired(key));
+    return Boolean.parseBoolean(required(key));
   }
 
   @Override
@@ -203,23 +212,23 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public int getInt(String key) {
-    return Integer.parseInt(getRequired(key));
+    return Integer.parseInt(required(key));
   }
 
   @Override
   public int getInt(String key, int defaultValue) {
-    String val = getProperty(key);
+    final String val = value(key);
     return (val == null) ? defaultValue : Integer.parseInt(val);
   }
 
   @Override
   public long getLong(String key) {
-    return Long.parseLong(getRequired(key));
+    return Long.parseLong(required(key));
   }
 
   @Override
   public long getLong(String key, long defaultValue) {
-    String val = getProperty(key);
+    final String val = value(key);
     return (val == null) ? defaultValue : Long.parseLong(val);
   }
 
@@ -273,21 +282,24 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public <T extends Enum<T>> T getEnum(Class<T> cls, String key) {
+    requireNonNull(cls, "Enum class is required");
     return Enum.valueOf(cls, get(key));
   }
 
   @Override
   public <T extends Enum<T>> T getEnum(Class<T> cls, String key, T defaultValue) {
+    requireNonNull(cls, "Enum class is required");
     return Enum.valueOf(cls, get(key, defaultValue.name()));
   }
 
   private OnChangeListener onChange(String key) {
+    requireNonNull(key, "key is required");
     return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
   }
 
   @Override
   public void onChange(String key, Consumer<String> callback) {
-    onChange(key).register(callback::accept);
+    onChange(key).register(callback);
   }
 
   @Override
@@ -314,7 +326,15 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public void setProperty(String key, String newValue) {
-    properties.setProperty(key, newValue);
+    requireNonNull(key, "key is required");
+    requireNonNull(newValue, "newValue is required, use clearProperty()");
+    properties.setValue(key, newValue);
+  }
+
+  @Override
+  public void clearProperty(String key) {
+    requireNonNull(key, "key is required");
+    properties.clearValue(key);
   }
 
   private static class OnChangeListener {
@@ -369,17 +389,20 @@ final class CoreConfiguration implements Configuration {
     /**
      * Set a property with expression evaluation.
      */
-    void setProperty(String key, String newValue) {
+    void setValue(String key, String newValue) {
       newValue = eval.eval(newValue);
-      Object oldValue;
-      if (newValue == null) {
-        oldValue = properties.remove(key);
-      } else {
-        oldValue = properties.put(key, newValue);
-      }
+      Object oldValue = properties.put(key, newValue);
       if (!Objects.equals(newValue, oldValue)) {
         propertiesBoolCache.remove(key);
         config.fireOnChange(key, newValue);
+      }
+    }
+
+    void clearValue(String key) {
+      Object oldValue = properties.remove(key);
+      if (oldValue != null) {
+        propertiesBoolCache.remove(key);
+        config.fireOnChange(key, null);
       }
     }
 
@@ -394,20 +417,26 @@ final class CoreConfiguration implements Configuration {
         return cachedValue;
       }
       // populate our specialised boolean cache to minimise costs on heavy use
-      final String rawValue = getProperty(key);
+      final String rawValue = value(key);
       boolean value = (rawValue == null) ? defaultValue : Boolean.parseBoolean(rawValue);
       propertiesBoolCache.put(key, value);
       return value;
     }
 
-    String getProperty(String key) {
-      return getProperty(key, null);
+    @Nullable
+    String value(String key) {
+      return _value(key, null);
+    }
+
+    String value(String key, String defaultValue) {
+      return _value(key, defaultValue);
     }
 
     /**
      * Get property with caching taking into account defaultValue and "null".
      */
-    String getProperty(String key, String defaultValue) {
+    @Nullable
+    private String _value(String key, @Nullable String defaultValue) {
       String value = properties.get(key);
       if (value == null) {
         // defining property at runtime with System property backing

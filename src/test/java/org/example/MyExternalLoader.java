@@ -10,7 +10,7 @@ public class MyExternalLoader implements ConfigurationSource {
 
     // we can read properties that have been already
     // loaded from files/resources if desired
-    configuration.get("myExternalLoader.location", null);
+    configuration.getOptional("myExternalLoader.location");
 
     // add set properties (kind of the point)
     configuration.setProperty("myExternalLoader", "wasExecuted");

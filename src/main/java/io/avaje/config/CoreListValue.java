@@ -15,7 +15,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<String> of(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptyList();
     }
@@ -24,7 +24,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<String> of(String key, String... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Arrays.asList(defaultValues);
     }
@@ -33,7 +33,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<Integer> ofInt(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptyList();
     }
@@ -42,7 +42,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<Integer> ofInt(String key, int... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       List<Integer> ints = new ArrayList<>(defaultValues.length);
       for (int defaultVal : defaultValues) {
@@ -55,7 +55,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<Long> ofLong(String key) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       return Collections.emptyList();
     }
@@ -64,7 +64,7 @@ final class CoreListValue implements Configuration.ListValue {
 
   @Override
   public List<Long> ofLong(String key, long... defaultValues) {
-    final String val = config.get(key, null);
+    final String val = config.value(key);
     if (val == null) {
       List<Long> ints = new ArrayList<>(defaultValues.length);
       for (long defaultVal : defaultValues) {

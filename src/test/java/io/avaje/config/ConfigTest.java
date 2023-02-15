@@ -22,7 +22,7 @@ class ConfigTest {
 
     // cached the initial value, still bar even when system property changed
     System.setProperty("MySystemProp0", "bazz");
-    assertThat(Config.get("MySystemProp0", null)).isEqualTo("bar");
+    assertThat(Config.get("MySystemProp0")).isEqualTo("bar");
 
     // mutate via Config.setProperty()
     Config.setProperty("MySystemProp0", "caz");
@@ -34,10 +34,10 @@ class ConfigTest {
 
   @Test
   void fallbackToSystemProperty_cacheInitialNullValue() {
-    assertThat(Config.get("MySystemProp", null)).isNull();
+    assertThat(Config.getOptional("MySystemProp")).isEmpty();
     System.setProperty("MySystemProp", "hello");
     // cached the initial null so still null
-    assertThat(Config.get("MySystemProp", null)).isNull();
+    assertThat(Config.getOptional("MySystemProp")).isEmpty();
   }
 
   @Test
@@ -45,13 +45,13 @@ class ConfigTest {
     assertThat(Config.get("MySystemProp2", "foo")).isEqualTo("foo");
     System.setProperty("MySystemProp2", "notFoo");
     // cached the initial value foo so still foo
-    assertThat(Config.get("MySystemProp2", null)).isEqualTo("foo");
-    Config.setProperty("MySystemProp2", null);
+    assertThat(Config.get("MySystemProp2")).isEqualTo("foo");
+    Config.clearProperty("MySystemProp2");
   }
 
   @Test
   void setProperty() {
-    assertThat(Config.get("MySystemProp3", null)).isNull();
+    assertThat(Config.getOptional("MySystemProp3")).isEmpty();
     Config.setProperty("MySystemProp3", "hello2");
     assertThat(Config.get("MySystemProp3")).isEqualTo("hello2");
   }
@@ -112,12 +112,12 @@ class ConfigTest {
   @Test
   public void get_default() {
     assertThat(Config.get("myapp.doesNotExist2", "MyDefault")).isEqualTo("MyDefault");
-    assertThat(Config.get("myapp.doesNotExist2", null)).isEqualTo("MyDefault");
+    assertThat(Config.get("myapp.doesNotExist2")).isEqualTo("MyDefault");
   }
 
   @Test
   void get_default_repeated_expect_returnDefaultValue() {
-    assertThat(Config.get("myapp.doesNotExist3", null)).isNull();
+    assertThat(Config.getOptional("myapp.doesNotExist3")).isEmpty();
     assertThat(Config.get("myapp.doesNotExist3", "other")).isEqualTo("other");
     assertThat(Config.get("myapp.doesNotExist3", "foo")).isEqualTo("foo");
     assertThat(Config.get("myapp.doesNotExist3", "junk")).isEqualTo("junk");
@@ -131,13 +131,13 @@ class ConfigTest {
 
   @Test
   void getBool_required_missing() {
-    Config.setProperty("myapp.doesNotExist", null);
+    Config.clearProperty("myapp.doesNotExist");
     assertThrows(IllegalStateException.class, () -> Config.getBool("myapp.doesNotExist"));
   }
 
   @Test
   void enabled_required_missing() {
-    Config.setProperty("myapp.doesNotExist", null);
+    Config.clearProperty("myapp.doesNotExist");
     assertThrows(IllegalStateException.class, () -> Config.enabled("myapp.doesNotExist"));
   }
 
@@ -171,7 +171,7 @@ class ConfigTest {
     // can dynamically change
     Config.setProperty("myapp.en.doesNotExist", "true");
     assertThat(Config.enabled("myapp.en.doesNotExist", true)).isTrue();
-    Config.setProperty("myapp.en.doesNotExist", null);
+    Config.clearProperty("myapp.en.doesNotExist");
   }
 
   @Test
@@ -222,7 +222,7 @@ class ConfigTest {
   @Test
   void getDecimal_default() {
     assertThat(Config.getDecimal("myTestDecimal.doesNotExist", "10.4")).isEqualByComparingTo("10.4");
-    Config.setProperty("myTestDecimal.doesNotExist", null);
+    Config.clearProperty("myTestDecimal.doesNotExist");
   }
 
   @Test
@@ -230,7 +230,7 @@ class ConfigTest {
     Config.setProperty("myTestDecimal", "14.3");
     assertThat(Config.getDecimal("myTestDecimal")).isEqualByComparingTo("14.3");
     assertThat(Config.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
-    Config.setProperty("myTestDecimal", null);
+    Config.clearProperty("myTestDecimal");
   }
 
   @Test
@@ -238,7 +238,7 @@ class ConfigTest {
     Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
     assertThat(Config.getURL("myConfigUrl", "http://two")).isEqualTo(new URL("http://bana"));
-    Config.setProperty("myConfigUrl", null);
+    Config.clearProperty("myConfigUrl");
   }
 
   @Test
@@ -246,7 +246,7 @@ class ConfigTest {
     Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURI("myConfigUrl")).isEqualTo(URI.create("http://bana"));
     assertThat(Config.getURI("myConfigUrl", "http://two")).isEqualTo(URI.create("http://bana"));
-    Config.setProperty("myConfigUrl", null);
+    Config.clearProperty("myConfigUrl");
   }
 
   @Test
@@ -254,7 +254,7 @@ class ConfigTest {
     Config.setProperty("myConfigDuration", "PT10H");
     assertThat(Config.getDuration("myConfigDuration")).isEqualTo(Duration.parse("PT10H"));
     assertThat(Config.getDuration("myConfigDuration", "PT10H")).isEqualTo(Duration.parse("PT10H"));
-    Config.setProperty("myConfigDuration", null);
+    Config.clearProperty("myConfigDuration");
   }
 
   @Test
@@ -265,7 +265,7 @@ class ConfigTest {
   @Test
   void getEnum_default() {
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum.doesNotExist2", MyTestEnum.C)).isEqualTo(MyTestEnum.C);
-    Config.setProperty("myTestEnum.doesNotExist2", null);
+    Config.clearProperty("myTestEnum.doesNotExist2");
   }
 
   @Test
@@ -273,7 +273,7 @@ class ConfigTest {
     Config.setProperty("myTestEnum", "B");
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum")).isEqualTo(MyTestEnum.B);
     assertThat(Config.getEnum(MyTestEnum.class, "myTestEnum", MyTestEnum.C)).isEqualTo(MyTestEnum.B);
-    Config.setProperty("myTestEnum", null);
+    Config.clearProperty("myTestEnum");
   }
 
   enum MyTestEnum {
