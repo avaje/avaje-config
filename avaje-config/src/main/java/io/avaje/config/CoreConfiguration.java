@@ -425,11 +425,21 @@ final class CoreConfiguration implements Configuration {
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
-      entries.loadIntoSystemProperties(excludedSet);
+      entries.forEach((key, entry) -> {
+        if (!excludedSet.contains(key) && !entry.isNull()) {
+          System.setProperty(key, entry.value());
+        }
+      });
     }
 
     Properties asProperties() {
-      return entries.asProperties();
+      Properties props = new Properties();
+      entries.forEach((key, entry) -> {
+        if (!entry.isNull()) {
+          props.setProperty(key, entry.value());
+        }
+      });
+      return props;
     }
   }
 

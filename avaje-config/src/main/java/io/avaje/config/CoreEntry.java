@@ -118,24 +118,6 @@ final class CoreEntry {
       return entry == null ? null : entry.value();
     }
 
-    Properties asProperties() {
-      Properties props = new Properties();
-      map.forEach((key, entry) -> {
-        if (!entry.isNull()) {
-          props.setProperty(key, entry.value());
-        }
-      });
-      return props;
-    }
-
-    void loadIntoSystemProperties(Set<String> excludedSet) {
-      map.forEach((key, entry) -> {
-        if (!excludedSet.contains(key) && !entry.isNull()) {
-          System.setProperty(key, entry.value());
-        }
-      });
-    }
-
     void forEach(BiConsumer<String, CoreEntry> consumer) {
       map.forEach(consumer);
     }
