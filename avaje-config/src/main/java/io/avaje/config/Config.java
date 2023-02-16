@@ -427,6 +427,15 @@ public class Config {
   public static void onChange(String key, Consumer<String> callback) {
     data.onChange(key, callback);
   }
+  
+  /**
+   * Register a callback for a change to the any configuration key.
+   *
+   * @param callback The callback handling to fire when a configuration changes.
+   */
+  public static void onAnyChange(Consumer<String> callback) {
+    data.onAnyChange(callback);
+  }
 
   /**
    * Register a callback for a change to the given configuration key as an Int value.

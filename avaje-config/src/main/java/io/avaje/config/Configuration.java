@@ -302,6 +302,13 @@ public interface Configuration {
    */
   void clearProperty(String key);
 
+  /** 
+   * Register a callback for a change to any configuration key.
+   *
+   * @param callback The callback handling to fire when a configuration changes.
+   */
+  void onAnyChange(Consumer<String> callback);
+
   /**
    * Register a callback for a change to the given configuration key.
    *

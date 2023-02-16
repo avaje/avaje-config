@@ -28,6 +28,7 @@ final class CoreConfiguration implements Configuration {
   private final EventLog log;
   private final ModifyAwareProperties properties;
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
+  private final List<Consumer<String>> globalCallbacks = new ArrayList<>();
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
   private boolean loadedSystemProperties;
@@ -302,6 +303,12 @@ final class CoreConfiguration implements Configuration {
   public void onChange(String key, Consumer<String> callback) {
     onChange(key).register(callback);
   }
+  
+  @Override
+  public void onAnyChange(Consumer<String> callback) {
+    globalCallbacks.add(callback);
+    asProperties().keySet().forEach(key -> onChange(key.toString()).register(callback));
+  }
 
   @Override
   public void onChangeInt(String key, IntConsumer callback) {
@@ -329,6 +336,9 @@ final class CoreConfiguration implements Configuration {
   public void setProperty(String key, String newValue) {
     requireNonNull(key, "key is required");
     requireNonNull(newValue, "newValue is required, use clearProperty()");
+    if(!globalCallbacks.isEmpty() && !callbacks.containsKey(key)) {
+    	globalCallbacks.forEach(c -> onChange(key, c));
+    }
     properties.setValue(key, newValue);
   }
 
