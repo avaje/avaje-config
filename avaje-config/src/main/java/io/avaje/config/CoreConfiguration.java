@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
+import static io.avaje.config.Constants.SYSTEM_PROPS;
+import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -89,7 +91,7 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public String toString() {
-    return "watcher:" + watcher + " properties:" + properties;
+    return watcher == null ? properties.toString() : "watcher:" + watcher + " " + properties;
   }
 
   @Override
@@ -415,10 +417,10 @@ final class CoreConfiguration implements Configuration {
       if (value == null) {
         // defining property at runtime with System property backing
         String systemValue = System.getProperty(key);
-        value = systemValue != null ? CoreEntry.of(systemValue, "SystemProperty") : defaultValue != null ? CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT) : CoreEntry.NULL_ENTRY;
+        value = systemValue != null ? CoreEntry.of(systemValue, SYSTEM_PROPS) : defaultValue != null ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT) : CoreEntry.NULL_ENTRY;
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
-        value = CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT);
+        value = CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
         entries.put(key, value);
       }
       return value;

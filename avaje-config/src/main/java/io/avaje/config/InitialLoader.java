@@ -263,7 +263,7 @@ final class InitialLoader {
       try {
         try (InputStream is = resource(resourcePath, source)) {
           if (is != null) {
-            yamlLoader.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file") + resourcePath));
+            yamlLoader.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
             return true;
           }
         }

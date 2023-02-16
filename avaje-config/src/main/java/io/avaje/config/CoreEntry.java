@@ -79,10 +79,9 @@ final class CoreEntry {
     return value == null;
   }
 
-
   @Override
   public String toString() {
-    return "CoreEntry [value=" + value + ", boolValue=" + boolValue + ", source=" + source + "]";
+    return isNull() ? "NullEntry" : "Entry[value=" + value + ", source=" + source + "]";
   }
 
   /**
@@ -101,6 +100,11 @@ final class CoreEntry {
           entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
         }
       });
+    }
+
+    @Override
+    public String toString() {
+      return "size:" + entryMap.size() + " entries:" + entryMap;
     }
 
     int size() {
