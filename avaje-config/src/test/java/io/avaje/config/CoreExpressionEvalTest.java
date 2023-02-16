@@ -2,9 +2,6 @@ package io.avaje.config;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,9 +83,9 @@ class CoreExpressionEvalTest {
 
   @Test
   void eval_withSourceMap() {
-    Map<String, String> source = new HashMap<>();
-    source.put("one", "1");
-    source.put("two", "2");
+    CoreEntry.CoreMap source = CoreEntry.newMap();
+    source.put("one", "1","");
+    source.put("two", "2","");
     final CoreExpressionEval exprEval = new CoreExpressionEval(source);
 
     assertThat(exprEval.eval("foo${one}bar${two}baz${one}")).isEqualTo("foo1bar2baz1");
@@ -109,6 +106,6 @@ class CoreExpressionEvalTest {
   }
 
   private String eval(String key) {
-    return new CoreExpressionEval(Collections.emptyMap()).eval(key);
+    return new CoreExpressionEval(CoreEntry.newMap()).eval(key);
   }
 }

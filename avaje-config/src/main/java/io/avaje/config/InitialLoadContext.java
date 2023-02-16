@@ -5,13 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.System.Logger.Level;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+
+import io.avaje.config.CoreEntry.CoreMap;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -20,9 +16,9 @@ final class InitialLoadContext {
 
   private final EventLog log;
   /**
-   * Map we are loading the properties into.
+   * CoreMap we are loading the properties into.
    */
-  private final Map<String, String> map = new LinkedHashMap<>();
+  private final CoreEntry.CoreMap map = CoreEntry.newMap();
 
   /**
    * Names of resources/files that were loaded.
@@ -64,7 +60,7 @@ final class InitialLoadContext {
 
   private void initSystemProperty(String envValue, String key) {
     if (envValue != null && System.getProperty(key) == null) {
-      map.put(key, envValue);
+      map.put(key, envValue, Constants.ENV_VARIABLES);
     }
   }
 
@@ -115,35 +111,32 @@ final class InitialLoadContext {
   /**
    * Add a property entry.
    */
-  void put(String key, String val) {
+  void put(String key, String val, String source) {
     if (val != null) {
       val = val.trim();
     }
-    map.put(key, val);
+    map.put(key, val, source);
   }
 
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-  Properties evalAll() {
+  CoreMap evalAll() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
-    Properties properties = new Properties();
-    for (Map.Entry<String, String> entry : map.entrySet()) {
-      String key = entry.getKey();
-      properties.setProperty(key, exprEval.eval(entry.getValue()));
-    }
-    return properties;
+    var core = CoreEntry.newMap();
+    map.forEach((key, entry) -> core.put(key, exprEval.eval(entry.value()), entry.source()));
+    return core;
   }
 
   /**
    * Read the special properties that can point to an external properties source.
    */
   String indirectLocation() {
-    String indirectLocation = map.get("load.properties");
+    CoreEntry indirectLocation = map.get("load.properties");
     if (indirectLocation == null) {
       indirectLocation = map.get("load.properties.override");
     }
-    return indirectLocation;
+    return indirectLocation == null ? null : indirectLocation.value();
   }
 
   /**
@@ -154,7 +147,7 @@ final class InitialLoadContext {
   }
 
   String getAppName() {
-    final String appName = map.get("app.name");
-    return (appName != null) ? appName : System.getProperty("app.name");
+    final CoreEntry appName = map.get("app.name");
+    return (appName != null) ? appName.value() : System.getProperty("app.name");
   }
 }

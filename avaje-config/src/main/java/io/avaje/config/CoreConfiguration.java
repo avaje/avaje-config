@@ -33,11 +33,11 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, Properties source) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source) {
     this(log, source, "");
   }
 
-  CoreConfiguration(EventLog log, Properties source, String prefix) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source, String prefix) {
     this.log = log;
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
@@ -148,16 +148,15 @@ final class CoreConfiguration implements Configuration {
   public Configuration forPath(String pathPrefix) {
     final var dotPrefix = pathPrefix + '.';
     final var dotLength = dotPrefix.length();
-    final var newProps = new Properties();
-    for (Map.Entry<String, String> entry : properties.properties.entrySet()) {
-      final var key = entry.getKey();
+    final var newEntryMap = CoreEntry.newMap();
+    properties.entries.forEach((key, entry) -> {
       if (key.startsWith(dotPrefix)) {
-        newProps.put(key.substring(dotLength), entry.getValue());
+        newEntryMap.put(key.substring(dotLength), entry);
       } else if (key.equals(pathPrefix)) {
-        newProps.put("", entry.getValue());
+        newEntryMap.put("", entry);
       }
-    }
-    return new CoreConfiguration(log, newProps, dotPrefix);
+    });
+    return new CoreConfiguration(log, newEntryMap, dotPrefix);
   }
 
   @Override
@@ -172,7 +171,7 @@ final class CoreConfiguration implements Configuration {
 
   @Nullable
   String value(String key) {
-    return properties.value(key);
+    return properties.entry(key).value();
   }
 
   private String required(String key) {
@@ -192,7 +191,7 @@ final class CoreConfiguration implements Configuration {
   public String get(String key, String defaultValue) {
     requireNonNull(key, "key is required");
     requireNonNull(defaultValue, "defaultValue is required, use getOptional() instead");
-    return properties.value(key, defaultValue);
+    return properties.entry(key, defaultValue).value();
   }
 
   @Override
@@ -354,36 +353,23 @@ final class CoreConfiguration implements Configuration {
 
   private static class ModifyAwareProperties {
 
-    /**
-     * Null value placeholder in properties ConcurrentHashMap.
-     */
-    private static final String NULL_PLACEHOLDER = "NULL";
-
-    private final Map<String, String> properties = new ConcurrentHashMap<>();
-    private final Map<String, Boolean> propertiesBoolCache = new ConcurrentHashMap<>();
-    private final Configuration.ExpressionEval eval = new CoreExpressionEval(properties);
+    private final CoreEntry.CoreMap entries;
+    private final Configuration.ExpressionEval eval;
     private final CoreConfiguration config;
 
-    ModifyAwareProperties(CoreConfiguration config, Properties source) {
+    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreMap entries) {
       this.config = config;
-      loadAll(source);
-    }
-
-    private void loadAll(Properties source) {
-      for (Map.Entry<Object, Object> entry : source.entrySet()) {
-        if (entry.getValue() != null) {
-          properties.put(entry.getKey().toString(), entry.getValue().toString());
-        }
-      }
+      this.entries = entries;
+      this.eval = new CoreExpressionEval(entries);
     }
 
     @Override
     public String toString() {
-      return properties.toString();
+      return entries.toString();
     }
 
     int size() {
-      return properties.size();
+      return entries.size();
     }
 
     /**
@@ -391,17 +377,15 @@ final class CoreConfiguration implements Configuration {
      */
     void setValue(String key, String newValue) {
       newValue = eval.eval(newValue);
-      Object oldValue = properties.put(key, newValue);
-      if (!Objects.equals(newValue, oldValue)) {
-        propertiesBoolCache.remove(key);
+      final CoreEntry oldEntry = entries.put(key, newValue, Constants.USER_PROVIDED);
+      if (oldEntry == null || !Objects.equals(newValue, oldEntry.value())) {
         config.fireOnChange(key, newValue);
       }
     }
 
     void clearValue(String key) {
-      Object oldValue = properties.remove(key);
+      final CoreEntry oldValue = entries.remove(key);
       if (oldValue != null) {
-        propertiesBoolCache.remove(key);
         config.fireOnChange(key, null);
       }
     }
@@ -412,61 +396,49 @@ final class CoreConfiguration implements Configuration {
      * with very high concurrent use.
      */
     boolean getBool(String key, boolean defaultValue) {
-      final Boolean cachedValue = propertiesBoolCache.get(key);
-      if (cachedValue != null) {
-        return cachedValue;
-      }
-      // populate our specialised boolean cache to minimise costs on heavy use
-      final String rawValue = value(key);
-      boolean value = (rawValue == null) ? defaultValue : Boolean.parseBoolean(rawValue);
-      propertiesBoolCache.put(key, value);
-      return value;
+      return entry(key, String.valueOf(defaultValue)).boolValue();
     }
 
-    @Nullable
-    String value(String key) {
-      return _value(key, null);
+    CoreEntry entry(String key) {
+      return _entry(key, null);
     }
 
-    String value(String key, String defaultValue) {
-      return _value(key, defaultValue);
+    CoreEntry entry(String key, String defaultValue) {
+      return _entry(key, defaultValue);
     }
 
     /**
      * Get property with caching taking into account defaultValue and "null".
      */
-    @Nullable
-    private String _value(String key, @Nullable String defaultValue) {
-      String value = properties.get(key);
+    private CoreEntry _entry(String key, @Nullable String defaultValue) {
+      CoreEntry value = entries.get(key);
       if (value == null) {
         // defining property at runtime with System property backing
-        value = System.getProperty(key);
-        if (value == null) {
-          value = (defaultValue == null) ? NULL_PLACEHOLDER : defaultValue;
-        }
-        // cache in concurrent map to provide higher concurrent use
-        properties.put(key, value);
+        String systemValue = System.getProperty(key);
+        value = systemValue != null ? CoreEntry.of(systemValue, "SystemProperty") : defaultValue != null ? CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT) : CoreEntry.NULL_ENTRY;
+        entries.put(key, value);
+      } else if (value.isNull() && defaultValue != null) {
+        value = CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT);
+        entries.put(key, value);
       }
-      return value != NULL_PLACEHOLDER ? value : defaultValue;
+      return value;
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
-      for (Map.Entry<String, String> entry : properties.entrySet()) {
-        final String value = entry.getValue();
-        if (!excludedSet.contains(entry.getKey()) && (value != NULL_PLACEHOLDER)) {
-          System.setProperty(entry.getKey(), value);
+      entries.forEach((key, entry) -> {
+        if (!excludedSet.contains(key) && !entry.isNull()) {
+          System.setProperty(key, entry.value());
         }
-      }
+      });
     }
 
     Properties asProperties() {
       Properties props = new Properties();
-      for (Map.Entry<String, String> entry : properties.entrySet()) {
-        final String value = entry.getValue();
-        if (value != NULL_PLACEHOLDER) {
-          props.setProperty(entry.getKey(), value);
+      entries.forEach((key, entry) -> {
+        if (!entry.isNull()) {
+          props.setProperty(key, entry.value());
         }
-      }
+      });
       return props;
     }
   }
