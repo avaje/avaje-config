@@ -74,7 +74,8 @@ class ConfigTest {
     assertThat(System.getProperty("myapp.bar.barRules")).isNull();
     assertThat(System.getProperty("myapp.bar.barDouble")).isEqualTo("33.3");
 
-    assertThat(properties).hasSize(8);
+    assertThat(properties).containsKeys("config.load.systemProperties", "config.watch.enabled", "myExternalLoader", "myapp.activateFoo", "myapp.bar.barDouble", "myapp.bar.barRules", "myapp.fooHome", "myapp.fooName", "system.excluded.properties");
+    assertThat(properties).hasSize(9);
   }
 
   @Test
@@ -119,8 +120,8 @@ class ConfigTest {
   void get_default_repeated_expect_returnDefaultValue() {
     assertThat(Config.getOptional("myapp.doesNotExist3")).isEmpty();
     assertThat(Config.get("myapp.doesNotExist3", "other")).isEqualTo("other");
-    assertThat(Config.get("myapp.doesNotExist3", "foo")).isEqualTo("foo");
-    assertThat(Config.get("myapp.doesNotExist3", "junk")).isEqualTo("junk");
+    assertThat(Config.get("myapp.doesNotExist3", "foo")).isEqualTo("other"); // No longer "foo" to be consistent with getBool treatment
+    assertThat(Config.get("myapp.doesNotExist3", "junk")).isEqualTo("other");
   }
 
   @Test

@@ -1,6 +1,5 @@
 package io.avaje.config;
 
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -20,13 +19,13 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
    */
   private static final String END = "}";
 
-  private Map<String, String> sourceMap;
+  private CoreEntry.Map sourceMap;
   private Properties sourceProperties;
 
   /**
    * Create with source map that can use used to eval expressions.
    */
-  CoreExpressionEval(Map<String, String> sourceMap) {
+  CoreExpressionEval(CoreEntry.Map sourceMap) {
     this.sourceMap = sourceMap;
   }
 
@@ -68,7 +67,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
 
   private String localLookup(String exp) {
     if (sourceMap != null) {
-      return sourceMap.get(exp);
+      return sourceMap.raw(exp);
     } else if (sourceProperties != null) {
       return sourceProperties.getProperty(exp);
     }
