@@ -1,14 +1,14 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import static java.util.Objects.requireNonNull;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 /**
  * Configuration entry.
@@ -16,33 +16,35 @@ import static java.util.Objects.requireNonNull;
 @NonNullApi
 final class CoreEntry {
 
-  /**
+/**
    * Entry used to represent no entry / null.
    */
   static final CoreEntry NULL_ENTRY = new CoreEntry();
 
   private final String value;
   private final boolean boolValue;
+  private final String source;
 
   /**
-   * Return a new empty map for entries.
+   * Return a new empty entryMap for entries.
    */
-  static Map newMap() {
-    return new CoreEntry.Map();
+  static CoreMap newMap() {
+    return new CoreEntry.CoreMap();
   }
 
   /**
-   * Return a new map populated from the given Properties.
+   * Return a new entryMap populated from the given Properties.
+   * @param propSource where these properties came from
    */
-  static Map newMap(Properties source) {
-    return new CoreEntry.Map(source);
+  static CoreMap newMap(Properties source, String propSource) {
+    return new CoreEntry.CoreMap(source, propSource);
   }
 
   /**
    * Return an entry for the given value.
    */
-  static CoreEntry of(@Nullable String val) {
-    return val == null ? NULL_ENTRY : new CoreEntry(val);
+  static CoreEntry of(@Nullable String val, String source) {
+    return val == null ? NULL_ENTRY : new CoreEntry(val, source);
   }
 
   /**
@@ -51,12 +53,14 @@ final class CoreEntry {
   private CoreEntry() {
     this.value = null;
     this.boolValue = false;
+    this.source = null;
   }
 
-  private CoreEntry(String value) {
+  private CoreEntry(String value, String source) {
     requireNonNull(value);
     this.value = value;
     this.boolValue = Boolean.parseBoolean(value);
+    this.source = source;
   }
 
   String value() {
@@ -67,59 +71,69 @@ final class CoreEntry {
     return boolValue;
   }
 
+  String source() {
+    return source;
+  }
+
   boolean isNull() {
     return value == null;
   }
 
+
+  @Override
+  public String toString() {
+    return "CoreEntry [value=" + value + ", boolValue=" + boolValue + ", source=" + source + "]";
+  }
+
   /**
-   * A map like container of CoreEntry entries.
+   * A entryMap like container of CoreEntry entries.
    */
-  static class Map {
+  static class CoreMap {
 
-    private final java.util.Map<String, CoreEntry> map = new ConcurrentHashMap<>();
+    private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
 
-    Map() {
+    CoreMap() {
     }
 
-    Map(Properties source) {
+    CoreMap(Properties source, String propSource) {
       source.forEach((key, value) -> {
         if (value != null) {
-          map.put(key.toString(), CoreEntry.of(value.toString()));
+          entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
         }
       });
     }
 
     int size() {
-      return map.size();
+      return entryMap.size();
     }
 
     @Nullable
     CoreEntry get(String key) {
-      return map.get(key);
+      return entryMap.get(key);
     }
 
     void put(String key, CoreEntry value) {
-      map.put(key, value);
+      entryMap.put(key, value);
     }
 
     @Nullable
-    CoreEntry put(String key, String value) {
-      return map.put(key, CoreEntry.of(value));
+    CoreEntry put(String key, String value, String source) {
+      return entryMap.put(key, CoreEntry.of(value, source));
     }
 
     @Nullable
     CoreEntry remove(String key) {
-      return map.remove(key);
+      return entryMap.remove(key);
     }
 
     @Nullable
     String raw(String key) {
-      final CoreEntry entry = map.get(key);
+      final var entry = entryMap.get(key);
       return entry == null ? null : entry.value();
     }
 
     void forEach(BiConsumer<String, CoreEntry> consumer) {
-      map.forEach(consumer);
+      entryMap.forEach(consumer);
     }
   }
 }

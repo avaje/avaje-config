@@ -83,9 +83,9 @@ class CoreExpressionEvalTest {
 
   @Test
   void eval_withSourceMap() {
-    CoreEntry.Map source = CoreEntry.newMap();
-    source.put("one", "1");
-    source.put("two", "2");
+    CoreEntry.CoreMap source = CoreEntry.newMap();
+    source.put("one", "1","");
+    source.put("two", "2","");
     final CoreExpressionEval exprEval = new CoreExpressionEval(source);
 
     assertThat(exprEval.eval("foo${one}bar${two}baz${one}")).isEqualTo("foo1bar2baz1");

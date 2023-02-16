@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.lang.System.Logger.Level;
 import java.util.*;
 
+import io.avaje.config.CoreEntry.CoreMap;
+
 /**
  * Manages the underlying map of properties we are gathering.
  */
@@ -14,9 +16,9 @@ final class InitialLoadContext {
 
   private final EventLog log;
   /**
-   * Map we are loading the properties into.
+   * CoreMap we are loading the properties into.
    */
-  private final CoreEntry.Map map = CoreEntry.newMap();
+  private final CoreEntry.CoreMap map = CoreEntry.newMap();
 
   /**
    * Names of resources/files that were loaded.
@@ -58,7 +60,7 @@ final class InitialLoadContext {
 
   private void initSystemProperty(String envValue, String key) {
     if (envValue != null && System.getProperty(key) == null) {
-      map.put(key, envValue);
+      map.put(key, envValue, Constants.ENV_VARIABLES);
     }
   }
 
@@ -109,21 +111,21 @@ final class InitialLoadContext {
   /**
    * Add a property entry.
    */
-  void put(String key, String val) {
+  void put(String key, String val, String source) {
     if (val != null) {
       val = val.trim();
     }
-    map.put(key, val);
+    map.put(key, val, source);
   }
 
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-  Properties evalAll() {
+  CoreMap evalAll() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
-    Properties properties = new Properties();
-    map.forEach((key, entry) -> properties.setProperty(key, exprEval.eval(entry.value())));
-    return properties;
+    var core = CoreEntry.newMap();
+    map.forEach((key, entry) -> core.put(key, exprEval.eval(entry.value()), entry.source()));
+    return core;
   }
 
   /**

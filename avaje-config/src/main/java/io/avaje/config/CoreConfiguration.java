@@ -33,11 +33,11 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, Properties source) {
-    this(log, CoreEntry.newMap(source), "");
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source) {
+    this(log, source, "");
   }
 
-  CoreConfiguration(EventLog log, CoreEntry.Map source, String prefix) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source, String prefix) {
     this.log = log;
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
@@ -353,11 +353,11 @@ final class CoreConfiguration implements Configuration {
 
   private static class ModifyAwareProperties {
 
-    private final CoreEntry.Map entries;
+    private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
     private final CoreConfiguration config;
 
-    ModifyAwareProperties(CoreConfiguration config, CoreEntry.Map entries) {
+    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreMap entries) {
       this.config = config;
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
@@ -377,7 +377,7 @@ final class CoreConfiguration implements Configuration {
      */
     void setValue(String key, String newValue) {
       newValue = eval.eval(newValue);
-      final CoreEntry oldEntry = entries.put(key, newValue);
+      final CoreEntry oldEntry = entries.put(key, newValue, Constants.USER_PROVIDED);
       if (oldEntry == null || !Objects.equals(newValue, oldEntry.value())) {
         config.fireOnChange(key, newValue);
       }
@@ -415,10 +415,10 @@ final class CoreConfiguration implements Configuration {
       if (value == null) {
         // defining property at runtime with System property backing
         String systemValue = System.getProperty(key);
-        value = systemValue != null ? CoreEntry.of(systemValue) : defaultValue != null ? CoreEntry.of(defaultValue) : CoreEntry.NULL_ENTRY;
+        value = systemValue != null ? CoreEntry.of(systemValue, "SystemProperty") : defaultValue != null ? CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT) : CoreEntry.NULL_ENTRY;
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
-        value = CoreEntry.of(defaultValue);
+        value = CoreEntry.of(defaultValue, Constants.USER_PROVIDED_DEFAULT);
         entries.put(key, value);
       }
       return value;

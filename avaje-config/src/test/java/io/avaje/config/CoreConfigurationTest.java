@@ -3,6 +3,8 @@ package io.avaje.config;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import io.avaje.config.CoreEntry.CoreMap;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -18,7 +20,7 @@ class CoreConfigurationTest {
 
   private final CoreConfiguration data = createSample();
 
-  private Properties basicProperties() {
+  private CoreMap basicProperties() {
     Properties properties = new Properties();
     properties.setProperty("a", "1");
     properties.setProperty("foo.bar", "42");
@@ -28,16 +30,17 @@ class CoreConfigurationTest {
     properties.setProperty("someValues", "13,42,55");
     properties.setProperty("1someValues", "13,42,55");
     properties.setProperty("myEnum", "TWO");
-    return properties;
+
+    return CoreEntry.newMap(properties, "test");
   }
 
   private CoreConfiguration createSample() {
-    return new CoreConfiguration(new DefaultEventLog(), basicProperties());
+    return new CoreConfiguration(new DefaultEventLog(), basicProperties(),"Test");
   }
 
   @Test
   void asProperties() {
-    final Properties properties = basicProperties();
+    final var properties = basicProperties();
     System.setProperty("SetViaSystemProperty", "FooBar");
 
     final CoreConfiguration configuration = new CoreConfiguration(new DefaultEventLog(), properties);
@@ -85,7 +88,7 @@ class CoreConfigurationTest {
     properties.setProperty("oneNot", "fried");
     properties.setProperty("modify", "me");
 
-    CoreConfiguration base = new CoreConfiguration(new DefaultEventLog(), properties);
+    CoreConfiguration base = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(properties, "test"));
     assertThat(base.size()).isEqualTo(9);
 
     Configuration one = base.forPath("one");
@@ -106,7 +109,7 @@ class CoreConfigurationTest {
   @Test
   void test_toString() {
     assertThat(data.toString()).isNotEmpty();
-    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), new Properties()) , Collections.emptyList(), null));
+    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
     data.loadIntoSystemProperties();
   }
 
@@ -325,30 +328,33 @@ class CoreConfigurationTest {
 
   @Test
   void evalProperties() {
-    final Properties properties = basicProperties();
-    properties.setProperty("someA", "before-${foo.bar}-after");
+    final var properties = basicProperties();
+    properties.put("someA", "before-${foo.bar}-after","eval");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), new Properties());
-    final Properties copy = config.eval(properties);
+    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test"));
+    
+    final var copy = config.eval(new CoreConfiguration(new DefaultEventLog(), properties).asProperties());
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
   }
 
   @Test
   void evalModify() {
-    final Properties properties = basicProperties();
+	final var properties = new CoreConfiguration(new DefaultEventLog(), basicProperties());
+
     properties.setProperty("someA", "before-${foo.bar}-after");
     properties.setProperty("yeahNah", "before-${no-eval-for-this}-after");
 
-    String beforeYeahNahValue = properties.getProperty("yeahNah");
+    String beforeYeahNahValue = properties.get("yeahNah");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), new Properties());
-    config.evalModify(properties);
+    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap());
+   var props= properties.asProperties();
+    config.evalModify(props);
 
-    String someAValue = properties.getProperty("someA");
+    String someAValue = props.getProperty("someA");
     assertThat(someAValue).isEqualTo("before-42-after");
 
-    String afterYeahNahValue = properties.getProperty("yeahNah");
+    String afterYeahNahValue = props.getProperty("yeahNah");
     assertThat(beforeYeahNahValue).isSameAs(afterYeahNahValue);
   }
 }
