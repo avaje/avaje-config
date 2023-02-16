@@ -83,7 +83,7 @@ class CoreExpressionEvalTest {
 
   @Test
   void eval_withSourceMap() {
-    CoreEntry.CoreEntryMap source = CoreEntry.newMap();
+    CoreEntry.CoreMap source = CoreEntry.newMap();
     source.put("one", "1","");
     source.put("two", "2","");
     final CoreExpressionEval exprEval = new CoreExpressionEval(source);

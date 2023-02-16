@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import io.avaje.config.CoreEntry.CoreEntryMap;
+import io.avaje.config.CoreEntry.CoreMap;
 
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
@@ -81,7 +81,7 @@ final class InitialLoader {
    *   - application-test.yaml
    * </pre>
    */
-  CoreEntryMap load() {
+  CoreMap load() {
     loadEnvironmentVars();
     loadLocalFiles();
     return eval();
@@ -254,7 +254,7 @@ final class InitialLoader {
   /**
    * Evaluate all the configuration entries and return as properties.
    */
-  CoreEntryMap eval() {
+  CoreMap eval() {
     return loadContext.evalAll();
   }
 

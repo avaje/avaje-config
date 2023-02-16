@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -27,16 +28,16 @@ final class CoreEntry {
   /**
    * Return a new empty entryMap for entries.
    */
-  static CoreEntryMap newMap() {
-    return new CoreEntry.CoreEntryMap();
+  static CoreMap newMap() {
+    return new CoreEntry.CoreMap();
   }
 
   /**
    * Return a new entryMap populated from the given Properties.
    * @param propSource where these properties came from
    */
-  static CoreEntryMap newMap(Properties source, String propSource) {
-    return new CoreEntry.CoreEntryMap(source, propSource);
+  static CoreMap newMap(Properties source, String propSource) {
+    return new CoreEntry.CoreMap(source, propSource);
   }
 
   /**
@@ -87,14 +88,14 @@ final class CoreEntry {
   /**
    * A entryMap like container of CoreEntry entries.
    */
-  static class CoreEntryMap {
+  static class CoreMap {
 
-    private final java.util.Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
+    private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
 
-    CoreEntryMap() {
+    CoreMap() {
     }
 
-    CoreEntryMap(Properties source, String propSource) {
+    CoreMap(Properties source, String propSource) {
       source.forEach((key, value) -> {
         if (value != null) {
           entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));

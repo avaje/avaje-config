@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.lang.System.Logger.Level;
 import java.util.*;
 
-import io.avaje.config.CoreEntry.CoreEntryMap;
+import io.avaje.config.CoreEntry.CoreMap;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -16,9 +16,9 @@ final class InitialLoadContext {
 
   private final EventLog log;
   /**
-   * CoreEntryMap we are loading the properties into.
+   * CoreMap we are loading the properties into.
    */
-  private final CoreEntry.CoreEntryMap map = CoreEntry.newMap();
+  private final CoreEntry.CoreMap map = CoreEntry.newMap();
 
   /**
    * Names of resources/files that were loaded.
@@ -121,7 +121,7 @@ final class InitialLoadContext {
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-  CoreEntryMap evalAll() {
+  CoreMap evalAll() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
     var core = CoreEntry.newMap();
     map.forEach((key, entry) -> core.put(key, exprEval.eval(entry.value()), entry.source()));

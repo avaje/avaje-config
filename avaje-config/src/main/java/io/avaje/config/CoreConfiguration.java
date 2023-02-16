@@ -33,11 +33,11 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreEntryMap source) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source) {
     this(log, source, "");
   }
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreEntryMap source, String prefix) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap source, String prefix) {
     this.log = log;
     this.properties = new ModifyAwareProperties(this, source);
     this.listValue = new CoreListValue(this);
@@ -353,11 +353,11 @@ final class CoreConfiguration implements Configuration {
 
   private static class ModifyAwareProperties {
 
-    private final CoreEntry.CoreEntryMap entries;
+    private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
     private final CoreConfiguration config;
 
-    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreEntryMap entries) {
+    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreMap entries) {
       this.config = config;
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);

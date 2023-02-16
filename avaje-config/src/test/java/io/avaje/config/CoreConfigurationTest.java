@@ -3,7 +3,7 @@ package io.avaje.config;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import io.avaje.config.CoreEntry.CoreEntryMap;
+import io.avaje.config.CoreEntry.CoreMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +20,7 @@ class CoreConfigurationTest {
 
   private final CoreConfiguration data = createSample();
 
-  private CoreEntryMap basicProperties() {
+  private CoreMap basicProperties() {
     Properties properties = new Properties();
     properties.setProperty("a", "1");
     properties.setProperty("foo.bar", "42");
