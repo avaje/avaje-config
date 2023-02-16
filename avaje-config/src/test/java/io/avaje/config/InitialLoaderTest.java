@@ -22,17 +22,17 @@ class InitialLoaderTest {
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     loader.loadYaml("test-properties/foo.yml", RESOURCE);
 
-    Properties properties = loader.eval();
+    var properties = loader.eval();
 
-    assertEquals("fromProperties", properties.getProperty("app.fromProperties"));
-    assertEquals("Two", properties.getProperty("app.two"));
+    assertEquals("fromProperties", properties.get("app.fromProperties").value());
+    assertEquals("Two", properties.get("app.two").value());
 
-    assertEquals("bart", properties.getProperty("eval.withDefault"));
-    assertEquals(userName, properties.getProperty("eval.name"));
-    assertEquals(userHome + "/after", properties.getProperty("eval.home"));
+    assertEquals("bart", properties.get("eval.withDefault").value());
+    assertEquals(userName, properties.get("eval.name").value());
+    assertEquals(userHome + "/after", properties.get("eval.home").value());
 
-    assertEquals("before|Beta|after", properties.getProperty("someOne"));
-    assertEquals("before|Two|after", properties.getProperty("someTwo"));
+    assertEquals("before|Beta|after", properties.get("someOne").value());
+    assertEquals("before|Two|after", properties.get("someTwo").value());
   }
 
   @Test
@@ -42,19 +42,19 @@ class InitialLoaderTest {
     loader.loadWithExtensionCheck("test-dummy.yml");
     loader.loadWithExtensionCheck("test-dummy2.yaml");
 
-    Properties properties = loader.eval();
-    assertThat(properties.getProperty("dummy.yaml.bar")).isEqualTo("baz");
-    assertThat(properties.getProperty("dummy.yml.foo")).isEqualTo("bar");
-    assertThat(properties.getProperty("dummy.properties.foo")).isEqualTo("bar");
+    var properties = loader.eval();
+    assertThat(properties.get("dummy.yaml.bar").value()).isEqualTo("baz");
+    assertThat(properties.get("dummy.yml.foo").value()).isEqualTo("bar");
+    assertThat(properties.get("dummy.properties.foo").value()).isEqualTo("bar");
   }
 
   @Test
   void loadYaml() {
     InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadYaml("test-properties/foo.yml", RESOURCE);
-    Properties properties = loader.eval();
+    var properties = loader.eval();
 
-    assertThat(properties.getProperty("Some.Other.pass")).isEqualTo("someDefault");
+    assertThat(properties.get("Some.Other.pass").value()).isEqualTo("someDefault");
   }
 
   @Test
@@ -64,14 +64,15 @@ class InitialLoaderTest {
 
     InitialLoader loader = new InitialLoader(new DefaultEventLog());
     loader.loadProperties("test-properties/one.properties", RESOURCE);
-    Properties properties = loader.eval();
-
-    assertThat(properties.getProperty("hello")).isEqualTo("there");
-    assertThat(properties.getProperty("name")).isEqualTo("Rob");
-    assertThat(properties.getProperty("statusPageUrl")).isEqualTo("https://host1:9876/status");
-    assertThat(properties.getProperty("statusPageUrl2")).isEqualTo("https://aaa:9876/status2");
-    assertThat(properties.getProperty("statusPageUrl3")).isEqualTo("https://aaa:89/status3");
-    assertThat(properties.getProperty("statusPageUrl4")).isEqualTo("https://there:9876/name/Rob");
+    var properties = loader.eval();
+    
+    assertThat(properties.get("hello").source()).isEqualTo("resource:test-properties/one.properties");
+    assertThat(properties.get("hello").value()).isEqualTo("there");
+    assertThat(properties.get("name").value()).isEqualTo("Rob");
+    assertThat(properties.get("statusPageUrl").value()).isEqualTo("https://host1:9876/status");
+    assertThat(properties.get("statusPageUrl2").value()).isEqualTo("https://aaa:9876/status2");
+    assertThat(properties.get("statusPageUrl3").value()).isEqualTo("https://aaa:89/status3");
+    assertThat(properties.get("statusPageUrl4").value()).isEqualTo("https://there:9876/name/Rob");
   }
 
   @Test
@@ -112,14 +113,14 @@ class InitialLoaderTest {
     try {
       System.setProperty("suppressTestResource", "");
       InitialLoader loader = new InitialLoader(new DefaultEventLog());
-      Properties properties = loader.load();
-      assertThat(properties.getProperty("myapp.activateFoo")).isEqualTo("true");
+      var properties = loader.load();
+      assertThat(properties.get("myapp.activateFoo").value()).isEqualTo("true");
 
       //application-test.yaml is not loaded when suppressTestResource is set to true
       System.setProperty("suppressTestResource", "true");
       InitialLoader loaderWithSuppressTestResource = new InitialLoader(new DefaultEventLog());
-      Properties propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
-      assertThat(propertiesWithoutTestResource.getProperty("myapp.activateFoo")).isNull();
+      var propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
+      assertThat(propertiesWithoutTestResource.get("myapp.activateFoo")).isNull();
     } finally {
       System.clearProperty("suppressTestResource");
     }

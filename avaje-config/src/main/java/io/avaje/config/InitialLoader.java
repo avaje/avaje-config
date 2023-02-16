@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import io.avaje.config.CoreEntry.CoreEntryMap;
+
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 
@@ -79,7 +81,7 @@ final class InitialLoader {
    *   - application-test.yaml
    * </pre>
    */
-  Properties load() {
+  CoreEntryMap load() {
     loadEnvironmentVars();
     loadLocalFiles();
     return eval();
@@ -252,7 +254,7 @@ final class InitialLoader {
   /**
    * Evaluate all the configuration entries and return as properties.
    */
-  Properties eval() {
+  CoreEntryMap eval() {
     return loadContext.evalAll();
   }
 
@@ -261,7 +263,7 @@ final class InitialLoader {
       try {
         try (InputStream is = resource(resourcePath, source)) {
           if (is != null) {
-            yamlLoader.load(is).forEach(loadContext::put);
+            yamlLoader.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file") + resourcePath));
             return true;
           }
         }
@@ -276,7 +278,7 @@ final class InitialLoader {
     try {
       try (InputStream is = resource(resourcePath, source)) {
         if (is != null) {
-          loadProperties(is);
+          loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
           return true;
         }
       }
@@ -290,18 +292,18 @@ final class InitialLoader {
     return loadContext.resource(resourcePath, source);
   }
 
-  private void loadProperties(InputStream is) throws IOException {
+  private void loadProperties(InputStream is, String source) throws IOException {
     Properties properties = new Properties();
     properties.load(is);
-    put(properties);
+    put(properties, source);
   }
 
-  private void put(Properties properties) {
+  private void put(Properties properties, String source) {
     Enumeration<?> enumeration = properties.propertyNames();
     while (enumeration.hasMoreElements()) {
       String key = (String) enumeration.nextElement();
       String val = properties.getProperty(key);
-      loadContext.put(key, val);
+      loadContext.put(key, val, source);
     }
   }
 

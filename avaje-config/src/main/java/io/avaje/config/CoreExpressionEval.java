@@ -19,13 +19,13 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
    */
   private static final String END = "}";
 
-  private CoreEntry.Map sourceMap;
+  private CoreEntry.CoreEntryMap sourceMap;
   private Properties sourceProperties;
 
   /**
    * Create with source map that can use used to eval expressions.
    */
-  CoreExpressionEval(CoreEntry.Map sourceMap) {
+  CoreExpressionEval(CoreEntry.CoreEntryMap sourceMap) {
     this.sourceMap = sourceMap;
   }
 
