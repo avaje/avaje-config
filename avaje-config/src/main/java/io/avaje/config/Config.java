@@ -429,7 +429,7 @@ public class Config {
   }
   
   /**
-   * Register a callback for a change to the any configuration key.
+   * Register a callback for a change to any configuration key.
    *
    * @param callback The callback handling to fire when a configuration changes.
    */
