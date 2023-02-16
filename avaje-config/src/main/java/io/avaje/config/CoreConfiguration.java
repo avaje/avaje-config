@@ -148,15 +148,15 @@ final class CoreConfiguration implements Configuration {
   public Configuration forPath(String pathPrefix) {
     final var dotPrefix = pathPrefix + '.';
     final var dotLength = dotPrefix.length();
-    final var newProps = CoreEntry.newMap();
+    final var newEntryMap = CoreEntry.newMap();
     properties.entries.forEach((key, entry) -> {
       if (key.startsWith(dotPrefix)) {
-        newProps.put(key.substring(dotLength), entry);
+        newEntryMap.put(key.substring(dotLength), entry);
       } else if (key.equals(pathPrefix)) {
-        newProps.put("", entry);
+        newEntryMap.put("", entry);
       }
     });
-    return new CoreConfiguration(log, newProps, dotPrefix);
+    return new CoreConfiguration(log, newEntryMap, dotPrefix);
   }
 
   @Override
