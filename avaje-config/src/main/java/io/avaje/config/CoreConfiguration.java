@@ -314,6 +314,14 @@ final class CoreConfiguration implements Configuration {
           listener.accept(event);
         }
       }
+      // legacy per-key listeners
+      for (String modifiedKey : modifiedKeys) {
+        OnChangeListener listener = callbacks.get(modifiedKey);
+        if (listener != null) {
+          final String value = properties.valueOrNull(modifiedKey);
+          listener.fireOnChange(value);
+        }
+      }
     }
   }
 
@@ -347,24 +355,17 @@ final class CoreConfiguration implements Configuration {
     onChange(key).register(newValue -> callback.accept(Boolean.parseBoolean(newValue)));
   }
 
-  private void fireOnChange(String key, String value) {
-    OnChangeListener listener = callbacks.get(key);
-    if (listener != null) {
-      listener.fireOnChange(value);
-    }
-  }
-
   @Override
   public void setProperty(String key, String newValue) {
     requireNonNull(key, "key is required");
     requireNonNull(newValue, "newValue is required, use clearProperty()");
-    properties.setValue(key, newValue);
+    eventBuilder("SetProperty").put(key, newValue).publish();
   }
 
   @Override
   public void clearProperty(String key) {
     requireNonNull(key, "key is required");
-    properties.clearValue(key);
+    eventBuilder("ClearProperty").remove(key).publish();
   }
 
   private static class OnChangeListener {
@@ -407,22 +408,10 @@ final class CoreConfiguration implements Configuration {
       return eval.eval(value);
     }
 
-    /**
-     * Set a property with expression evaluation.
-     */
-    void setValue(String key, String newValue) {
-      newValue = eval.eval(newValue);
-      final CoreEntry oldEntry = entries.put(key, newValue, Constants.USER_PROVIDED);
-      if (oldEntry == null || !Objects.equals(newValue, oldEntry.value())) {
-        config.fireOnChange(key, newValue);
-      }
-    }
-
-    void clearValue(String key) {
-      final CoreEntry oldValue = entries.remove(key);
-      if (oldValue != null) {
-        config.fireOnChange(key, null);
-      }
+    @Nullable
+    String valueOrNull(String key) {
+      CoreEntry entry = entries.get(key);
+      return entry == null ? null : entry.value();
     }
 
     /**
