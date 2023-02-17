@@ -260,7 +260,7 @@ class CoreConfigurationTest {
     data.eventBuilder("myTest")
       .put("a", "1") // not actually a change
       .put("onChangeTest_1", "one")
-      .put("onChangeTest_1.2", "two")
+      .put("onChangeTest_1.2", "two|${user.home}|be")
       .remove("onChange_doesNotExist")
       .remove("foo.bar")
       .publish();
@@ -276,8 +276,9 @@ class CoreConfigurationTest {
     assertThat(configuration.getOptional("foo.bar")).isEmpty();
     assertThat(data.getOptional("foo.bar")).isEmpty();
 
+    String userHome = System.getProperty("user.home");
     assertThat(configuration.get("onChangeTest_1")).isEqualTo("one");
-    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two");
+    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two|" + userHome+ "|be");
 
 
     assertThat(capturedEventsNoKeyMatch).isEmpty();

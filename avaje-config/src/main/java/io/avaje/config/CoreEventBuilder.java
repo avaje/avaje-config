@@ -23,6 +23,7 @@ final class CoreEventBuilder implements EventBuilder {
   public EventBuilder put(String key, String value) {
     requireNonNull(key);
     requireNonNull(value);
+    value = origin.eval(value);
     if (snapshot.isChanged(key, value)) {
       changes.put(key, value);
     }

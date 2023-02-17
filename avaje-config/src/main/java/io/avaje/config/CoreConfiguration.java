@@ -111,6 +111,10 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
+  String eval(String value) {
+    return properties.eval(value);
+  }
+
   @Override
   public Properties eval(Properties source) {
     final ExpressionEval exprEval = InitialLoader.evalFor(source);
@@ -397,6 +401,10 @@ final class CoreConfiguration implements Configuration {
 
     int size() {
       return entries.size();
+    }
+
+    String eval(String value) {
+      return eval.eval(value);
     }
 
     /**
