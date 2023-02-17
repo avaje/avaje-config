@@ -419,6 +419,9 @@ public class Config {
 
   /**
    * Register an event listener that will be notified of configuration changes.
+   * <p>
+   * Events are created when configuration is changed via {@link #eventBuilder(String)}
+   * or when configuration is reload from its sources (watching file changes etc).
    *
    * @param eventListener The listener that is called when changes have occurred
    * @param keys          Optionally specify keys when the listener is only interested
@@ -429,18 +432,20 @@ public class Config {
   }
 
   /**
-   * Set a configuration value.
+   * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
+   * used when setting multiple configuration values.
    * <p>
-   * This will fire an configuration callback listeners that are registered
-   * for this key.
-   * </p>
+   * This will fire configuration callback listeners that are registered.
    */
   public static void setProperty(String key, String value) {
     data.setProperty(key, value);
   }
 
   /**
-   * Clear the value for the given key.
+   * Clear the value for the given key. Note that {@link #eventBuilder(String)} should be
+   * used when setting multiple configuration values.
+   * <p>
+   * This will fire configuration callback listeners that are registered.
    *
    * @param key The configuration key we want to clear
    */
