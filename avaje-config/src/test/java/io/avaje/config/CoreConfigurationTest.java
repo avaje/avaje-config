@@ -1,13 +1,13 @@
 package io.avaje.config;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import io.avaje.config.CoreEntry.CoreMap;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -244,6 +244,49 @@ class CoreConfigurationTest {
   }
 
   @Test
+  void onChangeNew() {
+    // we will remove this entry
+    assertThat(data.getOptional("foo.bar")).contains("42");
+
+    final List<Event> capturedEvents = new ArrayList<>();
+    data.onChange(capturedEvents::add);
+
+    final List<Event> capturedEventsMatchOnKey = new ArrayList<>();
+    data.onChange(capturedEventsMatchOnKey::add, "onChangeTest_1");
+
+    final List<Event> capturedEventsNoKeyMatch = new ArrayList<>();
+    data.onChange(capturedEventsNoKeyMatch::add, "noMatchOnThisKey");
+
+    data.eventBuilder("myTest")
+      .put("a", "1") // not actually a change
+      .put("onChangeTest_1", "one")
+      .put("onChangeTest_1.2", "two")
+      .remove("onChange_doesNotExist")
+      .remove("foo.bar")
+      .publish();
+
+    assertThat(capturedEvents).hasSize(1);
+    final var event = capturedEvents.get(0);
+    assertThat(event.name()).isEqualTo("myTest");
+    assertThat(event.modifiedKeys()).containsExactlyInAnyOrder("onChangeTest_1", "onChangeTest_1.2", "foo.bar");
+
+    var configuration = event.configuration();
+
+    // we have removed this entry
+    assertThat(configuration.getOptional("foo.bar")).isEmpty();
+    assertThat(data.getOptional("foo.bar")).isEmpty();
+
+    assertThat(configuration.get("onChangeTest_1")).isEqualTo("one");
+    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two");
+
+
+    assertThat(capturedEventsNoKeyMatch).isEmpty();
+
+    assertThat(capturedEventsMatchOnKey).hasSize(1);
+    assertThat(capturedEventsMatchOnKey.get(0).modifiedKeys()).containsExactlyInAnyOrder("onChangeTest_1", "onChangeTest_1.2", "foo.bar");
+  }
+
+  @Test
   void onChange() {
     AtomicInteger count = new AtomicInteger();
     StringBuilder sb = new StringBuilder();
@@ -332,7 +375,7 @@ class CoreConfigurationTest {
     properties.put("someA", "before-${foo.bar}-after","eval");
 
     final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test"));
-    
+
     final var copy = config.eval(new CoreConfiguration(new DefaultEventLog(), properties).asProperties());
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");

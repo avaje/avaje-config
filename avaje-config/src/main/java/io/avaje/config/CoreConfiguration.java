@@ -27,6 +27,8 @@ final class CoreConfiguration implements Configuration {
 
   private final EventLog log;
   private final ModifyAwareProperties properties;
+  private final List<CoreListener> listeners = new ArrayList<>();
+
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
@@ -293,6 +295,29 @@ final class CoreConfiguration implements Configuration {
     return Enum.valueOf(cls, get(key, defaultValue.name()));
   }
 
+  @Override
+  public EventBuilder eventBuilder(String name) {
+    requireNonNull(name);
+    return new CoreEventBuilder(name, this, properties.copy());
+  }
+
+  void publishEvent(CoreEventBuilder eventBuilder) {
+    if (eventBuilder.hasChanges()) {
+      Set<String> modifiedKeys = properties.applyChanges(eventBuilder);
+      if (!modifiedKeys.isEmpty()) {
+        final var event = new CoreEvent(eventBuilder.name(), modifiedKeys, this);
+        for (CoreListener listener : listeners) {
+          listener.accept(event);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void onChange(Consumer<Event> eventListener, String... keys) {
+    listeners.add(new CoreListener(eventListener, keys));
+  }
+
   private OnChangeListener onChange(String key) {
     requireNonNull(key, "key is required");
     return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
@@ -442,6 +467,17 @@ final class CoreConfiguration implements Configuration {
         }
       });
       return props;
+    }
+
+    /**
+     * Return a copy of the internal map.
+     */
+    CoreEntry.CoreMap copy() {
+      return entries.copy();
+    }
+
+    Set<String> applyChanges(CoreEventBuilder eventBuilder) {
+      return entries.applyChanges(eventBuilder);
     }
   }
 

@@ -289,6 +289,18 @@ public interface Configuration {
   }
 
   /**
+   * Create an event builder to make changes to the configuration.
+   *
+   * @param name The name of the event which defines the source of the configuration value.
+   */
+  EventBuilder eventBuilder(String name);
+
+  /**
+   * Register an event listener that will be notified of configuration changes.
+   */
+  void onChange(Consumer<Event> eventListener, String... keys);
+
+  /**
    * Set a configuration value.
    * <p>
    * This will fire configuration callback listeners that are registered for this key.

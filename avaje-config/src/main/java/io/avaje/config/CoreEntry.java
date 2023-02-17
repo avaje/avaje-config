@@ -2,9 +2,9 @@ package io.avaje.config;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 
 import io.avaje.lang.NonNullApi;
@@ -90,8 +90,16 @@ final class CoreEntry {
   static class CoreMap {
 
     private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
+    private final ReentrantLock lock = new ReentrantLock();
 
     CoreMap() {
+    }
+
+    /**
+     * Copy constructor.
+     */
+    CoreMap(CoreMap source) {
+      entryMap.putAll(source.entryMap);
     }
 
     CoreMap(Properties source, String propSource) {
@@ -100,6 +108,10 @@ final class CoreEntry {
           entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
         }
       });
+    }
+
+    CoreMap copy() {
+      return new CoreMap(this);
     }
 
     @Override
@@ -114,6 +126,58 @@ final class CoreEntry {
     @Nullable
     CoreEntry get(String key) {
       return entryMap.get(key);
+    }
+
+    /**
+     * Apply changes returning the set of modified keys.
+     */
+    Set<String> applyChanges(CoreEventBuilder eventBuilder) {
+      lock.lock();
+      try {
+        Set<String> modifiedKeys = new HashSet<>();
+        final var sourceName = "event:" + eventBuilder.name();
+        eventBuilder.forEachPut((key, value) -> {
+          if (value == null) {
+            if (entryMap.remove(key) != null) {
+              modifiedKeys.add(key);
+            }
+          }
+          if (putIfChanged(key, value, sourceName)) {
+            modifiedKeys.add(key);
+          }
+        });
+        return modifiedKeys;
+
+      } finally {
+        lock.unlock();
+      }
+    }
+
+    /**
+     * Return true if this is a change in value.
+     */
+    boolean isChanged(String key, String value) {
+      final CoreEntry entry = entryMap.get(key);
+      return entry == null || !Objects.equals(entry.value, value);
+    }
+
+    /**
+     * Return true if this put resulted in a modification.
+     */
+    private boolean putIfChanged(String key, String value, String source) {
+      final CoreEntry entry = entryMap.get(key);
+      if (entry == null) {
+        entryMap.put(key, CoreEntry.of(value, source));
+        return true;
+      } else if (!Objects.equals(entry.value, value)) {
+        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source));
+        return true;
+      }
+      return false;
+    }
+
+    boolean containsKey(String key) {
+      return entryMap.containsKey(key);
     }
 
     void put(String key, CoreEntry value) {
