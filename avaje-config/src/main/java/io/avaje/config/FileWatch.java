@@ -5,10 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.System.Logger.Level;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 final class FileWatch {
 
@@ -56,43 +53,42 @@ final class FileWatch {
   }
 
   void check() {
+    final Map<String, String> keyValues = new LinkedHashMap<>();
     for (Entry file : files) {
       if (file.reload()) {
         log.log(Level.DEBUG, "reloading configuration from {0}", file);
         if (file.isYaml()) {
-          reloadYaml(file);
+          reloadYaml(file, keyValues);
         } else {
-          reloadProps(file);
+          reloadProps(file, keyValues);
         }
       }
     }
+    final var builder = configuration.eventBuilder("reload");
+    keyValues.forEach(builder::put);
+    builder.publish();
   }
 
-  private void reloadProps(Entry file) {
-    Properties properties = new Properties();
+  private void reloadProps(Entry file, Map<String, String> keyValues) {
     try (InputStream is = file.inputStream()) {
+      final var properties = new Properties();
       properties.load(is);
-      put(properties);
+      Enumeration<?> enumeration = properties.propertyNames();
+      while (enumeration.hasMoreElements()) {
+        final String key = (String) enumeration.nextElement();
+        keyValues.put(key, properties.getProperty(key));
+      }
     } catch (Exception e) {
       log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
     }
   }
 
-  private void put(Properties properties) {
-    Enumeration<?> enumeration = properties.propertyNames();
-    while (enumeration.hasMoreElements()) {
-      String key = (String) enumeration.nextElement();
-      String property = properties.getProperty(key);
-      configuration.setProperty(key, property);
-    }
-  }
-
-  private void reloadYaml(Entry file) {
+  private void reloadYaml(Entry file, Map<String, String> keyValues) {
     if (yamlLoader == null) {
       log.log(Level.ERROR, "Unexpected - no yamlLoader to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
-        yamlLoader.load(is).forEach(configuration::setProperty);
+        keyValues.putAll(yamlLoader.load(is));
       } catch (Exception e) {
         log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
       }
