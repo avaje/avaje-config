@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -110,7 +107,7 @@ class CoreConfigurationTest {
   void test_toString() {
     assertThat(data.toString()).isNotEmpty();
     data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
-    data.loadIntoSystemProperties();
+    assertThat(data.toString()).contains("watcher");
   }
 
   @Test

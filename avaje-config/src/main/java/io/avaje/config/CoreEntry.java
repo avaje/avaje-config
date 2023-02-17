@@ -95,23 +95,12 @@ final class CoreEntry {
     CoreMap() {
     }
 
-    /**
-     * Copy constructor.
-     */
-    CoreMap(CoreMap source) {
-      entryMap.putAll(source.entryMap);
-    }
-
     CoreMap(Properties source, String propSource) {
       source.forEach((key, value) -> {
         if (value != null) {
           entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
         }
       });
-    }
-
-    CoreMap copy() {
-      return new CoreMap(this);
     }
 
     @Override
@@ -141,8 +130,7 @@ final class CoreEntry {
             if (entryMap.remove(key) != null) {
               modifiedKeys.add(key);
             }
-          }
-          if (putIfChanged(key, value, sourceName)) {
+          } else if (putIfChanged(key, value, sourceName)) {
             modifiedKeys.add(key);
           }
         });
@@ -184,14 +172,8 @@ final class CoreEntry {
       entryMap.put(key, value);
     }
 
-    @Nullable
-    CoreEntry put(String key, String value, String source) {
-      return entryMap.put(key, CoreEntry.of(value, source));
-    }
-
-    @Nullable
-    CoreEntry remove(String key) {
-      return entryMap.remove(key);
+    void put(String key, String value, String source) {
+      entryMap.put(key, CoreEntry.of(value, source));
     }
 
     @Nullable

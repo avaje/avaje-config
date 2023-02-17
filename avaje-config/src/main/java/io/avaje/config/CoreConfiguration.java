@@ -37,13 +37,13 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap source) {
-    this(log, source, "");
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries) {
+    this(log, entries, "");
   }
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap source, String prefix) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries, String prefix) {
     this.log = log;
-    this.properties = new ModifyAwareProperties(this, source);
+    this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = prefix;
@@ -302,7 +302,7 @@ final class CoreConfiguration implements Configuration {
   @Override
   public EventBuilder eventBuilder(String name) {
     requireNonNull(name);
-    return new CoreEventBuilder(name, this, properties.copy());
+    return new CoreEventBuilder(name, this, properties.entryMap());
   }
 
   void publishEvent(CoreEventBuilder eventBuilder) {
@@ -387,10 +387,8 @@ final class CoreConfiguration implements Configuration {
 
     private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
-    private final CoreConfiguration config;
 
-    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreMap entries) {
-      this.config = config;
+    ModifyAwareProperties(CoreEntry.CoreMap entries) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
     }
@@ -466,11 +464,8 @@ final class CoreConfiguration implements Configuration {
       return props;
     }
 
-    /**
-     * Return a copy of the internal map.
-     */
-    CoreEntry.CoreMap copy() {
-      return entries.copy();
+    CoreEntry.CoreMap entryMap() {
+      return entries;
     }
 
     Set<String> applyChanges(CoreEventBuilder eventBuilder) {
