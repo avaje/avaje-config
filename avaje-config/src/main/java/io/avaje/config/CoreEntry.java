@@ -95,10 +95,10 @@ final class CoreEntry {
     CoreMap() {
     }
 
-    CoreMap(Properties source, String propSource) {
+    CoreMap(Properties source, String sourceName) {
       source.forEach((key, value) -> {
         if (value != null) {
-          entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
+          entryMap.put(key.toString(), CoreEntry.of(value.toString(), sourceName));
         }
       });
     }

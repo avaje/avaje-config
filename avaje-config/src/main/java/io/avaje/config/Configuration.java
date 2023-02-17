@@ -179,7 +179,6 @@ public interface Configuration {
 
   /**
    * Return a URL configuration value with a default value. Deprecated, it's better to use URI over URL
-
    *
    * @param key          The configuration key
    * @param defaultValue The default value
@@ -290,13 +289,27 @@ public interface Configuration {
 
   /**
    * Create an event builder to make changes to the configuration.
+   * <pre>{@code
+   *
+   *   configuration.eventBuilder("MyChanges")
+   *     .put("someKey", "val0")
+   *     .put("someOther.key", "42")
+   *     .remove("foo")
+   *     .publish();
+   *
+   * }</pre>
    *
    * @param name The name of the event which defines the source of the configuration value.
+   * @see #onChange(Consumer, String...)
    */
   EventBuilder eventBuilder(String name);
 
   /**
    * Register an event listener that will be notified of configuration changes.
+   *
+   * @param eventListener The listener that is called when changes have occurred
+   * @param keys          Optionally specify keys when the listener is only interested
+   *                      if changes are made for these specific properties
    */
   void onChange(Consumer<Event> eventListener, String... keys);
 

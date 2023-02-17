@@ -53,7 +53,34 @@ class ConfigTest {
   void setProperty() {
     assertThat(Config.getOptional("MySystemProp3")).isEmpty();
     Config.setProperty("MySystemProp3", "hello2");
+
     assertThat(Config.get("MySystemProp3")).isEqualTo("hello2");
+    Config.clearProperty("MySystemProp3");
+  }
+
+  @Test
+  void eventBuilderPublish() {
+    assertThat(Config.getOptional("MySystemProp4")).isEmpty();
+    Config.eventBuilder("MyChange").put("MySystemProp4", "hello4").publish();
+
+    assertThat(Config.get("MySystemProp4")).isEqualTo("hello4");
+    Config.clearProperty("MySystemProp4");
+  }
+
+  @Test
+  void onChangeEventListener() {
+    assertThat(Config.getOptional("MySystemProp5")).isEmpty();
+    AtomicReference<Event> capturedEvent = new AtomicReference<>();
+    Config.onChange((capturedEvent::set));
+    Config.setProperty("MySystemProp5", "hi5");
+
+    Event event = capturedEvent.get();
+
+    assertThat(event.name()).isEqualTo("SetProperty");
+    assertThat(event.modifiedKeys()).containsExactly("MySystemProp5");
+    assertThat(Config.get("MySystemProp5")).isEqualTo("hi5");
+
+    Config.clearProperty("MySystemProp5");
   }
 
   @Test

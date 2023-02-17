@@ -399,6 +399,36 @@ public class Config {
   }
 
   /**
+   * Create an event builder to make changes to the configuration.
+   * <pre>{@code
+   *
+   *   configuration.eventBuilder("MyChanges")
+   *     .put("someKey", "val0")
+   *     .put("someOther.key", "42")
+   *     .remove("foo")
+   *     .publish();
+   *
+   * }</pre>
+   *
+   * @param name The name of the event which defines the source of the configuration value.
+   * @see #onChange(Consumer, String...)
+   */
+  public static EventBuilder eventBuilder(String name) {
+    return data.eventBuilder(name);
+  }
+
+  /**
+   * Register an event listener that will be notified of configuration changes.
+   *
+   * @param eventListener The listener that is called when changes have occurred
+   * @param keys          Optionally specify keys when the listener is only interested
+   *                      if changes are made for these specific properties
+   */
+  public static void onChange(Consumer<Event> eventListener, String... keys) {
+    data.onChange(eventListener, keys);
+  }
+
+  /**
    * Set a configuration value.
    * <p>
    * This will fire an configuration callback listeners that are registered
