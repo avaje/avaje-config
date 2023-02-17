@@ -48,6 +48,7 @@ class CoreConfigurationTest {
     assertThat(loaded.get("SetViaSystemProperty")).isNull();
 
     System.clearProperty("SetViaSystemProperty");
+    System.clearProperty("foo.bar");
   }
 
   @Test
