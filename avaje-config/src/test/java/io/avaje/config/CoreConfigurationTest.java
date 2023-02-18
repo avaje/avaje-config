@@ -106,9 +106,8 @@ class CoreConfigurationTest {
 
   @Test
   void test_toString() {
-    assertThat(data.toString()).isNotEmpty();
     data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
-    assertThat(data.toString()).contains("watcher");
+    assertThat(data.toString()).doesNotContain("entries");
   }
 
   @Test

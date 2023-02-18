@@ -92,11 +92,6 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public String toString() {
-    return watcher == null ? properties.toString() : "watcher:" + watcher + " " + properties;
-  }
-
-  @Override
   public int size() {
     return properties.size();
   }
@@ -391,11 +386,6 @@ final class CoreConfiguration implements Configuration {
     ModifyAwareProperties(CoreEntry.CoreMap entries) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
-    }
-
-    @Override
-    public String toString() {
-      return entries.toString();
     }
 
     int size() {
