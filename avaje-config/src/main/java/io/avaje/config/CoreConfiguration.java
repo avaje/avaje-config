@@ -11,6 +11,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
@@ -27,7 +28,7 @@ final class CoreConfiguration implements Configuration {
 
   private final EventLog log;
   private final ModifyAwareProperties properties;
-  private final List<CoreListener> listeners = new ArrayList<>();
+  private final List<CoreListener> listeners = new CopyOnWriteArrayList<>();
 
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
