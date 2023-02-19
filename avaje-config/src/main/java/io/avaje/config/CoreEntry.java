@@ -1,14 +1,13 @@
 package io.avaje.config;
 
-import static java.util.Objects.requireNonNull;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Configuration entry.
@@ -16,7 +15,7 @@ import io.avaje.lang.Nullable;
 @NonNullApi
 final class CoreEntry {
 
-/**
+  /**
    * Entry used to represent no entry / null.
    */
   static final CoreEntry NULL_ENTRY = new CoreEntry();
@@ -34,6 +33,7 @@ final class CoreEntry {
 
   /**
    * Return a new entryMap populated from the given Properties.
+   *
    * @param propSource where these properties came from
    */
   static CoreMap newMap(Properties source, String propSource) {
@@ -79,11 +79,6 @@ final class CoreEntry {
     return value == null;
   }
 
-  @Override
-  public String toString() {
-    return isNull() ? "NullEntry" : "Entry[value=" + value + ", source=" + source + "]";
-  }
-
   /**
    * A entryMap like container of CoreEntry entries.
    */
@@ -94,17 +89,12 @@ final class CoreEntry {
     CoreMap() {
     }
 
-    CoreMap(Properties source, String propSource) {
+    CoreMap(Properties source, String sourceName) {
       source.forEach((key, value) -> {
         if (value != null) {
-          entryMap.put(key.toString(), CoreEntry.of(value.toString(), propSource));
+          entryMap.put(key.toString(), CoreEntry.of(value.toString(), sourceName));
         }
       });
-    }
-
-    @Override
-    public String toString() {
-      return "size:" + entryMap.size() + " entries:" + entryMap;
     }
 
     int size() {
@@ -116,18 +106,57 @@ final class CoreEntry {
       return entryMap.get(key);
     }
 
+    /**
+     * Apply changes returning the set of modified keys.
+     */
+    Set<String> applyChanges(CoreEventBuilder eventBuilder) {
+      Set<String> modifiedKeys = new HashSet<>();
+      final var sourceName = "event:" + eventBuilder.name();
+      eventBuilder.forEachPut((key, value) -> {
+        if (value == null) {
+          if (entryMap.remove(key) != null) {
+            modifiedKeys.add(key);
+          }
+        } else if (putIfChanged(key, value, sourceName)) {
+          modifiedKeys.add(key);
+        }
+      });
+      return modifiedKeys;
+    }
+
+    /**
+     * Return true if this is a change in value.
+     */
+    boolean isChanged(String key, String value) {
+      final CoreEntry entry = entryMap.get(key);
+      return entry == null || !Objects.equals(entry.value, value);
+    }
+
+    /**
+     * Return true if this put resulted in a modification.
+     */
+    private boolean putIfChanged(String key, String value, String source) {
+      final CoreEntry entry = entryMap.get(key);
+      if (entry == null) {
+        entryMap.put(key, CoreEntry.of(value, source));
+        return true;
+      } else if (!Objects.equals(entry.value, value)) {
+        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source));
+        return true;
+      }
+      return false;
+    }
+
+    boolean containsKey(String key) {
+      return entryMap.containsKey(key);
+    }
+
     void put(String key, CoreEntry value) {
       entryMap.put(key, value);
     }
 
-    @Nullable
-    CoreEntry put(String key, String value, String source) {
-      return entryMap.put(key, CoreEntry.of(value, source));
-    }
-
-    @Nullable
-    CoreEntry remove(String key) {
-      return entryMap.remove(key);
+    void put(String key, String value, String source) {
+      entryMap.put(key, CoreEntry.of(value, source));
     }
 
     @Nullable

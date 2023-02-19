@@ -11,6 +11,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
@@ -27,6 +29,8 @@ final class CoreConfiguration implements Configuration {
 
   private final EventLog log;
   private final ModifyAwareProperties properties;
+  private final ReentrantLock lock = new ReentrantLock();
+  private final List<CoreListener> listeners = new CopyOnWriteArrayList<>();
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
@@ -35,13 +39,13 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap source) {
-    this(log, source, "");
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries) {
+    this(log, entries, "");
   }
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap source, String prefix) {
+  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries, String prefix) {
     this.log = log;
-    this.properties = new ModifyAwareProperties(this, source);
+    this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = prefix;
@@ -90,11 +94,6 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public String toString() {
-    return watcher == null ? properties.toString() : "watcher:" + watcher + " " + properties;
-  }
-
-  @Override
   public int size() {
     return properties.size();
   }
@@ -107,6 +106,10 @@ final class CoreConfiguration implements Configuration {
       }
       timer.schedule(new Task(log, runnable), delayMillis, periodMillis);
     }
+  }
+
+  String eval(String value) {
+    return properties.eval(value);
   }
 
   @Override
@@ -293,6 +296,46 @@ final class CoreConfiguration implements Configuration {
     return Enum.valueOf(cls, get(key, defaultValue.name()));
   }
 
+  @Override
+  public EventBuilder eventBuilder(String name) {
+    requireNonNull(name);
+    return new CoreEventBuilder(name, this, properties.entryMap());
+  }
+
+  void publishEvent(CoreEventBuilder eventBuilder) {
+    if (eventBuilder.hasChanges()) {
+      lock.lock();
+      try {
+        applyChangesAndPublish(eventBuilder);
+      } finally {
+        lock.unlock();
+      }
+    }
+  }
+
+  private void applyChangesAndPublish(CoreEventBuilder eventBuilder) {
+    Set<String> modifiedKeys = properties.applyChanges(eventBuilder);
+    if (!modifiedKeys.isEmpty()) {
+      final var event = new CoreEvent(eventBuilder.name(), modifiedKeys, this);
+      for (CoreListener listener : listeners) {
+        listener.accept(event);
+      }
+    }
+    // legacy per-key listeners
+    for (String modifiedKey : modifiedKeys) {
+      OnChangeListener listener = callbacks.get(modifiedKey);
+      if (listener != null) {
+        final String value = properties.valueOrNull(modifiedKey);
+        listener.fireOnChange(value);
+      }
+    }
+  }
+
+  @Override
+  public void onChange(Consumer<Event> eventListener, String... keys) {
+    listeners.add(new CoreListener(eventListener, keys));
+  }
+
   private OnChangeListener onChange(String key) {
     requireNonNull(key, "key is required");
     return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
@@ -318,24 +361,17 @@ final class CoreConfiguration implements Configuration {
     onChange(key).register(newValue -> callback.accept(Boolean.parseBoolean(newValue)));
   }
 
-  private void fireOnChange(String key, String value) {
-    OnChangeListener listener = callbacks.get(key);
-    if (listener != null) {
-      listener.fireOnChange(value);
-    }
-  }
-
   @Override
   public void setProperty(String key, String newValue) {
     requireNonNull(key, "key is required");
     requireNonNull(newValue, "newValue is required, use clearProperty()");
-    properties.setValue(key, newValue);
+    eventBuilder("SetProperty").put(key, newValue).publish();
   }
 
   @Override
   public void clearProperty(String key) {
     requireNonNull(key, "key is required");
-    properties.clearValue(key);
+    eventBuilder("ClearProperty").remove(key).publish();
   }
 
   private static class OnChangeListener {
@@ -357,39 +393,24 @@ final class CoreConfiguration implements Configuration {
 
     private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
-    private final CoreConfiguration config;
 
-    ModifyAwareProperties(CoreConfiguration config, CoreEntry.CoreMap entries) {
-      this.config = config;
+    ModifyAwareProperties(CoreEntry.CoreMap entries) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
-    }
-
-    @Override
-    public String toString() {
-      return entries.toString();
     }
 
     int size() {
       return entries.size();
     }
 
-    /**
-     * Set a property with expression evaluation.
-     */
-    void setValue(String key, String newValue) {
-      newValue = eval.eval(newValue);
-      final CoreEntry oldEntry = entries.put(key, newValue, Constants.USER_PROVIDED);
-      if (oldEntry == null || !Objects.equals(newValue, oldEntry.value())) {
-        config.fireOnChange(key, newValue);
-      }
+    String eval(String value) {
+      return eval.eval(value);
     }
 
-    void clearValue(String key) {
-      final CoreEntry oldValue = entries.remove(key);
-      if (oldValue != null) {
-        config.fireOnChange(key, null);
-      }
+    @Nullable
+    String valueOrNull(String key) {
+      CoreEntry entry = entries.get(key);
+      return entry == null ? null : entry.value();
     }
 
     /**
@@ -442,6 +463,14 @@ final class CoreConfiguration implements Configuration {
         }
       });
       return props;
+    }
+
+    CoreEntry.CoreMap entryMap() {
+      return entries;
+    }
+
+    Set<String> applyChanges(CoreEventBuilder eventBuilder) {
+      return entries.applyChanges(eventBuilder);
     }
   }
 

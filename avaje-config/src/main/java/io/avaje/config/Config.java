@@ -399,18 +399,53 @@ public class Config {
   }
 
   /**
-   * Set a configuration value.
+   * Create an event builder to make changes to the configuration.
+   * <pre>{@code
+   *
+   *   configuration.eventBuilder("MyChanges")
+   *     .put("someKey", "val0")
+   *     .put("someOther.key", "42")
+   *     .remove("foo")
+   *     .publish();
+   *
+   * }</pre>
+   *
+   * @param name The name of the event which defines the source of the configuration value.
+   * @see #onChange(Consumer, String...)
+   */
+  public static EventBuilder eventBuilder(String name) {
+    return data.eventBuilder(name);
+  }
+
+  /**
+   * Register an event listener that will be notified of configuration changes.
    * <p>
-   * This will fire an configuration callback listeners that are registered
-   * for this key.
-   * </p>
+   * Events are created when configuration is changed via {@link #eventBuilder(String)}
+   * or when configuration is reload from its sources (watching file changes etc).
+   *
+   * @param eventListener The listener that is called when changes have occurred
+   * @param keys          Optionally specify keys when the listener is only interested
+   *                      if changes are made for these specific properties
+   */
+  public static void onChange(Consumer<Event> eventListener, String... keys) {
+    data.onChange(eventListener, keys);
+  }
+
+  /**
+   * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
+   * used when setting multiple configuration values.
+   * <p>
+   * This will fire configuration callback listeners that are registered.
    */
   public static void setProperty(String key, String value) {
     data.setProperty(key, value);
   }
 
   /**
-   * Clear the value for the given key.
+   * Clear the value for the given key. Note that {@link #eventBuilder(String)} should be
+   * used when setting multiple configuration values.
+   * <p>
+   * This will fire configuration callback listeners that are registered.
    *
    * @param key The configuration key we want to clear
    */
