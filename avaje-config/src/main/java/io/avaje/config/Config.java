@@ -413,7 +413,7 @@ public class Config {
    * @param name The name of the event which defines the source of the configuration value.
    * @see #onChange(Consumer, String...)
    */
-  public static EventBuilder eventBuilder(String name) {
+  public static Event.Builder eventBuilder(String name) {
     return data.eventBuilder(name);
   }
 

@@ -26,4 +26,42 @@ public interface Event {
    * Return the set of keys where the properties where modified.
    */
   Set<String> modifiedKeys();
+
+  /**
+   * Build and publish modifications to the configuration.
+   * <pre>{@code
+   *
+   *   configuration.eventBuilder("MyChanges")
+   *     .put("someKey", "val0")
+   *     .put("someOther.key", "42")
+   *     .remove("foo")
+   *     .publish();
+   *
+   * }</pre>
+   *
+   * @see Configuration#eventBuilder(String)
+   * @see Configuration#onChange(Consumer, String...)
+   */
+  interface Builder {
+
+    /**
+     * Set a property value.
+     *
+     * @param key The property key
+     * @param value The new value of the property
+     */
+    Builder put(String key, String value);
+
+    /**
+     * Remove a property from the configuration.
+     */
+    Builder remove(String key);
+
+    /**
+     * Publish the changes. Listeners registered via {@link Configuration#onChange(Consumer, String...)}
+     * will be notified on the changes.
+     */
+    void publish();
+
+  }
 }
