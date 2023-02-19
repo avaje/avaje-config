@@ -161,7 +161,7 @@ class FileWatchTest {
     final Properties properties = new Properties();
     properties.setProperty("config.watch.delay", "1");
     properties.setProperty("config.watch.period", "1");
-    return new CoreConfiguration(new DefaultEventLog(),  CoreEntry.newMap(properties, "newConfig"));
+    return new CoreConfiguration(new DefaultConfigurationLog(),  CoreEntry.newMap(properties, "newConfig"));
   }
 
   private List<File> files() {

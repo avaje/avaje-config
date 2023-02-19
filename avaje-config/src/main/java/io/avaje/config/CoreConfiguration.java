@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
 @NonNullApi
 final class CoreConfiguration implements Configuration {
 
-  private final EventLog log;
+  private final ConfigurationLog log;
   private final ModifyAwareProperties properties;
   private final ReentrantLock lock = new ReentrantLock();
   private final List<CoreListener> listeners = new CopyOnWriteArrayList<>();
@@ -39,11 +39,11 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries) {
+  CoreConfiguration(ConfigurationLog log, CoreEntry.CoreMap entries) {
     this(log, entries, "");
   }
 
-  CoreConfiguration(EventLog log, CoreEntry.CoreMap entries, String prefix) {
+  CoreConfiguration(ConfigurationLog log, CoreEntry.CoreMap entries, String prefix) {
     this.log = log;
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
@@ -55,7 +55,7 @@ final class CoreConfiguration implements Configuration {
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    EventLog log = ServiceLoader.load(EventLog.class).findFirst().orElseGet(DefaultEventLog::new);
+    ConfigurationLog log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
     log.preInitialisation();
     final InitialLoader loader = new InitialLoader(log);
     CoreConfiguration configuration = new CoreConfiguration(log, loader.load());
@@ -67,7 +67,7 @@ final class CoreConfiguration implements Configuration {
     return configuration;
   }
 
-  EventLog log() {
+  ConfigurationLog log() {
     return log;
   }
 
@@ -476,10 +476,10 @@ final class CoreConfiguration implements Configuration {
 
   private static class Task extends TimerTask {
 
-    private final EventLog log;
+    private final ConfigurationLog log;
     private final Runnable runnable;
 
-    private Task(EventLog log, Runnable runnable) {
+    private Task(ConfigurationLog log, Runnable runnable) {
       this.log = log;
       this.runnable = runnable;
     }

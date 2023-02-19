@@ -32,7 +32,7 @@ class CoreConfigurationTest {
   }
 
   private CoreConfiguration createSample() {
-    return new CoreConfiguration(new DefaultEventLog(), basicProperties(),"Test");
+    return new CoreConfiguration(new DefaultConfigurationLog(), basicProperties(),"Test");
   }
 
   @Test
@@ -40,7 +40,7 @@ class CoreConfigurationTest {
     final var properties = basicProperties();
     System.setProperty("SetViaSystemProperty", "FooBar");
 
-    final CoreConfiguration configuration = new CoreConfiguration(new DefaultEventLog(), properties);
+    final CoreConfiguration configuration = new CoreConfiguration(new DefaultConfigurationLog(), properties);
     configuration.initSystemProperties();
 
     final Properties loaded = configuration.asProperties();
@@ -86,7 +86,7 @@ class CoreConfigurationTest {
     properties.setProperty("oneNot", "fried");
     properties.setProperty("modify", "me");
 
-    CoreConfiguration base = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(properties, "test"));
+    CoreConfiguration base = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(properties, "test"));
     assertThat(base.size()).isEqualTo(9);
 
     Configuration one = base.forPath("one");
@@ -106,7 +106,7 @@ class CoreConfigurationTest {
 
   @Test
   void test_toString() {
-    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
+    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
     assertThat(data.toString()).doesNotContain("entries");
   }
 
@@ -372,23 +372,23 @@ class CoreConfigurationTest {
     final var properties = basicProperties();
     properties.put("someA", "before-${foo.bar}-after","eval");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap(new Properties(), "test"));
+    final CoreConfiguration config = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(new Properties(), "test"));
 
-    final var copy = config.eval(new CoreConfiguration(new DefaultEventLog(), properties).asProperties());
+    final var copy = config.eval(new CoreConfiguration(new DefaultConfigurationLog(), properties).asProperties());
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
   }
 
   @Test
   void evalModify() {
-	final var properties = new CoreConfiguration(new DefaultEventLog(), basicProperties());
+	final var properties = new CoreConfiguration(new DefaultConfigurationLog(), basicProperties());
 
     properties.setProperty("someA", "before-${foo.bar}-after");
     properties.setProperty("yeahNah", "before-${no-eval-for-this}-after");
 
     String beforeYeahNahValue = properties.get("yeahNah");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultEventLog(), CoreEntry.newMap());
+    final CoreConfiguration config = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap());
    var props= properties.asProperties();
     config.evalModify(props);
 

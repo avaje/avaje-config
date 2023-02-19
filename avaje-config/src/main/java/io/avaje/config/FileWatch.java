@@ -9,7 +9,7 @@ import java.util.*;
 
 final class FileWatch {
 
-  private final EventLog log;
+  private final ConfigurationLog log;
   private final Configuration configuration;
   private final YamlLoader yamlLoader;
   private final List<Entry> files;
