@@ -302,7 +302,7 @@ public interface Configuration {
    * @param name The name of the event which defines the source of the configuration value.
    * @see #onChange(Consumer, String...)
    */
-  EventBuilder eventBuilder(String name);
+  Event.Builder eventBuilder(String name);
 
   /**
    * Register an event listener that will be notified of configuration changes.

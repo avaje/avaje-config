@@ -297,7 +297,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public EventBuilder eventBuilder(String name) {
+  public Event.Builder eventBuilder(String name) {
     requireNonNull(name);
     return new CoreEventBuilder(name, this, properties.entryMap());
   }
