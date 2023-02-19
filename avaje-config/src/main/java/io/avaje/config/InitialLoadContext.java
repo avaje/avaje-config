@@ -14,7 +14,7 @@ import io.avaje.config.CoreEntry.CoreMap;
  */
 final class InitialLoadContext {
 
-  private final EventLog log;
+  private final ConfigurationLog log;
   /**
    * CoreMap we are loading the properties into.
    */
@@ -27,7 +27,7 @@ final class InitialLoadContext {
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
-  InitialLoadContext(EventLog log) {
+  InitialLoadContext(ConfigurationLog log) {
     this.log = log;
     this.exprEval = new CoreExpressionEval(map);
   }

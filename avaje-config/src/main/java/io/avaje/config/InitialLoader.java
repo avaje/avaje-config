@@ -35,11 +35,11 @@ final class InitialLoader {
     FILE
   }
 
-  private final EventLog log;
+  private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private YamlLoader yamlLoader;
 
-  InitialLoader(EventLog log) {
+  InitialLoader(ConfigurationLog log) {
     this.log = log;
     this.loadContext = new InitialLoadContext(log);
     initYamlLoader();

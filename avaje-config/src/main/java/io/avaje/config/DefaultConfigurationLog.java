@@ -7,7 +7,7 @@ import java.lang.System.Logger.Level;
 /**
  * Default implementation of EventLog just uses System.Logger.
  */
-final class DefaultEventLog implements EventLog {
+final class DefaultConfigurationLog implements ConfigurationLog {
 
   private final System.Logger log = AppLog.getLogger("io.avaje.config");
 
