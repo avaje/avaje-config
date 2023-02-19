@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;
 
-final class CoreEventBuilder implements Event.Builder {
+final class CoreEventBuilder implements ModificationEvent.Builder {
 
   private final String name;
   private final CoreConfiguration origin;
@@ -20,7 +20,7 @@ final class CoreEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder put(String key, String value) {
+  public ModificationEvent.Builder put(String key, String value) {
     requireNonNull(key);
     requireNonNull(value);
     value = origin.eval(value);
@@ -31,7 +31,7 @@ final class CoreEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder remove(String key) {
+  public ModificationEvent.Builder remove(String key) {
     requireNonNull(key);
     if (snapshot.containsKey(key)) {
       changes.put(key, null);

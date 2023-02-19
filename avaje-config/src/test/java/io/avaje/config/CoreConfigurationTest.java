@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,7 +35,11 @@ class CoreConfigurationTest {
   }
 
   private CoreConfiguration createSample() {
-    return new CoreConfiguration(new DefaultConfigurationLog(), basicProperties(),"Test");
+    return new CoreConfiguration(basicProperties());
+  }
+
+  private CoreConfiguration createConfig(CoreEntry.CoreMap entries) {
+    return new CoreConfiguration(entries);
   }
 
   @Test
@@ -40,7 +47,7 @@ class CoreConfigurationTest {
     final var properties = basicProperties();
     System.setProperty("SetViaSystemProperty", "FooBar");
 
-    final CoreConfiguration configuration = new CoreConfiguration(new DefaultConfigurationLog(), properties);
+    final CoreConfiguration configuration = createConfig(properties);
     configuration.initSystemProperties();
 
     final Properties loaded = configuration.asProperties();
@@ -86,7 +93,7 @@ class CoreConfigurationTest {
     properties.setProperty("oneNot", "fried");
     properties.setProperty("modify", "me");
 
-    CoreConfiguration base = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(properties, "test"));
+    CoreConfiguration base = createConfig(CoreEntry.newMap(properties, "test"));
     assertThat(base.size()).isEqualTo(9);
 
     Configuration one = base.forPath("one");
@@ -106,7 +113,7 @@ class CoreConfigurationTest {
 
   @Test
   void test_toString() {
-    data.setWatcher(new FileWatch( new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(new Properties(), "test")) , Collections.emptyList(), null));
+    data.setWatcher(new FileWatch(createConfig(CoreEntry.newMap(new Properties(), "test")), Collections.emptyList(), null));
     assertThat(data.toString()).doesNotContain("entries");
   }
 
@@ -245,13 +252,13 @@ class CoreConfigurationTest {
     // we will remove this entry
     assertThat(data.getOptional("foo.bar")).contains("42");
 
-    final List<Event> capturedEvents = new ArrayList<>();
+    final List<ModificationEvent> capturedEvents = new ArrayList<>();
     data.onChange(capturedEvents::add);
 
-    final List<Event> capturedEventsMatchOnKey = new ArrayList<>();
+    final List<ModificationEvent> capturedEventsMatchOnKey = new ArrayList<>();
     data.onChange(capturedEventsMatchOnKey::add, "onChangeTest_1");
 
-    final List<Event> capturedEventsNoKeyMatch = new ArrayList<>();
+    final List<ModificationEvent> capturedEventsNoKeyMatch = new ArrayList<>();
     data.onChange(capturedEventsNoKeyMatch::add, "noMatchOnThisKey");
 
     data.eventBuilder("myTest")
@@ -370,26 +377,26 @@ class CoreConfigurationTest {
   @Test
   void evalProperties() {
     final var properties = basicProperties();
-    properties.put("someA", "before-${foo.bar}-after","eval");
+    properties.put("someA", "before-${foo.bar}-after", "eval");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap(new Properties(), "test"));
+    final CoreConfiguration config = createConfig(CoreEntry.newMap(new Properties(), "test"));
 
-    final var copy = config.eval(new CoreConfiguration(new DefaultConfigurationLog(), properties).asProperties());
+    final var copy = config.eval(createConfig(properties).asProperties());
 
     assertThat(copy.getProperty("someA")).isEqualTo("before-42-after");
   }
 
   @Test
   void evalModify() {
-	final var properties = new CoreConfiguration(new DefaultConfigurationLog(), basicProperties());
+    final var properties = createConfig(basicProperties());
 
     properties.setProperty("someA", "before-${foo.bar}-after");
     properties.setProperty("yeahNah", "before-${no-eval-for-this}-after");
 
     String beforeYeahNahValue = properties.get("yeahNah");
 
-    final CoreConfiguration config = new CoreConfiguration(new DefaultConfigurationLog(), CoreEntry.newMap());
-   var props= properties.asProperties();
+    final CoreConfiguration config = createConfig(CoreEntry.newMap());
+    var props = properties.asProperties();
     config.evalModify(props);
 
     String someAValue = props.getProperty("someA");

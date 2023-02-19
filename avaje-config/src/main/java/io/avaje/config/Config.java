@@ -413,7 +413,7 @@ public class Config {
    * @param name The name of the event which defines the source of the configuration value.
    * @see #onChange(Consumer, String...)
    */
-  public static Event.Builder eventBuilder(String name) {
+  public static ModificationEvent.Builder eventBuilder(String name) {
     return data.eventBuilder(name);
   }
 
@@ -427,7 +427,7 @@ public class Config {
    * @param keys          Optionally specify keys when the listener is only interested
    *                      if changes are made for these specific properties
    */
-  public static void onChange(Consumer<Event> eventListener, String... keys) {
+  public static void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
     data.onChange(eventListener, keys);
   }
 

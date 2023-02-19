@@ -34,16 +34,19 @@ final class CoreConfiguration implements Configuration {
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
+  private final ModificationEventRunner eventRunner;
+
   private boolean loadedSystemProperties;
   private FileWatch watcher;
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(ConfigurationLog log, CoreEntry.CoreMap entries) {
-    this(log, entries, "");
+  CoreConfiguration(ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries) {
+    this(eventRunner, log, entries, "");
   }
 
-  CoreConfiguration(ConfigurationLog log, CoreEntry.CoreMap entries, String prefix) {
+  CoreConfiguration(ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries, String prefix) {
+    this.eventRunner = eventRunner;
     this.log = log;
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
@@ -51,14 +54,19 @@ final class CoreConfiguration implements Configuration {
     this.pathPrefix = prefix;
   }
 
+  CoreConfiguration(CoreEntry.CoreMap entries) {
+    this(new ForegroundEventRunner(), new DefaultConfigurationLog(), entries, "");
+  }
+
   /**
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    ConfigurationLog log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
+    final ModificationEventRunner runner = ServiceLoader.load(ModificationEventRunner.class).findFirst().orElseGet(ForegroundEventRunner::new);
+    final ConfigurationLog log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
     log.preInitialisation();
     final InitialLoader loader = new InitialLoader(log);
-    CoreConfiguration configuration = new CoreConfiguration(log, loader.load());
+    CoreConfiguration configuration = new CoreConfiguration(runner, log, loader.load());
     configuration.loadSources();
     loader.initWatcher(configuration);
     configuration.initSystemProperties();
@@ -161,7 +169,7 @@ final class CoreConfiguration implements Configuration {
         newEntryMap.put("", entry);
       }
     });
-    return new CoreConfiguration(log, newEntryMap, dotPrefix);
+    return new CoreConfiguration(eventRunner, log, newEntryMap, dotPrefix);
   }
 
   @Override
@@ -297,7 +305,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public Event.Builder eventBuilder(String name) {
+  public ModificationEvent.Builder eventBuilder(String name) {
     requireNonNull(name);
     return new CoreEventBuilder(name, this, properties.entryMap());
   }
@@ -306,7 +314,7 @@ final class CoreConfiguration implements Configuration {
     if (eventBuilder.hasChanges()) {
       lock.lock();
       try {
-        applyChangesAndPublish(eventBuilder);
+        eventRunner.run(() -> applyChangesAndPublish(eventBuilder));
       } finally {
         lock.unlock();
       }
@@ -316,7 +324,7 @@ final class CoreConfiguration implements Configuration {
   private void applyChangesAndPublish(CoreEventBuilder eventBuilder) {
     Set<String> modifiedKeys = properties.applyChanges(eventBuilder);
     if (!modifiedKeys.isEmpty()) {
-      final var event = new CoreEvent(eventBuilder.name(), modifiedKeys, this);
+      final var event = new CoreModificationEvent(eventBuilder.name(), modifiedKeys, this);
       for (CoreListener listener : listeners) {
         listener.accept(event);
       }
@@ -332,7 +340,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public void onChange(Consumer<Event> eventListener, String... keys) {
+  public void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
     listeners.add(new CoreListener(eventListener, keys));
   }
 
@@ -494,4 +502,14 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
+  /**
+   * Run the event listener notifications using the current thread that is publishing the modification.
+   */
+  static final class ForegroundEventRunner implements ModificationEventRunner {
+
+    @Override
+    public void run(Runnable eventListenersNotifyTask) {
+      eventListenersNotifyTask.run();
+    }
+  }
 }
