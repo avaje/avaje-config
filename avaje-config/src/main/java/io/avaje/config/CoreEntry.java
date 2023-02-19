@@ -1,14 +1,13 @@
 package io.avaje.config;
 
-import static java.util.Objects.requireNonNull;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Configuration entry.
@@ -16,7 +15,7 @@ import io.avaje.lang.Nullable;
 @NonNullApi
 final class CoreEntry {
 
-/**
+  /**
    * Entry used to represent no entry / null.
    */
   static final CoreEntry NULL_ENTRY = new CoreEntry();
@@ -34,6 +33,7 @@ final class CoreEntry {
 
   /**
    * Return a new entryMap populated from the given Properties.
+   *
    * @param propSource where these properties came from
    */
   static CoreMap newMap(Properties source, String propSource) {
@@ -85,7 +85,6 @@ final class CoreEntry {
   static class CoreMap {
 
     private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
-    private final ReentrantLock lock = new ReentrantLock();
 
     CoreMap() {
     }
@@ -111,24 +110,18 @@ final class CoreEntry {
      * Apply changes returning the set of modified keys.
      */
     Set<String> applyChanges(CoreEventBuilder eventBuilder) {
-      lock.lock();
-      try {
-        Set<String> modifiedKeys = new HashSet<>();
-        final var sourceName = "event:" + eventBuilder.name();
-        eventBuilder.forEachPut((key, value) -> {
-          if (value == null) {
-            if (entryMap.remove(key) != null) {
-              modifiedKeys.add(key);
-            }
-          } else if (putIfChanged(key, value, sourceName)) {
+      Set<String> modifiedKeys = new HashSet<>();
+      final var sourceName = "event:" + eventBuilder.name();
+      eventBuilder.forEachPut((key, value) -> {
+        if (value == null) {
+          if (entryMap.remove(key) != null) {
             modifiedKeys.add(key);
           }
-        });
-        return modifiedKeys;
-
-      } finally {
-        lock.unlock();
-      }
+        } else if (putIfChanged(key, value, sourceName)) {
+          modifiedKeys.add(key);
+        }
+      });
+      return modifiedKeys;
     }
 
     /**

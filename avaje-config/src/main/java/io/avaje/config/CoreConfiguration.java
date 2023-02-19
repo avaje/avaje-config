@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
@@ -28,8 +29,8 @@ final class CoreConfiguration implements Configuration {
 
   private final EventLog log;
   private final ModifyAwareProperties properties;
+  private final ReentrantLock lock = new ReentrantLock();
   private final List<CoreListener> listeners = new CopyOnWriteArrayList<>();
-
   private final Map<String, OnChangeListener> callbacks = new ConcurrentHashMap<>();
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
@@ -303,20 +304,29 @@ final class CoreConfiguration implements Configuration {
 
   void publishEvent(CoreEventBuilder eventBuilder) {
     if (eventBuilder.hasChanges()) {
-      Set<String> modifiedKeys = properties.applyChanges(eventBuilder);
-      if (!modifiedKeys.isEmpty()) {
-        final var event = new CoreEvent(eventBuilder.name(), modifiedKeys, this);
-        for (CoreListener listener : listeners) {
-          listener.accept(event);
-        }
+      lock.lock();
+      try {
+        applyChangesAndPublish(eventBuilder);
+      } finally {
+        lock.unlock();
       }
-      // legacy per-key listeners
-      for (String modifiedKey : modifiedKeys) {
-        OnChangeListener listener = callbacks.get(modifiedKey);
-        if (listener != null) {
-          final String value = properties.valueOrNull(modifiedKey);
-          listener.fireOnChange(value);
-        }
+    }
+  }
+
+  private void applyChangesAndPublish(CoreEventBuilder eventBuilder) {
+    Set<String> modifiedKeys = properties.applyChanges(eventBuilder);
+    if (!modifiedKeys.isEmpty()) {
+      final var event = new CoreEvent(eventBuilder.name(), modifiedKeys, this);
+      for (CoreListener listener : listeners) {
+        listener.accept(event);
+      }
+    }
+    // legacy per-key listeners
+    for (String modifiedKey : modifiedKeys) {
+      OnChangeListener listener = callbacks.get(modifiedKey);
+      if (listener != null) {
+        final String value = properties.valueOrNull(modifiedKey);
+        listener.fireOnChange(value);
       }
     }
   }
