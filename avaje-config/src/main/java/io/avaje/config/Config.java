@@ -443,14 +443,11 @@ public class Config {
    * Register an event listener that will be notified of configuration changes.
    * <p>
    * If we are only interested in changes to a single property it is easier to use
-   * {@link #onChange(String, Consumer)} or the variants for int, long, boolean.
+   * {@link #onChange(String, Consumer)} or the variants for int, long, boolean
+   * onChangeInt(), onChangeLong(), onChangeBool().
    * <p>
    * Typically, we use this when we are interested in changes to multiple properties
    * and want to get and act on the values of multiple properties.
-   * <p>
-   * Events are created when configuration is changed via {@link #eventBuilder(String)},
-   * {@link #setProperty(String, String)}, {@link #clearProperty(String)} or when
-   * configuration is reloaded from its sources (e.g. watching file changes).
    *
    * <pre>{@code
    *  configuration.onChange((modificationEvent) -> {
@@ -494,14 +491,11 @@ public class Config {
    *
    * <pre>{@code
    *
-   *   AtomicReference<String> value = new AtomicReference<>("initial");
+   *   configuration.onChange("myKey", (neValue) -> {
    *
-   *   configuration.onChange("myKey", (newStringValue) -> {
-   *     value.set(newStringValue);
+   *     // do something with the newValue ...
+   *
    *   ));
-   *
-   *   // using a method reference
-   *   configuration.onChange("myKey", value::set);
    *
    * }</pre>
    *
