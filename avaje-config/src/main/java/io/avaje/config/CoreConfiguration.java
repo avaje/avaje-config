@@ -54,6 +54,9 @@ final class CoreConfiguration implements Configuration {
     this.pathPrefix = prefix;
   }
 
+  /**
+   * For testing purposes.
+   */
   CoreConfiguration(CoreEntry.CoreMap entries) {
     this(new ForegroundEventRunner(), new DefaultConfigurationLog(), entries, "");
   }
