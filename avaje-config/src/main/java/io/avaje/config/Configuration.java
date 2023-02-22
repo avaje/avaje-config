@@ -323,47 +323,104 @@ public interface Configuration {
   /**
    * Register an event listener that will be notified of configuration changes.
    * <p>
-   * Events are created when configuration is changed via {@link #eventBuilder(String)}
-   * or when configuration is reload from its sources (watching file changes etc).
-
+   * If we are only interested in changes to a single property it is easier to use
+   * {@link #onChange(String, Consumer)} or the variants for int, long, boolean.
+   * <p>
+   * Typically, we use this when we are interested in changes to multiple properties
+   * and want to get and act on the values of multiple properties.
+   * <p>
+   * Events are created when configuration is changed via {@link #eventBuilder(String)},
+   * {@link #setProperty(String, String)}, {@link #clearProperty(String)} or when
+   * configuration is reloaded from its sources (e.g. watching file changes).
    *
-   * @param eventListener The listener that is called when changes have occurred
-   * @param keys          Optionally specify keys when the listener is only interested
-   *                      if changes are made for these specific properties
+   * <pre>{@code
+   *  configuration.onChange((modificationEvent) -> {
+   *
+   *    String newValue = modificationEvent.configuration().get("myFirstKey");
+   *    int newInt = modificationEvent.configuration().getInt("myOtherKey");
+   *    // do something ...
+   *
+   *  });
+   *
+   *  }</pre>
+   * <p>
+   * When we are only interested if some specific properties have changed then we
+   * can define those. The event listener will be invoked if there is a change to
+   * any of those keys.
+   *
+   * <pre>{@code
+   *  configuration.onChange((event) -> {
+   *
+   *    String newValue = event.configuration().get("myFirstInterestingKey");
+   *    int newInt = event.configuration().getInt("myOtherInterestingKey");
+   *    // do something ...
+   *
+   *  }, "myFirstInterestingKey", "myOtherInterestingKey");
+   *
+   *  }</pre>
+   *
+   * @param bulkChangeEventListener The listener that is called when changes have occurred
+   * @param keys                    Optionally specify keys when the listener is only interested
+   *                                if changes are made for these specific properties
    */
-  void onChange(Consumer<ModificationEvent> eventListener, String... keys);
+  void onChange(Consumer<ModificationEvent> bulkChangeEventListener, String... keys);
 
   /**
    * Register a callback for a change to the given configuration key.
+   * <p>
+   * Use this when we are only interested in changes to a single configuration property.
+   * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key      The configuration key we want to detect changes to
-   * @param callback The callback handling to fire when the configuration changes.
+   * <pre>{@code
+   *
+   *   AtomicReference<String> value = new AtomicReference<>("initial");
+   *
+   *   configuration.onChange("myKey", (newStringValue) -> {
+   *     value.set(newStringValue);
+   *   ));
+   *
+   *   // using a method reference
+   *   configuration.onChange("myKey", value::set);
+   *
+   * }</pre>
+   *
+   * @param key                          The configuration key we want to detect changes to
+   * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
-  void onChange(String key, Consumer<String> callback);
+  void onChange(String key, Consumer<String> singlePropertyChangeListener);
 
   /**
    * Register a callback for a change to the given configuration key as an Int value.
+   * <p>
+   * Use this when we are only interested in changes to a single configuration property.
+   * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key      The configuration key we want to detect changes to
-   * @param callback The callback handling to fire when the configuration changes.
+   * @param key                          The configuration key we want to detect changes to
+   * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
-  void onChangeInt(String key, IntConsumer callback);
+  void onChangeInt(String key, IntConsumer singlePropertyChangeListener);
 
   /**
    * Register a callback for a change to the given configuration key as a Long value.
+   * <p>
+   * Use this when we are only interested in changes to a single configuration property.
+   * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key      The configuration key we want to detect changes to
-   * @param callback The callback handling to fire when the configuration changes.
+   * @param key                          The configuration key we want to detect changes to
+   * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
-  void onChangeLong(String key, LongConsumer callback);
+  void onChangeLong(String key, LongConsumer singlePropertyChangeListener);
 
   /**
    * Register a callback for a change to the given configuration key as a Boolean value.
+   * <p>
+   * Use this when we are only interested in changes to a single configuration property.
+   * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key      The configuration key we want to detect changes to
-   * @param callback The callback handling to fire when the configuration changes.
+   * @param key                          The configuration key we want to detect changes to
+   * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
-  void onChangeBool(String key, Consumer<Boolean> callback);
+  void onChangeBool(String key, Consumer<Boolean> singlePropertyChangeListener);
 
   /**
    * Put the loaded properties into System properties.
