@@ -302,7 +302,7 @@ public interface Configuration {
    * @param name The name of the event which defines the source of the configuration value.
    * @see #onChange(Consumer, String...)
    */
-  Event.Builder eventBuilder(String name);
+  ModificationEvent.Builder eventBuilder(String name);
 
   /**
    * Register an event listener that will be notified of configuration changes.
@@ -315,7 +315,7 @@ public interface Configuration {
    * @param keys          Optionally specify keys when the listener is only interested
    *                      if changes are made for these specific properties
    */
-  void onChange(Consumer<Event> eventListener, String... keys);
+  void onChange(Consumer<ModificationEvent> eventListener, String... keys);
 
   /**
    * Set a single configuration value. Note that {@link #eventBuilder(String)} should be

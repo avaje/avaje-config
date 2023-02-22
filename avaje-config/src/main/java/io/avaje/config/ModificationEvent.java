@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * @see Configuration#eventBuilder(String)
  * @see Configuration#onChange(Consumer, String...)
  */
-public interface Event {
+public interface ModificationEvent {
 
   /**
    * Return the name of the event (e.g "reload").

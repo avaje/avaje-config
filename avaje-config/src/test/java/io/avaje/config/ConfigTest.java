@@ -70,11 +70,11 @@ class ConfigTest {
   @Test
   void onChangeEventListener() {
     assertThat(Config.getOptional("MySystemProp5")).isEmpty();
-    AtomicReference<Event> capturedEvent = new AtomicReference<>();
+    AtomicReference<ModificationEvent> capturedEvent = new AtomicReference<>();
     Config.onChange((capturedEvent::set));
     Config.setProperty("MySystemProp5", "hi5");
 
-    Event event = capturedEvent.get();
+    ModificationEvent event = capturedEvent.get();
 
     assertThat(event.name()).isEqualTo("SetProperty");
     assertThat(event.modifiedKeys()).containsExactly("MySystemProp5");

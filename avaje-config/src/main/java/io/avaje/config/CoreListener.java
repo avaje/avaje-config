@@ -7,21 +7,21 @@ import java.util.function.Consumer;
  */
 final class CoreListener {
 
-  private final Consumer<Event> listener;
+  private final Consumer<ModificationEvent> listener;
   private final String[] keys;
 
-  CoreListener(Consumer<Event> listener, String[] keys) {
+  CoreListener(Consumer<ModificationEvent> listener, String[] keys) {
     this.listener = listener;
     this.keys = keys;
   }
 
-  void accept(CoreEvent event) {
+  void accept(CoreModificationEvent event) {
     if (keys == null || keys.length == 0  || containsKey(event)) {
       listener.accept(event);
     }
   }
 
-  private boolean containsKey(CoreEvent event) {
+  private boolean containsKey(CoreModificationEvent event) {
     final var modifiedKeys = event.modifiedKeys();
     for (String key : keys) {
       if (modifiedKeys.contains(key)) {
