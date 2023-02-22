@@ -305,19 +305,6 @@ public interface Configuration {
   ModificationEvent.Builder eventBuilder(String name);
 
   /**
-   * Register an event listener that will be notified of configuration changes.
-   * <p>
-   * Events are created when configuration is changed via {@link #eventBuilder(String)}
-   * or when configuration is reload from its sources (watching file changes etc).
-
-   *
-   * @param eventListener The listener that is called when changes have occurred
-   * @param keys          Optionally specify keys when the listener is only interested
-   *                      if changes are made for these specific properties
-   */
-  void onChange(Consumer<ModificationEvent> eventListener, String... keys);
-
-  /**
    * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
    * used when setting multiple configuration values.
    * <p>
@@ -332,6 +319,19 @@ public interface Configuration {
    * This will fire configuration callback listeners that are registered.
    */
   void clearProperty(String key);
+
+  /**
+   * Register an event listener that will be notified of configuration changes.
+   * <p>
+   * Events are created when configuration is changed via {@link #eventBuilder(String)}
+   * or when configuration is reload from its sources (watching file changes etc).
+
+   *
+   * @param eventListener The listener that is called when changes have occurred
+   * @param keys          Optionally specify keys when the listener is only interested
+   *                      if changes are made for these specific properties
+   */
+  void onChange(Consumer<ModificationEvent> eventListener, String... keys);
 
   /**
    * Register a callback for a change to the given configuration key.
@@ -350,7 +350,7 @@ public interface Configuration {
   void onChangeInt(String key, IntConsumer callback);
 
   /**
-   * Register a callback for a change to the given configuration key as an Long value.
+   * Register a callback for a change to the given configuration key as a Long value.
    *
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
@@ -358,7 +358,7 @@ public interface Configuration {
   void onChangeLong(String key, LongConsumer callback);
 
   /**
-   * Register a callback for a change to the given configuration key as an Boolean value.
+   * Register a callback for a change to the given configuration key as a Boolean value.
    *
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.

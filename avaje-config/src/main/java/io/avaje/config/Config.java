@@ -418,20 +418,6 @@ public class Config {
   }
 
   /**
-   * Register an event listener that will be notified of configuration changes.
-   * <p>
-   * Events are created when configuration is changed via {@link #eventBuilder(String)}
-   * or when configuration is reload from its sources (watching file changes etc).
-   *
-   * @param eventListener The listener that is called when changes have occurred
-   * @param keys          Optionally specify keys when the listener is only interested
-   *                      if changes are made for these specific properties
-   */
-  public static void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
-    data.onChange(eventListener, keys);
-  }
-
-  /**
    * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
    * used when setting multiple configuration values.
    * <p>
@@ -451,6 +437,20 @@ public class Config {
    */
   public static void clearProperty(String key) {
     data.clearProperty(key);
+  }
+
+  /**
+   * Register an event listener that will be notified of configuration changes.
+   * <p>
+   * Events are created when configuration is changed via {@link #eventBuilder(String)}
+   * or when configuration is reload from its sources (watching file changes etc).
+   *
+   * @param eventListener The listener that is called when changes have occurred
+   * @param keys          Optionally specify keys when the listener is only interested
+   *                      if changes are made for these specific properties
+   */
+  public static void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
+    data.onChange(eventListener, keys);
   }
 
   /**
@@ -474,7 +474,7 @@ public class Config {
   }
 
   /**
-   * Register a callback for a change to the given configuration key as an Long value.
+   * Register a callback for a change to the given configuration key as a Long value.
    *
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
@@ -484,7 +484,7 @@ public class Config {
   }
 
   /**
-   * Register a callback for a change to the given configuration key as an Boolean value.
+   * Register a callback for a change to the given configuration key as a Boolean value.
    *
    * @param key      The configuration key we want to detect changes to
    * @param callback The callback handling to fire when the configuration changes.
