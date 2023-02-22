@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -282,7 +284,7 @@ class CoreConfigurationTest {
 
     String userHome = System.getProperty("user.home");
     assertThat(configuration.get("onChangeTest_1")).isEqualTo("one");
-    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two|" + userHome+ "|be");
+    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two|" + userHome + "|be");
 
 
     assertThat(capturedEventsNoKeyMatch).isEmpty();
@@ -319,6 +321,30 @@ class CoreConfigurationTest {
   }
 
   @Test
+  void onChangeString() {
+    AtomicReference<String> value = new AtomicReference<>("initial");
+    data.onChange("myKey", value::set);
+
+    data.setProperty("myKey", "change");
+    assertThat(value.get()).isEqualTo("change");
+
+    data.setProperty("myKey", "changedAgain");
+    assertThat(value.get()).isEqualTo("changedAgain");
+  }
+
+  @Test
+  void onChangeString_viaModificationEvent() {
+    AtomicReference<String> value = new AtomicReference<>("initial");
+    data.onChange((event) -> value.set(event.configuration().get("myKey")), "myKey");
+
+    data.setProperty("myKey", "change");
+    assertThat(value.get()).isEqualTo("change");
+
+    data.setProperty("myKey", "changedAgain");
+    assertThat(value.get()).isEqualTo("changedAgain");
+  }
+
+  @Test
   void setProperty_withEval() {
     assertThat(data.getOptional("ThisIsNotSet")).isEmpty();
     data.setProperty("ThisIsNotSet", "A|${user.home}|B");
@@ -328,50 +354,58 @@ class CoreConfigurationTest {
 
   @Test
   void onChangeInt() {
-    AtomicReference<Integer> ref = new AtomicReference<>();
-    ref.set(1);
+    final var value = new AtomicInteger(1);
+    data.onChangeInt("some.intKey", value::set);
 
-    data.onChangeInt("some.intKey", ref::set);
-
-    assertThat(ref.get()).isEqualTo(1);
+    assertThat(value.get()).isEqualTo(1);
 
     data.setProperty("some.intKey", "2");
-    assertThat(ref.get()).isEqualTo(2);
+    assertThat(value.get()).isEqualTo(2);
 
     data.setProperty("some.intKey", "42");
-    assertThat(ref.get()).isEqualTo(42);
+    assertThat(value.get()).isEqualTo(42);
   }
 
   @Test
   void onChangeLong() {
-    AtomicReference<Long> ref = new AtomicReference<>();
-    ref.set(1L);
-
-    data.onChangeLong("some.longKey", ref::set);
-
-    assertThat(ref.get()).isEqualTo(1);
+    final var value = new AtomicLong(1);
+    data.onChangeLong("some.longKey", value::set);
+    assertThat(value.get()).isEqualTo(1);
 
     data.setProperty("some.longKey", "2");
-    assertThat(ref.get()).isEqualTo(2);
+    assertThat(value.get()).isEqualTo(2);
 
     data.setProperty("some.longKey", "42");
-    assertThat(ref.get()).isEqualTo(42);
+    assertThat(value.get()).isEqualTo(42);
+  }
+
+  @Test
+  void onChangeLong_via_modificationEvent() {
+    final var value = new AtomicLong(1);
+    data.onChange(event -> {
+      long newValue = event.configuration().getLong("some.longKey");
+      value.set(newValue);
+    }, "some.longKey");
+
+    assertThat(value.get()).isEqualTo(1);
+    data.setProperty("some.longKey", "2");
+    assertThat(value.get()).isEqualTo(2);
+    data.setProperty("some.longKey", "42");
+    assertThat(value.get()).isEqualTo(42);
   }
 
   @Test
   void onChangeBool() {
-    AtomicReference<Boolean> ref = new AtomicReference<>();
-    ref.set(false);
+    final var value = new AtomicBoolean(false);
+    data.onChangeBool("some.boolKey", value::set);
 
-    data.onChangeBool("some.boolKey", ref::set);
-
-    assertThat(ref.get()).isFalse();
+    assertThat(value.get()).isFalse();
 
     data.setProperty("some.boolKey", "true");
-    assertThat(ref.get()).isTrue();
+    assertThat(value.get()).isTrue();
 
     data.setProperty("some.boolKey", "false");
-    assertThat(ref.get()).isFalse();
+    assertThat(value.get()).isFalse();
   }
 
   @Test
