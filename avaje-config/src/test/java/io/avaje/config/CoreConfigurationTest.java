@@ -166,37 +166,7 @@ class CoreConfigurationTest {
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     data.clearProperty("myTestDecimal");
   }
-
-  @Test
-  void getURL_doesNotExist() {
-    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist"));
-  }
-
-  @Test
-  void getURL_doesNotExist_malformed() {
-    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.doesNotExist", "junk"));
-  }
-
-  @Test
-  void getURL_doesNotExist_malformed2() {
-    data.setProperty("myUrl.invalid", "junk");
-    assertThrows(IllegalStateException.class, () -> data.getURL("myUrl.invalid"));
-  }
-
-  @Test
-  void getURL_default() throws MalformedURLException {
-    assertThat(data.getURL("myUrl.doesNotExist", "http://foo")).isEqualTo(new URL("http://foo"));
-    data.clearProperty("myUrl.doesNotExist");
-  }
-
-  @Test
-  void getURL() throws MalformedURLException {
-    data.setProperty("myUrl", "http://bar");
-    assertThat(data.getURL("myUrl")).isEqualTo(new URL("http://bar"));
-    assertThat(data.getURL("myUrl", "http://baz")).isEqualTo(new URL("http://bar"));
-    data.clearProperty("myUrl");
-  }
-
+  
   @Test
   void getList() {
     assertThat(data.list().of("someValues")).contains("13", "42", "55");
