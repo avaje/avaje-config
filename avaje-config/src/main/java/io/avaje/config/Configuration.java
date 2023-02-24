@@ -166,28 +166,6 @@ public interface Configuration {
   BigDecimal getDecimal(String key, String defaultValue);
 
   /**
-   * Return a URL configuration value. Deprecated, it's better to use URI over URL
-   * <p>
-   * IllegalStateException is thrown if the value is not defined in configuration.
-   * </p>
-   *
-   * @param key The configuration key
-   * @return The configured value
-   */
-  @Deprecated
-  URL getURL(String key);
-
-  /**
-   * Return a URL configuration value with a default value. Deprecated, it's better to use URI over URL
-   *
-   * @param key          The configuration key
-   * @param defaultValue The default value
-   * @return The configured value
-   */
-  @Deprecated
-  URL getURL(String key, String defaultValue);
-
-  /**
    * Return a URI configuration value.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
@@ -261,14 +239,6 @@ public interface Configuration {
   ListValue list();
 
   /**
-   * Deprecated migrate to list().
-   */
-  @Deprecated
-  default ListValue getList() {
-    return list();
-  }
-
-  /**
    * Return a Set of values configured.
    *
    * <pre>{@code
@@ -278,14 +248,6 @@ public interface Configuration {
    * }</pre>
    */
   SetValue set();
-
-  /**
-   * Deprecated migrate to set().
-   */
-  @Deprecated
-  default SetValue getSet() {
-    return set();
-  }
 
   /**
    * Create an event builder to make changes to the configuration.

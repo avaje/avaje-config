@@ -258,24 +258,6 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public URL getURL(String key) {
-    try {
-      return new URL(get(key));
-    } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for " + pathPrefix + key, e);
-    }
-  }
-
-  @Override
-  public URL getURL(String key, String defaultValue) {
-    try {
-      return new URL(get(key, defaultValue));
-    } catch (MalformedURLException e) {
-      throw new IllegalStateException("Invalid url for " + pathPrefix + key, e);
-    }
-  }
-
-  @Override
   public URI getURI(String key) {
     return URI.create(get(key));
   }
