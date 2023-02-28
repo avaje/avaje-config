@@ -262,14 +262,6 @@ class ConfigTest {
   }
 
   @Test
-  void getURL() throws MalformedURLException {
-    Config.setProperty("myConfigUrl", "http://bana");
-    assertThat(Config.getURL("myConfigUrl")).isEqualTo(new URL("http://bana"));
-    assertThat(Config.getURL("myConfigUrl", "http://two")).isEqualTo(new URL("http://bana"));
-    Config.clearProperty("myConfigUrl");
-  }
-
-  @Test
   void getURI() {
     Config.setProperty("myConfigUrl", "http://bana");
     assertThat(Config.getURI("myConfigUrl")).isEqualTo(URI.create("http://bana"));

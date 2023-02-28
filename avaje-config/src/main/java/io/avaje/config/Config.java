@@ -257,30 +257,6 @@ public class Config {
   }
 
   /**
-   * Return a URL configuration value.
-   * <p>
-   * IllegalStateException is thrown if the value is not defined in configuration.
-   * </p>
-   *
-   * @param key The configuration key
-   * @return The configured value
-   */
-  public static URL getURL(String key) {
-    return data.getURL(key);
-  }
-
-  /**
-   * Return a URL configuration value with a default value.
-   *
-   * @param key          The configuration key
-   * @param defaultValue The default value
-   * @return The configured value
-   */
-  public static URL getURL(String key, String defaultValue) {
-    return data.getURL(key, defaultValue);
-  }
-
-  /**
    * Return a URI configuration value.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
@@ -370,14 +346,6 @@ public class Config {
   }
 
   /**
-   * Deprecated migrate to list().
-   */
-  @Deprecated
-  public static Configuration.ListValue getList() {
-    return list();
-  }
-
-  /**
    * Return a Set of values configured.
    *
    * <pre>{@code
@@ -388,14 +356,6 @@ public class Config {
    */
   public static Configuration.SetValue set() {
     return data.set();
-  }
-
-  /**
-   * Deprecated migrate to set().
-   */
-  @Deprecated
-  public static Configuration.SetValue getSet() {
-    return set();
   }
 
   /**
