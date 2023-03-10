@@ -10,4 +10,6 @@ module io.avaje.config {
   uses io.avaje.config.ConfigurationLog;
   uses io.avaje.config.ModificationEventRunner;
   uses io.avaje.config.ConfigurationSource;
+
+  provides io.avaje.inject.spi.PropertyRequiresPlugin with io.avaje.config.InjectPropertiesPlugin;
 }
