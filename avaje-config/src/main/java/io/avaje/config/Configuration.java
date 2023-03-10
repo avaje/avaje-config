@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -67,6 +68,15 @@ public interface Configuration {
    * @return The configured value
    */
   String get(String key);
+  
+
+  /**
+   * Return a required configuration value as String.
+   * @param key The configuration key
+   * @return The configured value or null if not set
+   */
+  @Nullable
+  String getNullable(String key);
 
   /**
    * Return a configuration string value with a given default.

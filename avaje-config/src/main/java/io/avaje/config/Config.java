@@ -1,16 +1,16 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
+
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 /**
  * Provides application Configuration based on loading properties and yaml files
@@ -98,6 +98,16 @@ public class Config {
    */
   public static String get(String key) {
     return data.get(key);
+  }
+
+  /**
+   * Return a required configuration value as String.
+   * @param key The configuration key
+   * @return The configured value or null if not set
+   */
+  @Nullable
+  public static String getNullable(String key) {
+    return data.getNullable(key);
   }
 
   /**

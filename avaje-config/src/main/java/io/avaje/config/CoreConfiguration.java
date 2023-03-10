@@ -5,9 +5,7 @@ import io.avaje.lang.Nullable;
 
 import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -202,7 +200,13 @@ final class CoreConfiguration implements Configuration {
   public String get(String key) {
     return required(key);
   }
-
+  
+  @Override
+  @Nullable
+  public String getNullable(String key) {
+    return value(key);
+  }
+  
   @Override
   public String get(String key, String defaultValue) {
     requireNonNull(key, "key is required");
