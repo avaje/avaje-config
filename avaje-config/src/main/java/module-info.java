@@ -5,6 +5,7 @@ module io.avaje.config {
   requires transitive io.avaje.lang;
   requires transitive io.avaje.applog;
   requires static org.yaml.snakeyaml;
+  requires static io.avaje.inject;
 
   uses io.avaje.config.ConfigurationLog;
   uses io.avaje.config.ModificationEventRunner;
