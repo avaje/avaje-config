@@ -63,10 +63,11 @@ final class CoreConfiguration implements Configuration {
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    final ModificationEventRunner runner = ServiceLoader.load(ModificationEventRunner.class).findFirst().orElseGet(ForegroundEventRunner::new);
-    final ConfigurationLog log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
+    final var runner = ServiceLoader.load(ModificationEventRunner.class).findFirst().orElseGet(ForegroundEventRunner::new);
+    final var log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
     log.preInitialisation();
-    final InitialLoader loader = new InitialLoader(log);
+    final var resourceLoader = ServiceLoader.load(ResourceLoader.class).findFirst().orElseGet(DefaultResourceLoader::new);
+    final var loader = new InitialLoader(log, resourceLoader);
     CoreConfiguration configuration = new CoreConfiguration(runner, log, loader.load());
     configuration.loadSources();
     loader.initWatcher(configuration);
@@ -200,13 +201,13 @@ final class CoreConfiguration implements Configuration {
   public String get(String key) {
     return required(key);
   }
-  
+
   @Override
   @Nullable
   public String getNullable(String key) {
     return value(key);
   }
-  
+
   @Override
   public String get(String key, String defaultValue) {
     requireNonNull(key, "key is required");

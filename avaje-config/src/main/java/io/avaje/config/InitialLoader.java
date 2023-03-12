@@ -39,9 +39,9 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private YamlLoader yamlLoader;
 
-  InitialLoader(ConfigurationLog log) {
+  InitialLoader(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
-    this.loadContext = new InitialLoadContext(log);
+    this.loadContext = new InitialLoadContext(log, resourceLoader);
     initYamlLoader();
   }
 
