@@ -4,6 +4,10 @@ import java.util.Optional;
 
 import io.avaje.inject.spi.PropertyRequiresPlugin;
 
+/**
+ * Plugin used with Avaje Inject to support the {@code @RequiresProperty} annotation
+ * for conditional wiring based on properties.
+ */
 public class InjectPropertiesPlugin implements PropertyRequiresPlugin {
 
   @Override

@@ -101,16 +101,6 @@ public class Config {
   }
 
   /**
-   * Return a required configuration value as String.
-   * @param key The configuration key
-   * @return The configured value or null if not set
-   */
-  @Nullable
-  public static String getNullable(String key) {
-    return data.getNullable(key);
-  }
-
-  /**
    * Return a configuration string value with a given default.
    *
    * @param key          The configuration key
@@ -129,6 +119,20 @@ public class Config {
    */
   public static Optional<String> getOptional(String key) {
     return data.getOptional(key);
+  }
+
+  /**
+   * Return a configuration value as String or null if it is not defined.
+   * <p>
+   * This is an alternative to {@link #getOptional(String)} for cases where
+   * we prefer to work with null values rather than Optional.
+   *
+   * @param key The configuration key
+   * @return The configured value or null if not set
+   */
+  @Nullable
+  public static String getNullable(String key) {
+    return data.getNullable(key);
   }
 
   /**

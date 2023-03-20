@@ -15,6 +15,7 @@ import io.avaje.config.CoreEntry.CoreMap;
 final class InitialLoadContext {
 
   private final ConfigurationLog log;
+  private final ResourceLoader resourceLoader;
   /**
    * CoreMap we are loading the properties into.
    */
@@ -27,8 +28,9 @@ final class InitialLoadContext {
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
-  InitialLoadContext(ConfigurationLog log) {
+  InitialLoadContext(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
+    this.resourceLoader = resourceLoader;
     this.exprEval = new CoreExpressionEval(map);
   }
 
@@ -100,7 +102,7 @@ final class InitialLoadContext {
   }
 
   private InputStream resourceStream(String resourcePath) {
-    InputStream is = getClass().getResourceAsStream("/" + resourcePath);
+    InputStream is = resourceLoader.getResourceAsStream(resourcePath);
     if (is == null) {
       // search the module path for top level resource
       is = ClassLoader.getSystemResourceAsStream(resourcePath);

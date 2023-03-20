@@ -10,7 +10,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>3.1-SNAPSHOT</version>
+  <version>3.1-RC1</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
@@ -18,7 +18,7 @@
   </scm>
 
   <properties>
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-inject</artifactId>
-      <version>9.0-RC4</version>
+      <version>9.0-RC1</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
