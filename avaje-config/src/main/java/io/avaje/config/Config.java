@@ -3,9 +3,11 @@ package io.avaje.config;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -347,6 +349,19 @@ public class Config {
   }
 
   /**
+   * Return the enum configuration value with a default value.
+   *
+   * @param type The enum type
+   * @param key The configuration key
+   * @param defaultValue The default value
+   * @return The configured value
+   */
+  public static <T> T getAs(String key, Function<CoreEntry, T> mappingFunction) {
+
+    return data.getAs(key, mappingFunction);
+  }
+
+  /**
    * Return a List of values configured.
    *
    * <pre>{@code
@@ -393,12 +408,22 @@ public class Config {
 
   /**
    * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
-   * used when setting multiple configuration values.
+   * used to fluently set multiple configuration values.
    * <p>
    * This will fire configuration callback listeners that are registered.
    */
   public static void setProperty(String key, String value) {
     data.setProperty(key, value);
+  }
+
+  /**
+   * Add configuration values via a map. Note that {@link #eventBuilder(String)} is preferred to
+   * fluently set multiple configuration values.
+   *
+   * <p>This will fire configuration callback listeners that are registered.
+   */
+  public static void putAll(Map<String, Object> map) {
+    data.putAll(map);
   }
 
   /**

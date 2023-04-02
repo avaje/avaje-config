@@ -45,7 +45,7 @@ final class InitialLoader {
     initYamlLoader();
   }
 
-  String loadedFrom() {
+  Set<String> loadedFrom() {
     return loadContext.loadedFrom();
   }
 

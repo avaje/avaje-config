@@ -1,19 +1,20 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
-
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
+
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
@@ -240,6 +241,8 @@ public interface Configuration {
    */
   <T extends Enum<T>> T getEnum(Class<T> type, String key, T defaultValue);
 
+  <T> T getAs(String key, Function<CoreEntry, T> mappingFunction);
+
   /**
    * Return a List of values configured.
    *
@@ -286,6 +289,14 @@ public interface Configuration {
    * This will fire configuration callback listeners that are registered.
    */
   void setProperty(String key, String value);
+
+  /**
+   * Add configuration values via a map. Note that {@link #eventBuilder(String)} should be
+   * used to fluently set multiple configuration values.
+   * <p>
+   * This will fire configuration callback listeners that are registered.
+   */
+  void putAll(Map<String, Object> map);
 
   /**
    * Clear the value for the given key. Note that {@link #eventBuilder(String)} should be
