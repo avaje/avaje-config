@@ -3,9 +3,11 @@ package io.avaje.config;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -393,12 +395,21 @@ public class Config {
 
   /**
    * Set a single configuration value. Note that {@link #eventBuilder(String)} should be
-   * used when setting multiple configuration values.
+   * used to fluently set multiple configuration values.
    * <p>
    * This will fire configuration callback listeners that are registered.
    */
   public static void setProperty(String key, String value) {
     data.setProperty(key, value);
+  }
+
+  /**
+   * Add configuration values via a map.
+   *
+   * <p>This will fire configuration callback listeners that are registered.
+   */
+  public static void putAll(Map<String, Object> map) {
+    data.putAll(map);
   }
 
   /**

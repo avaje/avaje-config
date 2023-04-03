@@ -34,8 +34,8 @@ final class InitialLoadContext {
     this.exprEval = new CoreExpressionEval(map);
   }
 
-  String loadedFrom() {
-    return loadedResources.toString();
+  Set<String> loadedFrom() {
+    return loadedResources;
   }
 
   List<File> loadedFiles() {
