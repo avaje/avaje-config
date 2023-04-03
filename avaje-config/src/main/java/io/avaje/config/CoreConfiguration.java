@@ -308,6 +308,19 @@ final class CoreConfiguration implements Configuration {
           "Failed to convert key: " + key + " with the provided function", e);
     }
   }
+  
+  @Override
+  public <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction) {
+    requireNonNull("Key is required");
+    requireNonNull("mappingFunction is required");
+    
+    try {
+      return  Optional.ofNullable(value(key)).map(mappingFunction);
+    } catch (final Exception e) {
+      throw new IllegalStateException(
+          "Failed to convert key: " + key + " with the provided function", e);
+    }
+  }
 
   @Override
   public ModificationEvent.Builder eventBuilder(String name) {

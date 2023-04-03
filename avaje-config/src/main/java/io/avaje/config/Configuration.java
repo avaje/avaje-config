@@ -240,6 +240,15 @@ public interface Configuration {
   <T> T getAs(String key, Function<String, T> mappingFunction);
 
   /**
+   * Apply a mapping function to the value returned.
+   *
+   * @param key The configuration key
+   * @param mappingFunction the mapping function to execute
+   * @return The mapped value
+   */
+  <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction);
+
+  /**
    * Return the enum configuration value with a default value.
    *
    * @param type         The enum type

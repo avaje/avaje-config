@@ -296,6 +296,63 @@ class ConfigTest {
     Config.clearProperty("myTestEnum");
   }
 
+  @Test
+  void get_as_func() {
+    Config.setProperty("func", "amogus");
+    final var result =
+        Config.getAs(
+            "func",
+            x -> {
+              assertThat(x).isEqualTo("amogus");
+              return "sus";
+            });
+    assertThat(result).isEqualTo("sus");
+
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            Config.getAs(
+                "func",
+                x -> {
+                  throw new RuntimeException("broke");
+                }));
+    Config.clearProperty("func");
+  }
+
+  @Test
+  void get_as_func_op() {
+    Config.setProperty("func", "fire");
+    var result =
+        Config.getAsOptional(
+            "func",
+            x -> {
+              assertThat(x).isEqualTo("fire");
+              return "sus";
+            });
+
+    assertThat(result.orElseThrow()).isEqualTo("sus");
+
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            Config.getAsOptional(
+                "func",
+                x -> {
+                  throw new RuntimeException("broke");
+                }));
+    Config.clearProperty("func");
+
+    result =
+        Config.getAsOptional(
+            "func",
+            x -> {
+              assertThat(x).isEqualTo("fire");
+              return null;
+            });
+
+    assertThat(result.isEmpty()).isEqualTo(true);
+  }
+
   enum MyTestEnum {
     A, B, C
   }
