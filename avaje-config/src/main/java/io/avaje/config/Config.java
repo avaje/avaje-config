@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -344,6 +345,18 @@ public class Config {
    */
   public static <T extends Enum<T>> T getEnum(Class<T> type, String key, T defaultValue) {
     return data.getEnum(type, key, defaultValue);
+  }
+
+  /**
+   * Apply a mapping function to the value returned.
+   *
+   * @param key The configuration key
+   * @param mappingFunction the mapping function to execute
+   * @return The mapped value
+   */
+  public static <T> T getAs(String key, Function<String, T> mappingFunction) {
+
+    return data.getAs(key, mappingFunction);
   }
 
   /**

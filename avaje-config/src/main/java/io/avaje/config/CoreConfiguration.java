@@ -295,6 +295,20 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public <T> T getAs(String key, Function<String, T> mappingFunction) {
+    requireNonNull("Key is required");
+    requireNonNull("mappingFunction is required");
+    final var entry = required(key);
+
+    try {
+      return mappingFunction.apply(entry);
+    } catch (final Exception e) {
+      throw new IllegalStateException(
+          "Failed to convert key: " + key + " with the provided function", e);
+    }
+  }
+
+  @Override
   public ModificationEvent.Builder eventBuilder(String name) {
     requireNonNull(name);
     return new CoreEventBuilder(name, this, properties.entryMap());

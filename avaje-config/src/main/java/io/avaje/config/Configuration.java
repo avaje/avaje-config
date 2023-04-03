@@ -1,19 +1,19 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
-
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
+
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
@@ -229,6 +229,15 @@ public interface Configuration {
    * @return The configured value
    */
   <T extends Enum<T>> T getEnum(Class<T> type, String key);
+
+  /**
+   * Apply a mapping function to the value returned.
+   *
+   * @param key The configuration key
+   * @param mappingFunction the mapping function to execute
+   * @return The mapped value
+   */
+  <T> T getAs(String key, Function<String, T> mappingFunction);
 
   /**
    * Return the enum configuration value with a default value.
