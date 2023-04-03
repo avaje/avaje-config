@@ -95,7 +95,6 @@ final class CoreConfiguration implements Configuration {
 
   private void loadSources(Set<String> names) {
     for (final ConfigurationSource source : ServiceLoader.load(ConfigurationSource.class)) {
-
       source.load(this);
       names.add("ConfigurationSource:" + source.getClass().getCanonicalName());
     }
@@ -452,22 +451,27 @@ final class CoreConfiguration implements Configuration {
       CoreEntry value = entries.get(key);
       if (value == null) {
         // defining property at runtime with System property/ENV backing
-        String systemValue = System.getProperty(key);
-        if (systemValue == null) {
-          systemValue = System.getenv(key);
-        }
-        value =
-            systemValue != null
-                ? CoreEntry.of(systemValue, SYSTEM_PROPS)
-                : defaultValue != null
-                    ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT)
-                    : CoreEntry.NULL_ENTRY;
+        value = defaultEntry(defaultValue, systemValue(key));
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
         value = CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
         entries.put(key, value);
       }
       return value;
+    }
+
+    private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String systemValue) {
+      return systemValue != null
+        ? CoreEntry.of(systemValue, SYSTEM_PROPS)
+        : defaultValue != null
+          ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT)
+          : CoreEntry.NULL_ENTRY;
+    }
+
+    @Nullable
+    private static String systemValue(String key) {
+      final String systemValue = System.getProperty(key);
+      return systemValue == null ? System.getenv(key) : systemValue;
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
