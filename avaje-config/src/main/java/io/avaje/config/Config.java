@@ -417,8 +417,7 @@ public class Config {
   }
 
   /**
-   * Add configuration values via a map. Note that {@link #eventBuilder(String)} is preferred to
-   * fluently set multiple configuration values.
+   * Add configuration values via a map.
    *
    * <p>This will fire configuration callback listeners that are registered.
    */

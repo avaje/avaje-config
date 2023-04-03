@@ -291,8 +291,7 @@ public interface Configuration {
   void setProperty(String key, String value);
 
   /**
-   * Add configuration values via a map. Note that {@link #eventBuilder(String)} should be
-   * used to fluently set multiple configuration values.
+   * Add configuration values via a map.
    * <p>
    * This will fire configuration callback listeners that are registered.
    */
