@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -378,7 +377,7 @@ final class CoreConfiguration implements Configuration {
         (k, v) -> {
           requireNonNull(k, "map key is required");
           requireNonNull(v, "map value is required");
-          builder.put(k, v.toString()).publish();
+          builder.put(k, v.toString());
         });
 
     builder.publish();
