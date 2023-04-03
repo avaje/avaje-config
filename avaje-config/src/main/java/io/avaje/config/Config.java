@@ -349,19 +349,6 @@ public class Config {
   }
 
   /**
-   * Return the enum configuration value with a default value.
-   *
-   * @param type The enum type
-   * @param key The configuration key
-   * @param defaultValue The default value
-   * @return The configured value
-   */
-  public static <T> T getAs(String key, Function<CoreEntry, T> mappingFunction) {
-
-    return data.getAs(key, mappingFunction);
-  }
-
-  /**
    * Return a List of values configured.
    *
    * <pre>{@code
