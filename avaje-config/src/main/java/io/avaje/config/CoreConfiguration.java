@@ -308,7 +308,7 @@ final class CoreConfiguration implements Configuration {
               + key
               + " sourced from: "
               + properties.entry(key).source()
-              + "with the provided function",
+              + " with the provided function",
           e);
     }
   }
@@ -326,7 +326,7 @@ final class CoreConfiguration implements Configuration {
               + key
               + " sourced from: "
               + properties.entry(key).source()
-              + "with the provided function",
+              + " with the provided function",
           e);
     }
   }
