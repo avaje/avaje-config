@@ -234,7 +234,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
@@ -243,7 +243,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */

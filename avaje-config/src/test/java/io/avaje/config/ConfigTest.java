@@ -3,10 +3,9 @@ package io.avaje.config;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -297,7 +296,17 @@ class ConfigTest {
   }
 
   @Test
-  void get_as_func() {
+  void getAs_example() {
+    Config.setProperty("func", "2023-11-03");
+
+    LocalDate asLocalDate = Config.getAs("func", LocalDate::parse);
+    assertThat(asLocalDate).isEqualTo(LocalDate.of(2023, 11, 3));
+
+    Config.clearProperty("func");
+  }
+
+  @Test
+  void getAs_func() {
     Config.setProperty("func", "amogus");
     final var result =
         Config.getAs(
@@ -320,7 +329,7 @@ class ConfigTest {
   }
 
   @Test
-  void get_as_func_op() {
+  void getAsOptional_func() {
     Config.setProperty("func", "fire");
     var result =
         Config.getAsOptional(

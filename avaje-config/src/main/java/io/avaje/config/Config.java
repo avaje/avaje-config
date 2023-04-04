@@ -351,19 +351,18 @@ public class Config {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
   public static <T> T getAs(String key, Function<String, T> mappingFunction) {
-
     return data.getAs(key, mappingFunction);
   }
 
   /**
    * Apply a mapping function to the value returned as an optional.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
