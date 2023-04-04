@@ -69,8 +69,8 @@ final class CoreConfiguration implements Configuration {
     log.preInitialisation();
     final var resourceLoader = ServiceLoader.load(ResourceLoader.class).findFirst().orElseGet(DefaultResourceLoader::new);
     final var loader = new InitialLoader(log, resourceLoader);
-    CoreConfiguration configuration = new CoreConfiguration(runner, log, loader.load());
-    configuration.loadSources();
+    final CoreConfiguration configuration = new CoreConfiguration(runner, log, loader.load());
+    configuration.loadSources(loader.loadedFrom());
     loader.initWatcher(configuration);
     configuration.initSystemProperties();
     configuration.logMessage(loader);
@@ -94,9 +94,10 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
-  private void loadSources() {
-    for (ConfigurationSource source : ServiceLoader.load(ConfigurationSource.class)) {
+  private void loadSources(Set<String> names) {
+    for (final ConfigurationSource source : ServiceLoader.load(ConfigurationSource.class)) {
       source.load(this);
+      names.add("ConfigurationSource:" + source.getClass().getCanonicalName());
     }
   }
 
@@ -404,6 +405,21 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public void putAll(Map<String, Object> map) {
+    requireNonNull(map, "map cannot be null");
+    final var builder = eventBuilder("PutAll");
+
+    map.forEach(
+        (k, v) -> {
+          requireNonNull(k, "map key is required");
+          requireNonNull(v, "map value is required");
+          builder.put(k, v.toString());
+        });
+
+    builder.publish();
+  }
+
+  @Override
   public void clearProperty(String key) {
     requireNonNull(key, "key is required");
     eventBuilder("ClearProperty").remove(key).publish();
@@ -471,15 +487,28 @@ final class CoreConfiguration implements Configuration {
     private CoreEntry _entry(String key, @Nullable String defaultValue) {
       CoreEntry value = entries.get(key);
       if (value == null) {
-        // defining property at runtime with System property backing
-        String systemValue = System.getProperty(key);
-        value = systemValue != null ? CoreEntry.of(systemValue, SYSTEM_PROPS) : defaultValue != null ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT) : CoreEntry.NULL_ENTRY;
+        // defining property at runtime with System property/ENV backing
+        value = defaultEntry(defaultValue, systemValue(key));
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
         value = CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
         entries.put(key, value);
       }
       return value;
+    }
+
+    private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String systemValue) {
+      return systemValue != null
+        ? CoreEntry.of(systemValue, SYSTEM_PROPS)
+        : defaultValue != null
+          ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT)
+          : CoreEntry.NULL_ENTRY;
+    }
+
+    @Nullable
+    private static String systemValue(String key) {
+      final String systemValue = System.getProperty(key);
+      return systemValue == null ? System.getenv(key) : systemValue;
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {

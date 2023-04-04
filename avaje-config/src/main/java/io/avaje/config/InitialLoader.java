@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.lang.System.Logger.Level;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.avaje.config.CoreEntry.CoreMap;
@@ -45,7 +46,7 @@ final class InitialLoader {
     initYamlLoader();
   }
 
-  String loadedFrom() {
+  Set<String> loadedFrom() {
     return loadContext.loadedFrom();
   }
 

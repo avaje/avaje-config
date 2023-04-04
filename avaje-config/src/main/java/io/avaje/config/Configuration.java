@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -304,6 +305,13 @@ public interface Configuration {
    * This will fire configuration callback listeners that are registered.
    */
   void setProperty(String key, String value);
+
+  /**
+   * Add configuration values via a map.
+   * <p>
+   * This will fire configuration callback listeners that are registered.
+   */
+  void putAll(Map<String, Object> map);
 
   /**
    * Clear the value for the given key. Note that {@link #eventBuilder(String)} should be
