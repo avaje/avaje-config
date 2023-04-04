@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -293,6 +294,42 @@ final class CoreConfiguration implements Configuration {
   public <T extends Enum<T>> T getEnum(Class<T> cls, String key, T defaultValue) {
     requireNonNull(cls, "Enum class is required");
     return Enum.valueOf(cls, get(key, defaultValue.name()));
+  }
+
+  @Override
+  public <T> T getAs(String key, Function<String, T> mappingFunction) {
+    requireNonNull("Key is required");
+    requireNonNull("mappingFunction is required");
+    final var entry = required(key);
+    try {
+      return mappingFunction.apply(entry);
+    } catch (final Exception e) {
+      throw new IllegalStateException(
+          "Failed to convert key: "
+              + key
+              + " sourced from: "
+              + properties.entry(key).source()
+              + " with the provided function",
+          e);
+    }
+  }
+
+  @Override
+  public <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction) {
+    requireNonNull("Key is required");
+    requireNonNull("mappingFunction is required");
+
+    try {
+      return Optional.ofNullable(value(key)).map(mappingFunction);
+    } catch (final Exception e) {
+      throw new IllegalStateException(
+          "Failed to convert key: "
+              + key
+              + " sourced from: "
+              + properties.entry(key).source()
+              + " with the provided function",
+          e);
+    }
   }
 
   @Override

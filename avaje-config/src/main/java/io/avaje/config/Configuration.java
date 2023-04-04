@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
@@ -229,6 +230,24 @@ public interface Configuration {
    * @return The configured value
    */
   <T extends Enum<T>> T getEnum(Class<T> type, String key);
+
+  /**
+   * Apply a mapping function to the value returned.
+   *
+   * @param key The configuration key
+   * @param mappingFunction the mapping function to execute
+   * @return The mapped value
+   */
+  <T> T getAs(String key, Function<String, T> mappingFunction);
+
+  /**
+   * Apply a mapping function to the value returned.
+   *
+   * @param key The configuration key
+   * @param mappingFunction the mapping function to execute
+   * @return The mapped value
+   */
+  <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction);
 
   /**
    * Return the enum configuration value with a default value.
