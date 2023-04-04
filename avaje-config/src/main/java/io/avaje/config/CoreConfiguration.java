@@ -300,25 +300,34 @@ final class CoreConfiguration implements Configuration {
     requireNonNull("Key is required");
     requireNonNull("mappingFunction is required");
     final var entry = required(key);
-
     try {
       return mappingFunction.apply(entry);
     } catch (final Exception e) {
       throw new IllegalStateException(
-          "Failed to convert key: " + key + " with the provided function", e);
+          "Failed to convert key: "
+              + key
+              + " sourced from: "
+              + properties.entry(key).source()
+              + "with the provided function",
+          e);
     }
   }
-  
+
   @Override
   public <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction) {
     requireNonNull("Key is required");
     requireNonNull("mappingFunction is required");
-    
+
     try {
-      return  Optional.ofNullable(value(key)).map(mappingFunction);
+      return Optional.ofNullable(value(key)).map(mappingFunction);
     } catch (final Exception e) {
       throw new IllegalStateException(
-          "Failed to convert key: " + key + " with the provided function", e);
+          "Failed to convert key: "
+              + key
+              + " sourced from: "
+              + properties.entry(key).source()
+              + "with the provided function",
+          e);
     }
   }
 
