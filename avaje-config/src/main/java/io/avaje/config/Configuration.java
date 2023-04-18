@@ -371,11 +371,11 @@ public interface Configuration {
    *
    * <pre>{@code
    *
-   *   configuration.onChange("myKey", (neValue) -> {
+   *   configuration.onChange("myKey", (newValue) -> {
    *
    *     // do something with the newValue ...
    *
-   *   ));
+   *   )};
    *
    * }</pre>
    *
