@@ -120,6 +120,14 @@ class CoreConfigurationTest {
   }
 
   @Test
+  void toEnvKey() {
+    assertThat(CoreConfiguration.toEnvKey("My")).isEqualTo("MY");
+    assertThat(CoreConfiguration.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
+    assertThat(CoreConfiguration.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
+    assertThat(CoreConfiguration.toEnvKey("BAR")).isEqualTo("BAR");
+  }
+
+  @Test
   void get() {
     assertEquals(data.get("a", "something"), "1");
     assertEquals(data.get("doesNotExist", "something"), "something");
@@ -166,7 +174,7 @@ class CoreConfigurationTest {
     assertThat(data.getDecimal("myTestDecimal", "10.4")).isEqualByComparingTo("14.3");
     data.clearProperty("myTestDecimal");
   }
-  
+
   @Test
   void getList() {
     assertThat(data.list().of("someValues")).contains("13", "42", "55");
