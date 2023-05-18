@@ -438,6 +438,10 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
+  static String toEnvKey(String key) {
+    return key.replace('.','_').toUpperCase();
+  }
+
   private static class ModifyAwareProperties {
 
     private final CoreEntry.CoreMap entries;
@@ -505,8 +509,8 @@ final class CoreConfiguration implements Configuration {
 
     @Nullable
     private static String systemValue(String key) {
-      final String systemValue = System.getProperty(key);
-      return systemValue == null ? System.getenv(key) : systemValue;
+      final String val = System.getProperty(key, System.getenv(key));
+      return val != null ? val : System.getenv(toEnvKey(key));
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
