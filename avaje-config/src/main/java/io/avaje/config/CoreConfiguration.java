@@ -211,6 +211,12 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public String getNullable(String key, String defaultValue) {
+    requireNonNull(key, "key is required");
+    return properties.entry(key, defaultValue).value();
+  }
+
+  @Override
   public String get(String key, String defaultValue) {
     requireNonNull(key, "key is required");
     requireNonNull(defaultValue, "defaultValue is required, use getOptional() instead");

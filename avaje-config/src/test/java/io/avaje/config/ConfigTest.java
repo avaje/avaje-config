@@ -32,6 +32,19 @@ class ConfigTest {
   }
 
   @Test
+  void getNullable() {
+    assertThat(Config.getNullable("IDoNotExist")).isNull();
+    assertThat(Config.getNullable("IDoNotExist", System.getenv("AlsoDoNotExist"))).isNull();
+  }
+
+  @Test
+  void getNullableExists() {
+    assertThat(Config.getNullable("IDoNotExist", "SomeVal")).isEqualTo("SomeVal");
+    System.setProperty("MyRareSystemProp", "hello");
+    assertThat(Config.getNullable("MyRareSystemProp", System.getenv("AlsoDoNotExist"))).isEqualTo("hello");
+  }
+
+  @Test
   void fallbackToSystemProperty_cacheInitialNullValue() {
     assertThat(Config.getOptional("MySystemProp")).isEmpty();
     System.setProperty("MySystemProp", "hello");

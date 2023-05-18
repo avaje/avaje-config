@@ -138,6 +138,21 @@ public class Config {
   }
 
   /**
+   * Return a configuration value as String or null if it is not defined.
+   * <p>
+   * This is an alternative to {@link #getOptional(String)} for cases where
+   * we prefer to work with null values rather than Optional.
+   *
+   * @param key The configuration key
+   * @param defaultValue The default value that can be null
+   * @return The configured value or null if not set
+   */
+  @Nullable
+  public static String getNullable(String key, @Nullable String defaultValue) {
+    return data.getNullable(key, defaultValue);
+  }
+
+  /**
    * Return boolean configuration value with the given default value.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
