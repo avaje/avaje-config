@@ -33,15 +33,25 @@ class ConfigTest {
 
   @Test
   void getNullable() {
-    assertThat(Config.getNullable("IDoNotExist")).isNull();
-    assertThat(Config.getNullable("IDoNotExist", System.getenv("AlsoDoNotExist"))).isNull();
+    assertThat(Config.getNullable("IDoNotExist0")).isNull();
+    assertThat(Config.getNullable("IDoNotExist0", System.getenv("AlsoDoNotExist"))).isNull();
   }
 
   @Test
   void getNullableExists() {
-    assertThat(Config.getNullable("IDoNotExist", "SomeVal")).isEqualTo("SomeVal");
+    assertThat(Config.getNullable("IDoNotExist1", "SomeVal")).isEqualTo("SomeVal");
     System.setProperty("MyRareSystemProp", "hello");
     assertThat(Config.getNullable("MyRareSystemProp", System.getenv("AlsoDoNotExist"))).isEqualTo("hello");
+  }
+
+  @Test
+  void getOptionalWithNullDefault() {
+    assertThat(Config.getOptional("IDoNotExist2", System.getenv("AlsoDoNotExist"))).isEmpty();
+  }
+
+  @Test
+  void getOptionalWithDefault() {
+    assertThat(Config.getOptional("IDoNotExist3", System.getProperty("user.home"))).isNotEmpty();
   }
 
   @Test
@@ -114,7 +124,7 @@ class ConfigTest {
     assertThat(System.getProperty("myapp.bar.barDouble")).isEqualTo("33.3");
 
     assertThat(properties).containsKeys("config.load.systemProperties", "config.watch.enabled", "myExternalLoader", "myapp.activateFoo", "myapp.bar.barDouble", "myapp.bar.barRules", "myapp.fooHome", "myapp.fooName", "system.excluded.properties");
-    assertThat(properties).hasSize(9);
+    assertThat(properties).hasSize(11);
   }
 
   @Test

@@ -229,6 +229,11 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public Optional<String> getOptional(String key, String defaultValue) {
+    return Optional.ofNullable(getNullable(key, defaultValue));
+  }
+
+  @Override
   public boolean getBool(String key) {
     return Boolean.parseBoolean(required(key));
   }
