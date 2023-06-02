@@ -37,9 +37,6 @@ final class CoreSetValue implements Configuration.SetValue {
   @Override
   public Set<Integer> ofInt(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptySet();
-    }
     return splitInt(val);
   }
 
@@ -59,9 +56,6 @@ final class CoreSetValue implements Configuration.SetValue {
   @Override
   public Set<Long> ofLong(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptySet();
-    }
     return splitLong(val);
   }
 
@@ -106,6 +100,11 @@ final class CoreSetValue implements Configuration.SetValue {
   <T> Set<T> splitAs(String allValues, Function<String, T> function) {
 
     final Set<T> set = new LinkedHashSet<>();
+
+    if (allValues == null) {
+      return Collections.emptySet();
+    }
+
     for (final var value : allValues.split(",")) {
 
       set.add(function.apply(value));

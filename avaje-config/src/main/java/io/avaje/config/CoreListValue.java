@@ -36,9 +36,6 @@ final class CoreListValue implements Configuration.ListValue {
   @Override
   public List<Integer> ofInt(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptyList();
-    }
     return splitInt(val);
   }
 
@@ -58,9 +55,6 @@ final class CoreListValue implements Configuration.ListValue {
   @Override
   public List<Long> ofLong(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptyList();
-    }
     return splitLong(val);
   }
 
@@ -103,6 +97,10 @@ final class CoreListValue implements Configuration.ListValue {
   <T> List<T> splitAs(String allValues, Function<String, T> function) {
 
     final List<T> list = new ArrayList<>();
+
+    if (allValues == null) {
+      return Collections.emptyList();
+    }
 
     for (final var value : allValues.split(",")) {
       list.add(function.apply(value));
