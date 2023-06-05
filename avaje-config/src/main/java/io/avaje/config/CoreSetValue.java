@@ -16,59 +16,57 @@ final class CoreSetValue implements Configuration.SetValue {
   @Override
   public Set<String> of(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptySet();
-    }
-    return split(val);
+    return val == null ? Collections.emptySet() : split(val);
   }
 
   @Override
   public Set<String> of(String key, String... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      final Set<String> values = new LinkedHashSet<>();
-      Collections.addAll(values, defaultValues);
-      return values;
-    }
-    return split(val);
+    return val == null ? stringDefaults(defaultValues) : split(val);
+  }
+
+  private static Set<String> stringDefaults(String[] defaultValues) {
+    final Set<String> values = new LinkedHashSet<>();
+    Collections.addAll(values, defaultValues);
+    return values;
   }
 
   @Override
   public Set<Integer> ofInt(String key) {
-    final String val = config.value(key);
-    return splitInt(val);
+    return splitInt(config.value(key));
   }
 
   @Override
   public Set<Integer> ofInt(String key, int... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      final Set<Integer> ints = new LinkedHashSet<>();
-      for (final int defaultVal : defaultValues) {
-        ints.add(defaultVal);
-      }
-      return ints;
+    return val == null ? intDefaults(defaultValues) : splitInt(val);
+  }
+
+  private static Set<Integer> intDefaults(int[] defaultValues) {
+    final Set<Integer> ints = new LinkedHashSet<>();
+    for (final int defaultVal : defaultValues) {
+      ints.add(defaultVal);
     }
-    return splitInt(val);
+    return ints;
   }
 
   @Override
   public Set<Long> ofLong(String key) {
-    final String val = config.value(key);
-    return splitLong(val);
+    return splitLong(config.value(key));
   }
 
   @Override
   public Set<Long> ofLong(String key, long... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      final Set<Long> ints = new LinkedHashSet<>();
-      for (final long defaultVal : defaultValues) {
-        ints.add(defaultVal);
-      }
-      return ints;
+    return val == null ? longDefaults(defaultValues) : splitLong(val);
+  }
+
+  private static Set<Long> longDefaults(long[] defaultValues) {
+    final Set<Long> ints = new LinkedHashSet<>();
+    for (final long defaultVal : defaultValues) {
+      ints.add(defaultVal);
     }
-    return splitLong(val);
+    return ints;
   }
 
   @Override
@@ -77,15 +75,12 @@ final class CoreSetValue implements Configuration.SetValue {
     try {
       return splitAs(val, function);
     } catch (final Exception e) {
-      throw new IllegalStateException(
-          "Failed to convert key: " + key + " with the provided function", e);
+      throw new IllegalStateException("Failed to convert key: " + key + " with the provided function", e);
     }
   }
 
   Set<String> split(String allValues) {
-    final Set<String> set = new LinkedHashSet<>();
-    Collections.addAll(set, allValues.split(","));
-    return set;
+    return stringDefaults(allValues.split(","));
   }
 
   Set<Integer> splitInt(String allValues) {
@@ -97,18 +92,13 @@ final class CoreSetValue implements Configuration.SetValue {
   }
 
   <T> Set<T> splitAs(String allValues, Function<String, T> function) {
-
-    final Set<T> set = new LinkedHashSet<>();
-
     if (allValues == null) {
       return Collections.emptySet();
     }
-
+    final Set<T> set = new LinkedHashSet<>();
     for (final var value : allValues.split(",")) {
-
       set.add(function.apply(value));
     }
-
     return set;
   }
 }
