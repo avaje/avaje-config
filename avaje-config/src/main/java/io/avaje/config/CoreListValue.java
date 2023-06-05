@@ -17,57 +17,51 @@ final class CoreListValue implements Configuration.ListValue {
   @Override
   public List<String> of(String key) {
     final String val = config.value(key);
-    if (val == null) {
-      return Collections.emptyList();
-    }
-    return split(val);
+    return val == null ? Collections.emptyList() : split(val);
   }
 
   @Override
   public List<String> of(String key, String... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      return Arrays.asList(defaultValues);
-    }
-    return split(val);
+    return val == null ? Arrays.asList(defaultValues) : split(val);
   }
 
   @Override
   public List<Integer> ofInt(String key) {
-    final String val = config.value(key);
-    return splitInt(val);
+    return splitInt(config.value(key));
   }
 
   @Override
   public List<Integer> ofInt(String key, int... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      final List<Integer> ints = new ArrayList<>(defaultValues.length);
-      for (final int defaultVal : defaultValues) {
-        ints.add(defaultVal);
-      }
-      return ints;
+    return val == null ? intDefaults(defaultValues) : splitInt(val);
+  }
+
+  private static List<Integer> intDefaults(int[] defaultValues) {
+    final List<Integer> ints = new ArrayList<>(defaultValues.length);
+    for (final int defaultVal : defaultValues) {
+      ints.add(defaultVal);
     }
-    return splitInt(val);
+    return ints;
   }
 
   @Override
   public List<Long> ofLong(String key) {
-    final String val = config.value(key);
-    return splitLong(val);
+    return splitLong(config.value(key));
   }
 
   @Override
   public List<Long> ofLong(String key, long... defaultValues) {
     final String val = config.value(key);
-    if (val == null) {
-      final List<Long> ints = new ArrayList<>(defaultValues.length);
-      for (final long defaultVal : defaultValues) {
-        ints.add(defaultVal);
-      }
-      return ints;
+    return val == null ? longDefaults(defaultValues) : splitLong(val);
+  }
+
+  private static List<Long> longDefaults(long[] defaultValues) {
+    final List<Long> ints = new ArrayList<>(defaultValues.length);
+    for (final long defaultVal : defaultValues) {
+      ints.add(defaultVal);
     }
-    return splitLong(val);
+    return ints;
   }
 
   @Override
@@ -76,8 +70,7 @@ final class CoreListValue implements Configuration.ListValue {
     try {
       return splitAs(val, function);
     } catch (final Exception e) {
-      throw new IllegalStateException(
-          "Failed to convert key: " + key + " with the provided function", e);
+      throw new IllegalStateException("Failed to convert key: " + key + " with the provided function", e);
     }
   }
 
@@ -94,17 +87,13 @@ final class CoreListValue implements Configuration.ListValue {
   }
 
   <T> List<T> splitAs(String allValues, Function<String, T> function) {
-
-    final List<T> list = new ArrayList<>();
-
     if (allValues == null) {
       return Collections.emptyList();
     }
-
+    final List<T> list = new ArrayList<>();
     for (final var value : allValues.split(",")) {
       list.add(function.apply(value));
     }
-
     return list;
   }
 }
