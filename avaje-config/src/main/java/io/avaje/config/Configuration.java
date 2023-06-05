@@ -256,7 +256,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key             The configuration key
+   * @param key The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
@@ -265,7 +265,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key             The configuration key
+   * @param key The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
@@ -401,7 +401,7 @@ public interface Configuration {
    *
    * }</pre>
    *
-   * @param key                          The configuration key we want to detect changes to
+   * @param key  The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChange(String key, Consumer<String> singlePropertyChangeListener);
@@ -412,7 +412,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key                          The configuration key we want to detect changes to
+   * @param key  The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeInt(String key, IntConsumer singlePropertyChangeListener);
@@ -423,7 +423,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key                          The configuration key we want to detect changes to
+   * @param key  The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeLong(String key, LongConsumer singlePropertyChangeListener);
@@ -434,7 +434,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key                          The configuration key we want to detect changes to
+   * @param key  The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeBool(String key, Consumer<Boolean> singlePropertyChangeListener);
@@ -492,7 +492,7 @@ public interface Configuration {
   interface ListValue {
 
     /**
-     * Return the list of values for the key returning an empty
+     * Return the list of values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -501,7 +501,7 @@ public interface Configuration {
     List<String> of(String key);
 
     /**
-     * Return the list of values for the key returning the default values
+     * Return the list of values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
@@ -510,7 +510,7 @@ public interface Configuration {
     List<String> of(String key, String... defaultValues);
 
     /**
-     * Return the list of integer values for the key returning an empty
+     * Return the list of integer values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -519,7 +519,7 @@ public interface Configuration {
     List<Integer> ofInt(String key);
 
     /**
-     * Return the list of integer values for the key returning the default values
+     * Return the list of integer values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
@@ -528,7 +528,7 @@ public interface Configuration {
     List<Integer> ofInt(String key, int... defaultValues);
 
     /**
-     * Return the list of long values for the key returning an empty
+     * Return the list of long values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -537,15 +537,24 @@ public interface Configuration {
     List<Long> ofLong(String key);
 
     /**
-     * Return the long values for the key returning the default values
+     * Return the long values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
      * @return The configured values or default values
      */
     List<Long> ofLong(String key, long... defaultValues);
-  }
 
+    /**
+     * Apply a mapping function to the values for the given key, returning an empty
+     * collection if the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @param mappingFunction the mapping function to execute on each value
+     * @return The configured and mapped values
+     */
+    <T> List<T> ofType(String key, Function<String, T> mappingFunction);
+  }
 
   /**
    * Return a Set of values configured.
@@ -560,7 +569,7 @@ public interface Configuration {
   interface SetValue {
 
     /**
-     * Return the Set of values for the key returning an empty
+     * Return the Set of values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -569,7 +578,7 @@ public interface Configuration {
     Set<String> of(String key);
 
     /**
-     * Return the Set of values for the key returning the default values
+     * Return the Set of values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
@@ -578,7 +587,7 @@ public interface Configuration {
     Set<String> of(String key, String... defaultValues);
 
     /**
-     * Return the list of integer values for the key returning an empty
+     * Return the list of integer values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -587,7 +596,7 @@ public interface Configuration {
     Set<Integer> ofInt(String key);
 
     /**
-     * Return the list of integer values for the key returning the default values
+     * Return the list of integer values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
@@ -596,7 +605,7 @@ public interface Configuration {
     Set<Integer> ofInt(String key, int... defaultValues);
 
     /**
-     * Return the list of long values for the key returning an empty
+     * Return the list of long values for the key, returning an empty
      * collection if the configuration is not defined.
      *
      * @param key The configuration key
@@ -605,13 +614,22 @@ public interface Configuration {
     Set<Long> ofLong(String key);
 
     /**
-     * Return the long values for the key returning the default values
+     * Return the long values for the key, returning the default values
      * if the configuration is not defined.
      *
      * @param key The configuration key
      * @return The configured values or default values
      */
     Set<Long> ofLong(String key, long... defaultValues);
-  }
 
+    /**
+     * Apply a mapping function to the values for the given key, returning an empty collection if
+     * the configuration is not defined.
+     *
+     * @param key The configuration key
+     * @param mappingFunction the mapping function to execute on each value
+     * @return The configured and mapped values
+     */
+    <T> Set<T> ofType(String key, Function<String, T> mappingFunction);
+  }
 }

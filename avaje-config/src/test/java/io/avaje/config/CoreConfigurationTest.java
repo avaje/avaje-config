@@ -191,6 +191,10 @@ class CoreConfigurationTest {
     assertThat(data.list().ofLong("someValues", 22L)).contains(13L, 42L, 55L);
     assertThat(data.list().ofLong("list.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.list().ofLong("list.long.notThere2")).isEmpty();
+
+    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.list().ofType("list.long.notThere2", Short::parseShort)).isEmpty();
   }
 
   @Test
@@ -209,6 +213,11 @@ class CoreConfigurationTest {
     assertThat(data.set().ofLong("1someValues", 22L)).contains(13L, 42L, 55L);
     assertThat(data.set().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.set().ofLong("1set.long.notThere2")).isEmpty();
+
+    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.set().ofType("list.long.notThere2", Short::parseShort)).isEmpty();
+
   }
 
   enum MyEnum {
