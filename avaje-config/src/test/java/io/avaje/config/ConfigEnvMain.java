@@ -11,10 +11,10 @@ public class ConfigEnvMain {
 //    final String appInstanceId = System.getProperty("appInstanceId");
 
     System.out.println("--- 2");
-    System.out.println("appName=" + Config.get("appName", null));
-    System.out.println("appInstanceId=" + Config.get("appInstanceId", null));
-    System.out.println("appEnvironment=" + Config.get("appEnvironment", null));
-    System.out.println("appVersion=" + Config.get("appVersion", null));
-    System.out.println("appIp=" + Config.get("appIp", null));
+    System.out.println("appName=" + Config.getNullable("appName"));
+    System.out.println("appInstanceId=" + Config.getNullable("appInstanceId"));
+    System.out.println("appEnvironment=" + Config.getNullable("appEnvironment"));
+    System.out.println("appVersion=" + Config.getNullable("appVersion"));
+    System.out.println("appIp=" + Config.getNullable("appIp"));
   }
 }
