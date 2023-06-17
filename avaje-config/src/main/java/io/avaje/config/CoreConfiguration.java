@@ -500,11 +500,13 @@ final class CoreConfiguration implements Configuration {
     }
 
     private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String systemValue) {
-      return systemValue != null
-        ? CoreEntry.of(systemValue, SYSTEM_PROPS)
-        : defaultValue != null
-          ? CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT)
-          : CoreEntry.NULL_ENTRY;
+      if (systemValue != null) {
+        return CoreEntry.of(systemValue, SYSTEM_PROPS);
+      } else if (defaultValue != null) {
+        return CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
+      } else {
+        return CoreEntry.NULL_ENTRY;
+      }
     }
 
     @Nullable
