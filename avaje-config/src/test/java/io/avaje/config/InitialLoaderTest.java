@@ -69,6 +69,8 @@ class InitialLoaderTest {
     var properties = loader.eval();
 
     assertThat(properties.get("hello").source()).isEqualTo("resource:test-properties/one.properties");
+
+    assertThat(properties.get("sameFileEval.4").value()).isEqualTo("somethin-2-3-4");
     assertThat(properties.get("hello").value()).isEqualTo("there");
     assertThat(properties.get("name").value()).isEqualTo("Rob");
     assertThat(properties.get("statusPageUrl").value()).isEqualTo("https://host1:9876/status");

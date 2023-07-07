@@ -25,6 +25,7 @@ final class InitialLoadContext {
    * Names of resources/files that were loaded.
    */
   private final Set<String> loadedResources = new LinkedHashSet<>();
+
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
 
@@ -68,7 +69,7 @@ final class InitialLoadContext {
 
   static String podService(String podName) {
     if (podName != null && podName.length() > 16) {
-      int p0 = podName.lastIndexOf('-', podName.length() - 16);
+      final int p0 = podName.lastIndexOf('-', podName.length() - 16);
       if (p0 > -1) {
         return podName.substring(0, p0);
       }
@@ -125,14 +126,40 @@ final class InitialLoadContext {
    */
   CoreMap evalAll() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
-    var core = CoreEntry.newMap();
-    map.forEach((key, entry) -> core.put(key, exprEval.eval(entry.value()), entry.source()));
+    final var core = CoreEntry.newMap();
+
+    final var unsolved = new HashMap<String, String>();
+
+    map.forEach(
+        (key, entry) -> {
+          final var value = exprEval.eval(entry.value());
+          if (value.indexOf("${") != -1) {
+            unsolved.put(key, value);
+          }
+          core.put(key, exprEval.eval(entry.value()), entry.source());
+        });
+    // make another pass
+    if (!unsolved.isEmpty()) {
+      final var coreEval = new CoreExpressionEval(core);
+      for (final Entry<String, String> entry : sortByContains(unsolved)) {
+        final var key = entry.getKey();
+        final var value = entry.getValue();
+        final var coreEntry = core.get(key);
+        core.put(key, coreEval.eval(value), coreEntry.source());
+      }
+    }
     return core;
   }
 
-  /**
-   * Read the special properties that can point to an external properties source.
-   */
+  // sort so that we don't accidentally miss any in the second round of evals
+  static SortedSet<Map.Entry<String, String>> sortByContains(Map<String, String> map) {
+    final SortedSet<Map.Entry<String, String>> sortedEntries =
+        new TreeSet<>((e1, e2) -> (e1.getValue().contains(e1.getKey()) ? 1 : -1));
+    sortedEntries.addAll(map.entrySet());
+    return sortedEntries;
+  }
+
+  /** Read the special properties that can point to an external properties source. */
   String indirectLocation() {
     CoreEntry indirectLocation = map.get("load.properties");
     if (indirectLocation == null) {
