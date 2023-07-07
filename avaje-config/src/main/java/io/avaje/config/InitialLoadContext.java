@@ -58,6 +58,7 @@ final class InitialLoadContext {
     initSystemProperty(System.getenv("POD_NAMESPACE"), "app.environment");
     initSystemProperty(System.getenv("POD_VERSION"), "app.version");
     initSystemProperty(System.getenv("POD_IP"), "app.ipAddress");
+    initSystemProperty(System.getenv("CONFIG_PROFILES"), "config.profiles");
   }
 
   private void initSystemProperty(String envValue, String key) {
@@ -139,6 +140,13 @@ final class InitialLoadContext {
       indirectLocation = map.get("load.properties.override");
     }
     return indirectLocation == null ? null : indirectLocation.value();
+  }
+
+  String profiles() {
+    final CoreEntry indirectLocation = map.get("config.profiles");
+    return indirectLocation == null
+        ? System.getProperty("config.profiles")
+        : indirectLocation.value();
   }
 
   /**

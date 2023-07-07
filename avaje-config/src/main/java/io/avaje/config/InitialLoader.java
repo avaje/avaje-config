@@ -204,6 +204,19 @@ final class InitialLoader {
     }
   }
 
+  /** Load configuration defined by a <em>config.profiles</em> property. */
+  private void loadViaProfiles() {
+    final String paths = loadContext.profiles();
+    if (paths != null) {
+      for (final String path : splitPaths(paths)) {
+        final var profile = loadContext.eval(path);
+        loadProperties("application-" + profile + ".properties", RESOURCE);
+        loadYaml("application-" + profile + ".yaml", RESOURCE);
+        loadYaml("application-" + profile + ".yml", RESOURCE);
+      }
+    }
+  }
+
   private void loadViaPaths(String paths) {
     for (String path : splitPaths(paths)) {
       loadWithExtensionCheck(loadContext.eval(path));
