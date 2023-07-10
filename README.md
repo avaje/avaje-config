@@ -61,7 +61,6 @@ Config.onChangeBool("myapp.foo", newBooleanValue -> {
 
 ```
 
-
 ## Loading properties
 
 Config loads properties from expected locations as well as via command line arguments.
@@ -77,11 +76,17 @@ Below is the how it looks for configuration properties.
 
 - loads via system property `props.file` or environment variable `PROPS_FILE` (if defined)
 
+- loads via system property `config.profiles` or environment variable `CONFIG_PROFILES` (if defined).
+
+Setting the `config.profiles` or environment variable `CONFIG_PROFILES` will cause avaje config to load the property files in the form `application-${profile}.properties` (will also work for yml/yaml files). 
+
+For example, if you set the `config.profiles` to `dev,docker` it will attempt to load `application-dev.properties` and `application-docker.properties`.
+
 - loads via `load.properties` property.
 
 We can define a `load.properties` property which has name of property file in resource folder, or path locations for other properties/yaml files to load.
 
-`load.properties` is pretty versatile and can even be chained. For example, in your main application properties, you can have `load.properties=application-${profile:local}.properties` to load based on the profile environment variable/-Dprofile JVM arg, and in the loaded properties you can add `load.properties` there to load more properties and so on.
+`load.properties` is pretty versatile and can even be chained. For example, in your main application properties, you can have `load.properties=application-${profile:local}.properties` to load based on another property, and in the loaded properties you can add `load.properties` there to load more properties, and so on.
 
 Example application.properties:
 ```

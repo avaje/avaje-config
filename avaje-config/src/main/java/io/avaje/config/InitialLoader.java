@@ -118,6 +118,7 @@ final class InitialLoader {
     loadMain(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
+    loadViaProfiles();
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
@@ -201,6 +202,19 @@ final class InitialLoader {
     String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
+    }
+  }
+
+  /** Load configuration defined by a <em>config.profiles</em> property. */
+  private void loadViaProfiles() {
+    final String paths = loadContext.profiles();
+    if (paths != null) {
+      for (final String path : splitPaths(paths)) {
+        final var profile = loadContext.eval(path);
+        loadWithExtensionCheck("application-" + profile + ".properties");
+        loadWithExtensionCheck("application-" + profile + ".yaml");
+        loadWithExtensionCheck("application-" + profile + ".yml");
+      }
     }
   }
 
