@@ -75,6 +75,15 @@ class InitialLoaderTest {
     assertThat(properties.get("statusPageUrl2").value()).isEqualTo("https://aaa:9876/status2");
     assertThat(properties.get("statusPageUrl3").value()).isEqualTo("https://aaa:89/status3");
     assertThat(properties.get("statusPageUrl4").value()).isEqualTo("https://there:9876/name/Rob");
+    assertThat(properties.get("sameFileEval.4").value()).isEqualTo("somethin1-2-3-4");
+    assertThat(properties.get("sameFileEval.3").value()).isEqualTo("somethin1-2-3");
+    assertThat(properties.get("sameFileEval.2").value()).isEqualTo("somethin1-2");
+    assertThat(properties.get("sameFileEval.1").value()).isEqualTo("somethin1");
+    assertThat(properties.get("asameFileEval.0").value()).isEqualTo("somethin1-2-3-afour");
+    assertThat(properties.get("zsameFileEval.0").value()).isEqualTo("somethin1-2-3-zfour");
+    assertThat(properties.get("zsameFileCombo").value()).isEqualTo("A|somethin1-2|somethin1-2-3|B");
+    assertThat(properties.get("someOne").value()).isEqualTo("before|${app.one}|after");
+    assertThat(properties.get("someOne2").value()).isEqualTo("Bef|before|${app.one}|after|Aft");
   }
 
   @Test

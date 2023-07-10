@@ -125,9 +125,7 @@ final class InitialLoadContext {
    */
   CoreMap evalAll() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
-    var core = CoreEntry.newMap();
-    map.forEach((key, entry) -> core.put(key, exprEval.eval(entry.value()), entry.source()));
-    return core;
+    return CoreExpressionEval.evalFor(map);
   }
 
   /**
