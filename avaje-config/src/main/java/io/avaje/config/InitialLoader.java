@@ -211,9 +211,9 @@ final class InitialLoader {
     if (paths != null) {
       for (final String path : splitPaths(paths)) {
         final var profile = loadContext.eval(path);
-        loadProperties("application-" + profile + ".properties", RESOURCE);
-        loadYaml("application-" + profile + ".yaml", RESOURCE);
-        loadYaml("application-" + profile + ".yml", RESOURCE);
+        loadWithExtensionCheck("application-" + profile + ".properties");
+        loadWithExtensionCheck("application-" + profile + ".yaml");
+        loadWithExtensionCheck("application-" + profile + ".yml");
       }
     }
   }
