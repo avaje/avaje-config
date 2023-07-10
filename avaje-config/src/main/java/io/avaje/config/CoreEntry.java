@@ -32,6 +32,13 @@ final class CoreEntry {
   }
 
   /**
+   * Return a copy of the entryMap given the source.
+   */
+  static CoreMap newMap(CoreMap source) {
+    return new CoreEntry.CoreMap(source);
+  }
+
+  /**
    * Return a new entryMap populated from the given Properties.
    *
    * @param propSource where these properties came from
@@ -63,6 +70,10 @@ final class CoreEntry {
     this.source = source;
   }
 
+  boolean needsEvaluation() {
+    return value != null && value.contains("${");
+  }
+
   String value() {
     return value;
   }
@@ -87,6 +98,10 @@ final class CoreEntry {
     private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
 
     CoreMap() {
+    }
+
+    CoreMap(CoreMap source) {
+      entryMap.putAll(source.entryMap);
     }
 
     CoreMap(Properties source, String sourceName) {
