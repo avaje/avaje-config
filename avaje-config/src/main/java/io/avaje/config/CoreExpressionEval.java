@@ -36,19 +36,47 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
     this.sourceProperties = sourceProperties;
   }
 
+  /**
+   * Evaluate all the entries until no more can be resolved.
+   *
+   * @param map The source map which is copied and resolved
+   * @return A copy of the source map will all entries resolved if possible
+   */
+  static CoreEntry.CoreMap evalFor(CoreEntry.CoreMap map) {
+    final var copy = CoreEntry.newMap(map);
+    return new CoreExpressionEval(copy).evalAll();
+  }
+
+  private CoreEntry.CoreMap evalAll() {
+    sourceMap.forEach((key, entry) -> {
+      if (entry.needsEvaluation()) {
+        sourceMap.put(key, eval(entry.value()), entry.source());
+      }
+    });
+    return sourceMap;
+  }
+
   @Override
   public String eval(String val) {
-    if (val == null) {
-      return null;
+    return val == null ? null : evalRecurse(val);
+  }
+
+  private String evalRecurse(String input) {
+    final String resolved = evalInput(input);
+    if (resolved.contains(START) && !resolved.equals(input)) {
+      return evalRecurse(resolved);
+    } else {
+      return resolved;
     }
-    int sp = val.indexOf(START);
-    if (sp > -1) {
-      int ep = val.indexOf(END, sp + 1);
-      if (ep > -1) {
-        return eval(val, sp, ep);
-      }
+  }
+
+  private String evalInput(String input) {
+    final int start = input.indexOf(START);
+    if (start == -1) {
+      return input;
     }
-    return val;
+    final int end = input.indexOf(END, start + 1);
+    return end == -1 ? input : eval(input, start, end);
   }
 
   /**
@@ -74,11 +102,11 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
     return null;
   }
 
-  private String eval(String val, int sp, int ep) {
-    return new EvalBuffer(val, sp, ep).process();
+  private String eval(String val, int start, int end) {
+    return new EvalBuffer(val, start, end).process();
   }
 
-  private class EvalBuffer {
+  private final class EvalBuffer {
 
     private final StringBuilder buf = new StringBuilder();
     private final String original;
@@ -88,10 +116,10 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
     private String expression;
     private String defaultValue;
 
-    EvalBuffer(String val, int start, int ep) {
+    EvalBuffer(String val, int start, int end) {
       this.original = val;
       this.start = start;
-      this.end = ep;
+      this.end = end;
       this.position = 0;
       moveToStart();
     }
@@ -163,7 +191,6 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
       }
       return end();
     }
-
   }
 
 }
