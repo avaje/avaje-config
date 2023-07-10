@@ -118,6 +118,7 @@ final class InitialLoader {
     loadMain(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
+    loadViaProfiles();
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
