@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.System.Logger.Level;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -39,6 +40,7 @@ final class InitialLoader {
 
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
+  private final Set<String> profileResourceLoaded = new HashSet<>();
   private YamlLoader yamlLoader;
 
   InitialLoader(ConfigurationLog log, ResourceLoader resourceLoader) {
@@ -118,6 +120,8 @@ final class InitialLoader {
     loadViaProfiles(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
+    // load additional profile RESOURCE(s) if added via loadMain()
+    loadViaProfiles(RESOURCE);
     loadViaProfiles(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
@@ -171,9 +175,7 @@ final class InitialLoader {
       final String appName = loadContext.getAppName();
       if (appName != null) {
         final String prefix = localDev.getAbsolutePath() + File.separator + appName;
-        loadYaml(prefix + ".yaml", FILE);
-        loadYaml(prefix + ".yml", FILE);
-        loadProperties(prefix + ".properties", FILE);
+        load(prefix, FILE);
       }
     }
   }
@@ -188,9 +190,7 @@ final class InitialLoader {
       return false;
     }
     int before = loadContext.size();
-    loadProperties("application-test.properties", RESOURCE);
-    loadYaml("application-test.yaml", RESOURCE);
-    loadYaml("application-test.yml", RESOURCE);
+    load("application-test", RESOURCE);
     if (loadProperties("test-ebean.properties", RESOURCE)) {
       log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
@@ -213,15 +213,19 @@ final class InitialLoader {
     return paths == null ? null : splitPaths(paths);
   }
 
-  /** Load configuration defined by a <em>config.profiles</em> property. */
+  /**
+   * Load configuration defined by a <em>config.profiles</em> property.
+   */
   private void loadViaProfiles(Source source) {
     final var profiles = profiles();
     if (profiles != null) {
       for (final String path : profiles) {
         final var profile = loadContext.eval(path);
-        loadProperties("application-" + profile + ".properties", source);
-        loadYaml("application-" + profile + ".yaml", source);
-        loadYaml("application-" + profile + ".yml", source);
+        if (source != RESOURCE || !profileResourceLoaded.contains(profile)) {
+          if (load("application-" + profile, source)) {
+            profileResourceLoaded.add(profile);
+          }
+        }
       }
     }
   }
@@ -244,9 +248,7 @@ final class InitialLoader {
    * Load the main configuration for the given source.
    */
   private void loadMain(Source source) {
-    loadYaml("application.yaml", source);
-    loadYaml("application.yml", source);
-    loadProperties("application.properties", source);
+    load("application", source);
     if (loadProperties("ebean.properties", source)) {
       log.log(Level.WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
     }
@@ -266,7 +268,7 @@ final class InitialLoader {
 
   boolean loadWithExtensionCheck(String fileName) {
     if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
-      return loadYaml(fileName, RESOURCE) || loadYaml(fileName, FILE);
+      return loadYamlPath(fileName, RESOURCE) || loadYamlPath(fileName, FILE);
     } else if (fileName.endsWith("properties")) {
       return loadProperties(fileName, RESOURCE) || loadProperties(fileName, FILE);
     } else {
@@ -281,7 +283,28 @@ final class InitialLoader {
     return loadContext.evalAll();
   }
 
-  boolean loadYaml(String resourcePath, Source source) {
+  /**
+   * Attempt to load a properties and yaml/yml file.
+   * Return true if at least one was loaded.
+   */
+  boolean load(String resourcePath, Source source) {
+    final boolean props = loadProperties(resourcePath + ".properties", source);
+    final boolean yaml = loadYaml(resourcePath, source);
+    return props || yaml;
+  }
+
+  /**
+   * Load YAML first and if not found load YML.
+   */
+  private boolean loadYaml(String resourcePath, Source source) {
+    if (loadYamlPath(resourcePath + ".yaml", source)) {
+      return true;
+    } else {
+      return loadYamlPath(resourcePath + ".yml", source);
+    }
+  }
+
+  boolean loadYamlPath(String resourcePath, Source source) {
     if (yamlLoader != null) {
       try {
         try (InputStream is = resource(resourcePath, source)) {
