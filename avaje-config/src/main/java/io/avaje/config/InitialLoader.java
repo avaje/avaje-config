@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.avaje.config.CoreEntry.CoreMap;
+import io.avaje.lang.Nullable;
 
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
@@ -114,11 +115,12 @@ final class InitialLoader {
    */
   void loadLocalFiles() {
     loadMain(RESOURCE);
+    loadViaProfiles(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
+    loadViaProfiles(FILE);
     loadViaSystemProperty();
     loadViaIndirection();
-    loadViaProfiles();
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
@@ -205,15 +207,21 @@ final class InitialLoader {
     }
   }
 
-  /** Load configuration defined by a <em>config.profiles</em> property. */
-  private void loadViaProfiles() {
+  @Nullable
+  private String[] profiles() {
     final String paths = loadContext.profiles();
-    if (paths != null) {
-      for (final String path : splitPaths(paths)) {
+    return paths == null ? null : splitPaths(paths);
+  }
+
+  /** Load configuration defined by a <em>config.profiles</em> property. */
+  private void loadViaProfiles(Source source) {
+    final var profiles = profiles();
+    if (profiles != null) {
+      for (final String path : profiles) {
         final var profile = loadContext.eval(path);
-        loadWithExtensionCheck("application-" + profile + ".properties");
-        loadWithExtensionCheck("application-" + profile + ".yaml");
-        loadWithExtensionCheck("application-" + profile + ".yml");
+        loadProperties("application-" + profile + ".properties", source);
+        loadYaml("application-" + profile + ".yaml", source);
+        loadYaml("application-" + profile + ".yml", source);
       }
     }
   }
