@@ -59,6 +59,7 @@ final class InitialLoadContext {
     initSystemProperty(System.getenv("POD_VERSION"), "app.version");
     initSystemProperty(System.getenv("POD_IP"), "app.ipAddress");
     initSystemProperty(System.getenv("CONFIG_PROFILES"), "config.profiles");
+    initSystemProperty(System.getenv("AVAJE_PROFILES"), "avaje.profiles");
   }
 
   private void initSystemProperty(String envValue, String key) {
@@ -133,7 +134,7 @@ final class InitialLoadContext {
    * Read the special properties that can point to an external properties source.
    */
   String indirectLocation() {
-    CoreEntry indirectLocation = map.get("load.properties");
+    var indirectLocation = map.get("load.properties");
     if (indirectLocation == null) {
       indirectLocation = map.get("load.properties.override");
     }
@@ -141,10 +142,16 @@ final class InitialLoadContext {
   }
 
   String profiles() {
-    final CoreEntry indirectLocation = map.get("config.profiles");
-    return indirectLocation == null
-        ? System.getProperty("config.profiles")
-        : indirectLocation.value();
+    final var configEntry = map.get("config.profiles");
+    final var configProfile =
+        configEntry == null ? System.getProperty("config.profiles") : configEntry.value();
+
+    if (configProfile != null) {
+      return configProfile;
+    }
+
+    final var avajeProfile = map.get("avaje.profiles");
+    return avajeProfile == null ? System.getProperty("avaje.profiles") : avajeProfile.value();
   }
 
   /**
@@ -155,7 +162,7 @@ final class InitialLoadContext {
   }
 
   String getAppName() {
-    final CoreEntry appName = map.get("app.name");
+    final var appName = map.get("app.name");
     return (appName != null) ? appName.value() : System.getProperty("app.name");
   }
 }
