@@ -76,7 +76,7 @@ Below is the how it looks for configuration properties.
 
 - loads via system property `props.file` or environment variable `PROPS_FILE` (if defined)
 
-- loads via system property `config.profiles` or environment variable `CONFIG_PROFILES` (if defined).
+- loads via system property `avaje.profiles` or environment variable `AVAJE_PROFILES` (if defined).
 
 Setting the `config.profiles` or environment variable `CONFIG_PROFILES` will cause avaje config to load the property files in the form `application-${profile}.properties` (will also work for yml/yaml files). 
 
