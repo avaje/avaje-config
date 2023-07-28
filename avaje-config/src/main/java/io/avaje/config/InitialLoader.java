@@ -1,20 +1,22 @@
 package io.avaje.config;
 
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.System.Logger.Level;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.avaje.config.CoreEntry.CoreMap;
 import io.avaje.lang.Nullable;
 
-import static io.avaje.config.InitialLoader.Source.FILE;
-import static io.avaje.config.InitialLoader.Source.RESOURCE;
+
 
 /**
  * Loads the configuration from known/expected locations.
