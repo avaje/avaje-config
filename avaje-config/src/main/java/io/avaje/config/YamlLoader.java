@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Load Yaml config into a flattened map.
  */
-interface YamlLoader {
+public interface YamlLoader {
 
   /**
    * Load the yaml into a flat map of key value pairs.

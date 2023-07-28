@@ -10,5 +10,6 @@ module io.avaje.config {
   uses io.avaje.config.ModificationEventRunner;
   uses io.avaje.config.ConfigurationSource;
   uses io.avaje.config.ResourceLoader;
+  uses io.avaje.config.YamlLoader;
 
 }

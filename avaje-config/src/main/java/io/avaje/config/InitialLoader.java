@@ -99,12 +99,18 @@ final class InitialLoader {
 
   private void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
-      try {
-        Class.forName("org.yaml.snakeyaml.Yaml");
-        yamlLoader = new YamlLoaderSnake();
-      } catch (ClassNotFoundException e) {
-        yamlLoader = new YamlLoaderSimple();
-      }
+      yamlLoader =
+          ServiceLoader.load(YamlLoader.class)
+              .findFirst()
+              .orElseGet(
+                  () -> {
+                    try {
+                      Class.forName("org.yaml.snakeyaml.Yaml");
+                      return new YamlLoaderSnake();
+                    } catch (final ClassNotFoundException e) {
+                      return new YamlLoaderSimple();
+                    }
+                  });
     }
   }
 
@@ -258,11 +264,9 @@ final class InitialLoader {
     String fileName = System.getenv("PROPS_FILE");
     if (fileName == null) {
       fileName = System.getProperty("props.file");
-      if (fileName != null) {
-        if (!loadWithExtensionCheck(fileName)) {
-          log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
-        }
-      }
+      if ((fileName != null) && !loadWithExtensionCheck(fileName)) {
+    log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
+  }
     }
   }
 
@@ -307,7 +311,7 @@ final class InitialLoader {
   boolean loadYamlPath(String resourcePath, Source source) {
     if (yamlLoader != null) {
       try {
-        try (InputStream is = resource(resourcePath, source)) {
+        try (var is = resource(resourcePath, source)) {
           if (is != null) {
             yamlLoader.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
             return true;
@@ -322,7 +326,7 @@ final class InitialLoader {
 
   boolean loadProperties(String resourcePath, Source source) {
     try {
-      try (InputStream is = resource(resourcePath, source)) {
+      try (var is = resource(resourcePath, source)) {
         if (is != null) {
           loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
           return true;
@@ -345,7 +349,7 @@ final class InitialLoader {
   }
 
   private void put(Properties properties, String source) {
-    Enumeration<?> enumeration = properties.propertyNames();
+    final var enumeration = properties.propertyNames();
     while (enumeration.hasMoreElements()) {
       String key = (String) enumeration.nextElement();
       String val = properties.getProperty(key);
