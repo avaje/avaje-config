@@ -102,17 +102,10 @@ final class InitialLoader {
   private void initYamlLoader() {
     if (!"true".equals(System.getProperty("skipYaml"))) {
       yamlLoader =
-          ServiceLoader.load(YamlLoader.class)
+          ServiceLoader.load(YamlLoaderProvider.class)
               .findFirst()
-              .orElseGet(
-                  () -> {
-                    try {
-                      Class.forName("org.yaml.snakeyaml.Yaml");
-                      return new YamlLoaderSnake();
-                    } catch (final ClassNotFoundException e) {
-                      return new YamlLoaderSimple();
-                    }
-                  });
+              .map(YamlLoaderProvider::getLoader)
+              .orElse(null);
     }
   }
 
@@ -150,7 +143,7 @@ final class InitialLoader {
 
   void loadViaCommandLine(String[] args) {
     for (int i = 0; i < args.length; i++) {
-      String arg = args[i];
+      final String arg = args[i];
       if (arg.startsWith("-P") || arg.startsWith("-p")) {
         if (arg.length() == 2 && i < args.length - 1) {
           // next argument expected to be a properties file paths
@@ -178,7 +171,7 @@ final class InitialLoader {
    * Provides a way to override properties when running via main() locally.
    */
   private void loadLocalDev() {
-    File localDev = new File(System.getProperty("user.home"), ".localdev");
+    final File localDev = new File(System.getProperty("user.home"), ".localdev");
     if (localDev.exists()) {
       final String appName = loadContext.getAppName();
       if (appName != null) {
@@ -197,7 +190,7 @@ final class InitialLoader {
     if (Boolean.getBoolean("suppressTestResource")) {
       return false;
     }
-    int before = loadContext.size();
+    final int before = loadContext.size();
     load("application-test", RESOURCE);
     if (loadProperties("test-ebean.properties", RESOURCE)) {
       log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
@@ -209,7 +202,7 @@ final class InitialLoader {
    * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
-    String paths = loadContext.indirectLocation();
+    final String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
     }
@@ -229,17 +222,15 @@ final class InitialLoader {
     if (profiles != null) {
       for (final String path : profiles) {
         final var profile = loadContext.eval(path);
-        if (source != RESOURCE || !profileResourceLoaded.contains(profile)) {
-          if (load("application-" + profile, source)) {
-            profileResourceLoaded.add(profile);
-          }
-        }
+        if ((source != RESOURCE || !profileResourceLoaded.contains(profile)) && load("application-" + profile, source)) {
+        profileResourceLoaded.add(profile);
+      }
       }
     }
   }
 
   private void loadViaPaths(String paths) {
-    for (String path : splitPaths(paths)) {
+    for (final String path : splitPaths(paths)) {
       loadWithExtensionCheck(loadContext.eval(path));
     }
   }
@@ -319,7 +310,7 @@ final class InitialLoader {
             return true;
           }
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Error loading yaml properties - " + resourcePath, e);
       }
     }
@@ -334,7 +325,7 @@ final class InitialLoader {
           return true;
         }
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Error loading properties - " + resourcePath, e);
     }
     return false;
@@ -345,7 +336,7 @@ final class InitialLoader {
   }
 
   private void loadProperties(InputStream is, String source) throws IOException {
-    Properties properties = new Properties();
+    final Properties properties = new Properties();
     properties.load(is);
     put(properties, source);
   }
@@ -353,8 +344,8 @@ final class InitialLoader {
   private void put(Properties properties, String source) {
     final var enumeration = properties.propertyNames();
     while (enumeration.hasMoreElements()) {
-      String key = (String) enumeration.nextElement();
-      String val = properties.getProperty(key);
+      final String key = (String) enumeration.nextElement();
+      final String val = properties.getProperty(key);
       loadContext.put(key, val, source);
     }
   }

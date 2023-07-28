@@ -1,12 +1,12 @@
-package io.avaje.config;
+package io.avaje.config.yml;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class YamlParserTest {
 
@@ -19,7 +19,8 @@ class YamlParserTest {
   }
 
   void basic(final Map<String, String> map) {
-    assertThat(map).containsOnlyKeys("name", "properties.key1", "properties.key2", "sorted.1", "sorted.2");
+    assertThat(map)
+        .containsOnlyKeys("name", "properties.key1", "properties.key2", "sorted.1", "sorted.2");
     assertThat(map.get("name")).isEqualTo("Name123");
     assertThat(map.get("properties.key1")).isEqualTo("value1");
     assertThat(map.get("properties.key2")).isEqualTo("value2");
@@ -97,23 +98,12 @@ class YamlParserTest {
   private void parse_multiLine(Map<String, String> map) {
     assertThat(map).containsOnlyKeys("a0", "a1", "a2", "a3", "a4", "n1.k0", "n1.k1");
     assertThat(map.get("n1.k1")).isEqualTo("kv1");
-    assertThat(map.get("n1.k0")).isEqualTo("a line0\n" +
-      "b line1\n" +
-      "a other\n");
-    assertThat(map.get("a0")).isEqualTo("a line0\n" +
-      "b line1\n");
-    assertThat(map.get("a1")).isEqualTo("a line0\n" +
-      "b line1\n");
-    assertThat(map.get("a2")).isEqualTo("a line0\n" +
-      "b line1");
-    assertThat(map.get("a3")).isEqualTo("a line0\n" +
-      "\n" +
-      "b line1");
-    assertThat(map.get("a4")).isEqualTo("a line0\n" +
-      "b line1\n" +
-      "\n" +
-      "c line1\n" +
-      "\n");
+    assertThat(map.get("n1.k0")).isEqualTo("a line0\n" + "b line1\n" + "a other\n");
+    assertThat(map.get("a0")).isEqualTo("a line0\n" + "b line1\n");
+    assertThat(map.get("a1")).isEqualTo("a line0\n" + "b line1\n");
+    assertThat(map.get("a2")).isEqualTo("a line0\n" + "b line1");
+    assertThat(map.get("a3")).isEqualTo("a line0\n" + "\n" + "b line1");
+    assertThat(map.get("a4")).isEqualTo("a line0\n" + "b line1\n" + "\n" + "c line1\n" + "\n");
   }
 
   @Test
@@ -128,9 +118,7 @@ class YamlParserTest {
     assertThat(map.get("a1")).isEqualTo("");
     assertThat(map.get("a2")).isEqualTo("");
     assertThat(map.get("a3")).isEqualTo("");
-    assertThat(map.get("a4")).isEqualTo("\n" +
-      "\n" +
-      "\n");
+    assertThat(map.get("a4")).isEqualTo("\n" + "\n" + "\n");
   }
 
   @Test
@@ -162,27 +150,24 @@ class YamlParserTest {
 
   @Test
   void parse_top_vals() {
-    assertThatThrownBy(() -> parseYaml("/yaml/err-top-vals.yaml"))
-      .hasMessageContaining("line: 2");
-    assertThatThrownBy(() -> parseYaml2("/yaml/err-top-vals.yaml"))
-      .hasMessageContaining("line 4");
+    assertThatThrownBy(() -> parseYaml("/yaml/err-top-vals.yaml")).hasMessageContaining("line: 2");
+    assertThatThrownBy(() -> parseYaml2("/yaml/err-top-vals.yaml")).hasMessageContaining("line 4");
   }
 
   @Test
   void parse_err_req_key2() {
     assertThatThrownBy(() -> parseYaml2("/yaml/err-require-topkey.yaml"))
-      .hasMessageContaining("line 5");
+        .hasMessageContaining("line 5");
     assertThatThrownBy(() -> parseYaml("/yaml/err-require-topkey.yaml"))
-      .hasMessageContaining("line:5");
+        .hasMessageContaining("line:5");
   }
-
 
   private Map<String, String> parseYaml2(String s) {
     return load.load(res(s));
   }
 
   private Map<String, String> parseYaml(String s) {
-    YamlLoaderSimple parser = new YamlLoaderSimple();
+    final YamlLoaderSimple parser = new YamlLoaderSimple();
     return parser.load(res(s));
   }
 

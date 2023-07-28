@@ -1,4 +1,4 @@
-package io.avaje.config;
+package io.avaje.config.yml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,10 +12,12 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.StringJoiner;
 
+import io.avaje.config.YamlLoader;
+
 /**
  * Simple YAML parser for loading yaml based config.
  */
-final class YamlLoaderSimple implements YamlLoader {
+public final class YamlLoaderSimple implements YamlLoader {
 
   enum MultiLineTrim {
     Clip,
@@ -51,7 +53,7 @@ final class YamlLoaderSimple implements YamlLoader {
       } while (line != null);
 
       return keyValues;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new UncheckedIOException(e);
     }
   }
@@ -105,9 +107,9 @@ final class YamlLoaderSimple implements YamlLoader {
     if (multiLineTrim != MultiLineTrim.Keep) {
       multiLineTrimTrailing();
     }
-    String join = (multiLineTrim == MultiLineTrim.Implicit) ? " " : "\n";
-    StringBuilder sb = new StringBuilder();
-    int lastIndex = multiLines.size() - 1;
+    final String join = (multiLineTrim == MultiLineTrim.Implicit) ? " " : "\n";
+    final StringBuilder sb = new StringBuilder();
+    final int lastIndex = multiLines.size() - 1;
     for (int i = 0; i <= lastIndex; i++) {
       String line = multiLines.get(i);
       if (line.length() < multiLineIndent) {
@@ -249,7 +251,7 @@ final class YamlLoaderSimple implements YamlLoader {
     if (value.startsWith("\"")) {
       return unquoteValue('"', value);
     }
-    int commentPos = value.indexOf('#');
+    final int commentPos = value.indexOf('#');
     if (commentPos > -1) {
       return value.substring(0, commentPos).trim();
     }
@@ -262,8 +264,8 @@ final class YamlLoaderSimple implements YamlLoader {
   }
 
   private String fullKey() {
-    StringJoiner fullKey = new StringJoiner(".");
-    for (Key next : keyStack) {
+    final StringJoiner fullKey = new StringJoiner(".");
+    for (final Key next : keyStack) {
       fullKey.add(next.key());
     }
     return fullKey.toString();
@@ -284,10 +286,7 @@ final class YamlLoaderSimple implements YamlLoader {
   }
 
   private String unquoteKey(String value) {
-    if (value.startsWith("'") && value.endsWith("'")) {
-      return value.substring(1, value.length() - 1);
-    }
-    if (value.startsWith("\"") && value.endsWith("\"")) {
+    if ((value.startsWith("'") && value.endsWith("'")) || (value.startsWith("\"") && value.endsWith("\""))) {
       return value.substring(1, value.length() - 1);
     }
     return value;

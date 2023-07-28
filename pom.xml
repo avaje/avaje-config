@@ -9,12 +9,13 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config-reactor</artifactId>
-  <version>1</version>
+  <version>3.8</version>
   <packaging>pom</packaging>
   <name>avaje config reactor</name>
 
   <modules>
     <module>avaje-config</module>
+    <module>avaje-config-yml</module>
   </modules>
 
 </project>

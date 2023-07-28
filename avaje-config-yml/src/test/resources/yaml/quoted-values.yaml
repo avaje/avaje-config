@@ -1,0 +1,11 @@
+a: unquoted value
+a1: unquoted value with comment  ## with comment
+b: 'single quote'
+b1: 'single quote with comment'  ## a comment
+c: "double quote"
+c1: "double quote with comment"  ## a comment
+
+d: ' single quote with spaces '
+d1: ' single quote with spaces + comment ' ## a comment
+e: " double quote with spaces "
+e1: ' double quote with spaces + comment ' ## a comment

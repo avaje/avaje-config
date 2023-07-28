@@ -1,0 +1,29 @@
+a0: |
+  a line0
+  b line1
+a1: |
+    a line0
+    b line1
+
+n1:
+  k0: |  ## comment
+    a line0
+    b line1
+    a other
+  k1: kv1
+
+a2: |-
+  a line0
+  b line1
+a3: |-
+    a line0
+
+    b line1
+
+
+a4: |+
+  a line0
+  b line1
+
+  c line1
+
