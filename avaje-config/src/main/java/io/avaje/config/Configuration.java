@@ -26,7 +26,7 @@ import io.avaje.lang.Nullable;
  *
  *  String topicName = Config.get("app.topic.name");
  *
- *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+ *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
  *
  * }</pre>
  */
@@ -286,7 +286,7 @@ public interface Configuration {
    *
    * <pre>{@code
    *
-   *  List<Integer> codes = Config.getList().ofInt("my.codes", 97, 45);
+   *  List<Integer> codes = Config.list().ofInt("my.codes", 97, 45);
    *
    * }</pre>
    */
@@ -485,7 +485,7 @@ public interface Configuration {
    * <h3>Example</h3>
    * <pre>{@code
    *
-   *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+   *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
    *
    * }</pre>
    */
@@ -631,5 +631,67 @@ public interface Configuration {
      * @return The configured and mapped values
      */
     <T> Set<T> ofType(String key, Function<String, T> mappingFunction);
+  }
+
+  /**
+   * Return a Builder for Configuration that is loaded manually (not via the normal resource loading).
+   */
+  static Builder builder() {
+    return new CoreConfigurationBuilder();
+  }
+
+  /**
+   * Build Configuration manually explicitly loading all the configuration as key value pairs.
+   * <p>
+   * Building configuration this way does NOT automatically load resources like application.properties
+   * and also does NOT load ConfigurationSource. ALL configuration is explicitly loaded via calls
+   * to {@link Builder#put(String, String)}, {@link Builder#putAll(Map)}.
+   */
+  interface Builder {
+
+    /**
+     * Put an entry into the configuration.
+     */
+    Builder put(String key, String value);
+
+    /**
+     * Put entries into the configuration.
+     */
+    Builder putAll(Map<String, ?> sourceMap);
+
+    /**
+     * Put entries into the configuration from properties.
+     */
+    Builder putAll(Properties source);
+
+    /**
+     * Optionally set the event runner to use . If not specified a foreground runner will be used.
+     */
+    Builder eventRunner(ModificationEventRunner eventRunner);
+
+    /**
+     * Optionally set the log to use. If not specified then a logger using System.Logger will be used.
+     */
+    Builder log(ConfigurationLog log);
+
+    /**
+     * Optionally set the resource loader to use. If not specified then class path based resource loader is used.
+     */
+    Builder resourceLoader(ResourceLoader resourceLoader);
+
+    /**
+     * Specify to include standard resource loading.
+     * <p>
+     * This includes the loading of application.properties, application.yaml etc.
+     */
+    Builder includeResourceLoading();
+
+    /**
+     * Build and return the Configuration.
+     * <p>
+     * Performs evaluation of property values that contain expressions (e.g. {@code ${user.home}})
+     * and returns the configuration.
+     */
+    Configuration build();
   }
 }

@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import org.junit.jupiter.api.Test;
 
+import static io.avaje.config.CoreExpressionEval.evalFor;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +25,7 @@ class InitialLoaderTest {
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     loader.loadYamlPath("test-properties/foo.yml", RESOURCE);
 
-    var properties = loader.eval();
+    var properties = evalFor(loader.entryMap());
 
     assertEquals("fromProperties", properties.get("app.fromProperties").value());
     assertEquals("Two", properties.get("app.two").value());
@@ -44,7 +45,7 @@ class InitialLoaderTest {
     loader.loadWithExtensionCheck("test-dummy.yml");
     loader.loadWithExtensionCheck("test-dummy2.yaml");
 
-    var properties = loader.eval();
+    var properties = evalFor(loader.entryMap());
     assertThat(properties.get("dummy.yaml.bar").value()).isEqualTo("baz");
     assertThat(properties.get("dummy.yml.foo").value()).isEqualTo("bar");
     assertThat(properties.get("dummy.properties.foo").value()).isEqualTo("bar");
@@ -55,7 +56,7 @@ class InitialLoaderTest {
   void loadYaml() {
     InitialLoader loader = newInitialLoader();
     loader.loadYamlPath("test-properties/foo.yml", RESOURCE);
-    var properties = loader.eval();
+    var properties = evalFor(loader.entryMap());
 
     assertThat(properties.get("Some.Other.pass").value()).isEqualTo("someDefault");
   }
@@ -67,7 +68,7 @@ class InitialLoaderTest {
 
     InitialLoader loader = newInitialLoader();
     loader.loadProperties("test-properties/one.properties", RESOURCE);
-    var properties = loader.eval();
+    var properties = evalFor(loader.entryMap());
 
     assertThat(properties.get("hello").source()).isEqualTo("resource:test-properties/one.properties");
     assertThat(properties.get("hello").value()).isEqualTo("there");
@@ -125,13 +126,13 @@ class InitialLoaderTest {
     try {
       System.setProperty("suppressTestResource", "");
       InitialLoader loader = newInitialLoader();
-      var properties = loader.load();
+      var properties = evalFor(loader.load());
       assertThat(properties.get("myapp.activateFoo").value()).isEqualTo("true");
 
       //application-test.yaml is not loaded when suppressTestResource is set to true
       System.setProperty("suppressTestResource", "true");
       InitialLoader loaderWithSuppressTestResource = newInitialLoader();
-      var propertiesWithoutTestResource = loaderWithSuppressTestResource.load();
+      var propertiesWithoutTestResource = evalFor(loaderWithSuppressTestResource.load());
       assertThat(propertiesWithoutTestResource.get("myapp.activateFoo")).isNull();
     } finally {
       System.clearProperty("suppressTestResource");
