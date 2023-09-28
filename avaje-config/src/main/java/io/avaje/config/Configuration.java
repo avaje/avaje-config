@@ -333,7 +333,7 @@ public interface Configuration {
    * <p>
    * This will fire configuration callback listeners that are registered.
    */
-  void putAll(Map<String, Object> map);
+  void putAll(Map<String, ?> map);
 
   /**
    * Clear the value for the given key. Note that {@link #eventBuilder(String)} should be

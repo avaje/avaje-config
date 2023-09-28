@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -51,6 +52,11 @@ public interface ModificationEvent {
      * @param value The new value of the property
      */
     Builder put(String key, String value);
+
+    /**
+     * Set all the properties from the map.
+     */
+    Builder putAll(Map<String, ?> map);
 
     /**
      * Remove a property from the configuration.

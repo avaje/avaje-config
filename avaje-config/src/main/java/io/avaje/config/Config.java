@@ -456,7 +456,7 @@ public class Config {
    *
    * <p>This will fire configuration callback listeners that are registered.
    */
-  public static void putAll(Map<String, Object> map) {
+  public static void putAll(Map<String, ?> map) {
     data.putAll(map);
   }
 

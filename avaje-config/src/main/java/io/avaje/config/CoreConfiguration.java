@@ -403,18 +403,9 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public void putAll(Map<String, Object> map) {
+  public void putAll(Map<String, ?> map) {
     requireNonNull(map, "map cannot be null");
-    final var builder = eventBuilder("PutAll");
-
-    map.forEach(
-        (k, v) -> {
-          requireNonNull(k, "map key is required");
-          requireNonNull(v, "map value is required");
-          builder.put(k, v.toString());
-        });
-
-    builder.publish();
+    eventBuilder("PutAll").putAll(map).publish();
   }
 
   @Override
