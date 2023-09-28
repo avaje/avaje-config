@@ -3,12 +3,7 @@ package io.avaje.config;
 import io.avaje.config.CoreEntry.CoreMap;
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -192,8 +187,8 @@ class CoreConfigurationTest {
     assertThat(data.list().ofLong("list.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.list().ofLong("list.long.notThere2")).isEmpty();
 
-    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
-    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short) 13, (short) 42, (short) 55);
+    assertThat(data.list().ofType("someValues", Short::parseShort)).contains((short) 13, (short) 42, (short) 55);
     assertThat(data.list().ofType("list.long.notThere2", Short::parseShort)).isEmpty();
   }
 
@@ -214,8 +209,8 @@ class CoreConfigurationTest {
     assertThat(data.set().ofLong("1set.long.notThere", 51L, 52L)).contains(51L, 52L);
     assertThat(data.set().ofLong("1set.long.notThere2")).isEmpty();
 
-    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
-    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short)13, (short)42, (short)55);
+    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short) 13, (short) 42, (short) 55);
+    assertThat(data.set().ofType("someValues", Short::parseShort)).contains((short) 13, (short) 42, (short) 55);
     assertThat(data.set().ofType("list.long.notThere2", Short::parseShort)).isEmpty();
 
   }
@@ -234,6 +229,27 @@ class CoreConfigurationTest {
   @Test
   void getEnum_doesNotExist() {
     assertThrows(IllegalStateException.class, () -> data.getEnum(MyEnum.class, "myEnum.doesNotExist"));
+  }
+
+  @Test
+  void onChangePutAll() {
+    final List<ModificationEvent> capturedEvents = new ArrayList<>();
+    data.onChange(capturedEvents::add);
+
+    Map<String, String> myUpdate = Map.of("a", "1", "onChangeTest_1", "one", "onChangeTest_1.2", "two|${user.home}|be");
+
+    data.putAll(myUpdate);
+
+    assertThat(capturedEvents).hasSize(1);
+    final var event = capturedEvents.get(0);
+    assertThat(event.name()).isEqualTo("PutAll");
+    assertThat(event.modifiedKeys()).containsExactlyInAnyOrder("onChangeTest_1", "onChangeTest_1.2");
+
+    var configuration = event.configuration();
+
+    String userHome = System.getProperty("user.home");
+    assertThat(configuration.get("onChangeTest_1")).isEqualTo("one");
+    assertThat(configuration.get("onChangeTest_1.2")).isEqualTo("two|" + userHome + "|be");
   }
 
   @Test

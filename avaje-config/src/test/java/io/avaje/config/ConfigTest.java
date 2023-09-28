@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -134,6 +135,22 @@ class ConfigTest {
     final Configuration configuration = Config.asConfiguration();
     assertThat(configuration.get("myapp.fooName")).isEqualTo("Hello");
     assertThat(configuration.get("myapp.fooHome")).isEqualTo(home + "/config");
+  }
+
+  @Test
+  void putAll() {
+    Map<String, Object> extra = Map.of("myTempKey", "foo");
+    Config.putAll(extra);
+
+    Map<String, String> extra2 = Map.of("myTempKey2", "foo2");
+    Config.putAll(extra2);
+
+    final Configuration configuration = Config.asConfiguration();
+    assertThat(configuration.get("myTempKey")).isEqualTo("foo");
+    assertThat(configuration.get("myTempKey2")).isEqualTo("foo2");
+
+    configuration.clearProperty("myTempKey");
+    configuration.clearProperty("myTempKey2");
   }
 
   @Disabled
@@ -332,22 +349,22 @@ class ConfigTest {
   void getAs_func() {
     Config.setProperty("func", "amogus");
     final var result =
-        Config.getAs(
-            "func",
-            x -> {
-              assertThat(x).isEqualTo("amogus");
-              return "sus";
-            });
+      Config.getAs(
+        "func",
+        x -> {
+          assertThat(x).isEqualTo("amogus");
+          return "sus";
+        });
     assertThat(result).isEqualTo("sus");
 
     assertThrows(
-        IllegalStateException.class,
-        () ->
-            Config.getAs(
-                "func",
-                x -> {
-                  throw new RuntimeException("broke");
-                }));
+      IllegalStateException.class,
+      () ->
+        Config.getAs(
+          "func",
+          x -> {
+            throw new RuntimeException("broke");
+          }));
     Config.clearProperty("func");
   }
 
@@ -355,32 +372,32 @@ class ConfigTest {
   void getAsOptional_func() {
     Config.setProperty("func", "fire");
     var result =
-        Config.getAsOptional(
-            "func",
-            x -> {
-              assertThat(x).isEqualTo("fire");
-              return "sus";
-            });
+      Config.getAsOptional(
+        "func",
+        x -> {
+          assertThat(x).isEqualTo("fire");
+          return "sus";
+        });
 
     assertThat(result.orElseThrow()).isEqualTo("sus");
 
     assertThrows(
-        IllegalStateException.class,
-        () ->
-            Config.getAsOptional(
-                "func",
-                x -> {
-                  throw new RuntimeException("broke");
-                }));
+      IllegalStateException.class,
+      () ->
+        Config.getAsOptional(
+          "func",
+          x -> {
+            throw new RuntimeException("broke");
+          }));
     Config.clearProperty("func");
 
     result =
-        Config.getAsOptional(
-            "func",
-            x -> {
-              assertThat(x).isEqualTo("fire");
-              return null;
-            });
+      Config.getAsOptional(
+        "func",
+        x -> {
+          assertThat(x).isEqualTo("fire");
+          return null;
+        });
 
     assertThat(result.isEmpty()).isEqualTo(true);
   }

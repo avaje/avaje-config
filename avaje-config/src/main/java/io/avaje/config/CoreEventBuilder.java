@@ -20,6 +20,15 @@ final class CoreEventBuilder implements ModificationEvent.Builder {
   }
 
   @Override
+  public ModificationEvent.Builder putAll(Map<String, ?> map) {
+    map.forEach((key, value) -> {
+      requireNonNull(value);
+      put(key, value.toString());
+    });
+    return this;
+  }
+
+  @Override
   public ModificationEvent.Builder put(String key, String value) {
     requireNonNull(key);
     requireNonNull(value);
