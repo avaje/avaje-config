@@ -18,6 +18,10 @@ class CoreConfigurationTest {
   private final CoreConfiguration data = createSample();
 
   private CoreMap basicProperties() {
+    return CoreEntry.newMap(properties(), "test");
+  }
+
+  private static Properties properties() {
     Properties properties = new Properties();
     properties.setProperty("a", "1");
     properties.setProperty("foo.bar", "42");
@@ -27,8 +31,8 @@ class CoreConfigurationTest {
     properties.setProperty("someValues", "13,42,55");
     properties.setProperty("1someValues", "13,42,55");
     properties.setProperty("myEnum", "TWO");
-
-    return CoreEntry.newMap(properties, "test");
+    properties.setProperty("myHome", "my/${user.home}/home");
+    return properties;
   }
 
   private CoreConfiguration createSample() {
@@ -120,6 +124,24 @@ class CoreConfigurationTest {
     assertThat(CoreConfiguration.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
     assertThat(CoreConfiguration.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
     assertThat(CoreConfiguration.toEnvKey("BAR")).isEqualTo("BAR");
+  }
+
+  @Test
+  void builder() {
+    var conf = Configuration.builder()
+      .putAll(properties())
+      .putAll(Map.of("myExtraMap", "foo", "myExtraMap.b", "bar"))
+      .put("myExtraOne", "baz")
+      .build();
+
+    assertEquals(conf.get("a", "something"), "1");
+    assertEquals(conf.get("doesNotExist", "something"), "something");
+    assertEquals(conf.get("myExtraMap"), "foo");
+    assertEquals(conf.get("myExtraMap.b"), "bar");
+    assertEquals(conf.get("myExtraOne"), "baz");
+
+    String userHome = System.getProperty("user.home");
+    assertEquals(conf.get("myHome"), "my/" + userHome + "/home");
   }
 
   @Test
@@ -255,6 +277,7 @@ class CoreConfigurationTest {
   @Test
   void onChangeNew() {
     // we will remove this entry
+    System.clearProperty("foo.bar");
     assertThat(data.getOptional("foo.bar")).contains("42");
 
     final List<ModificationEvent> capturedEvents = new ArrayList<>();

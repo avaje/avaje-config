@@ -69,13 +69,24 @@ final class CoreConfiguration implements Configuration {
     log.preInitialisation();
     final var resourceLoader = ServiceLoader.load(ResourceLoader.class).findFirst().orElseGet(DefaultResourceLoader::new);
     final var loader = new InitialLoader(log, resourceLoader);
-    final CoreConfiguration configuration = new CoreConfiguration(runner, log, loader.load());
-    configuration.loadSources(loader.loadedFrom());
-    loader.initWatcher(configuration);
-    configuration.initSystemProperties();
-    configuration.logMessage(loader);
+    return new CoreConfiguration(runner, log, loader.load()).postLoad(loader);
+  }
+
+  CoreConfiguration postLoad() {
+    return postLoad(null);
+  }
+
+  private CoreConfiguration postLoad(@Nullable InitialLoader loader) {
+    if (loader != null) {
+      loadSources(loader.loadedFrom());
+      loader.initWatcher(this);
+    }
+    initSystemProperties();
+    if (loader != null) {
+      logMessage(loader);
+    }
     log.postInitialisation();
-    return configuration;
+    return this;
   }
 
   ConfigurationLog log() {

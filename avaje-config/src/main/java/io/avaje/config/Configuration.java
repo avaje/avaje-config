@@ -632,4 +632,54 @@ public interface Configuration {
      */
     <T> Set<T> ofType(String key, Function<String, T> mappingFunction);
   }
+
+  /**
+   * Return a Builder for Configuration that is loaded manually (not via the normal resource loading).
+   */
+  static Builder builder() {
+    return new CoreConfigurationBuilder();
+  }
+
+  /**
+   * Build Configuration manually explicitly loading all the configuration as key value pairs.
+   * <p>
+   * Building configuration this way does NOT automatically load resources like application.properties
+   * and also does NOT load ConfigurationSource. ALL configuration is explicitly loaded via calls
+   * to {@link Builder#put(String, String)}, {@link Builder#putAll(Map)}.
+   */
+  interface Builder {
+
+    /**
+     * Put an entry into the configuration.
+     */
+    Builder put(String key, String value);
+
+    /**
+     * Put entries into the configuration.
+     */
+    Builder putAll(Map<String, ?> sourceMap);
+
+    /**
+     * Put entries into the configuration from properties.
+     */
+    Builder putAll(Properties source);
+
+    /**
+     * Optionally set the event runner to use . If not specified a foreground runner will be used.
+     */
+    Builder eventRunner(ModificationEventRunner eventRunner);
+
+    /**
+     * Optionally set the log to use. If not specified then a logger using System.Logger will be used.
+     */
+    Builder log(ConfigurationLog log);
+
+    /**
+     * Build and return the Configuration.
+     * <p>
+     * Performs evaluation of property values that contain expressions (e.g. {@code ${user.home}})
+     * and returns the configuration.
+     */
+    Configuration build();
+  }
 }
