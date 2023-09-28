@@ -14,6 +14,9 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private ConfigurationLog configurationLog;
   private ResourceLoader resourceLoader;
 
+  private boolean includeResourceLoading;
+  private InitialLoader initialLoader;
+
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
     this.eventRunner = eventRunner;
@@ -62,27 +65,31 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     return this;
   }
 
-  Configuration loadResources() {
-    final var runner = initRunner();
-    final var log = initLog();
-
-    log.preInitialisation();
-    final var loader = new InitialLoader(log, initResourceLoader());
-    CoreEntry.CoreMap entries = loader.load();
-
-    return new CoreConfiguration(runner, log, entries).postLoad(loader);
+  @Override
+  public Configuration.Builder includeResourceLoading() {
+    this.includeResourceLoading = true;
+    return this;
   }
 
   @Override
   public Configuration build() {
-    return new CoreConfiguration(initRunner(), initLog(), initEntries())
-      .postLoad();
+    final var runner = initRunner();
+    final var log = initLog();
+    if (includeResourceLoading) {
+      log.preInitialisation();
+      initialLoader = new InitialLoader(log, initResourceLoader());
+    }
+    return new CoreConfiguration(runner, log, initEntries()).postLoad(initialLoader);
   }
 
   private CoreEntry.CoreMap initEntries() {
-    final var entries = CoreEntry.newMap();
+    final var entries = initEntryMap();
     sourceMap.forEach((key, value) -> entries.put(key, value, "initial"));
     return CoreExpressionEval.evalFor(entries);
+  }
+
+  private CoreEntry.CoreMap initEntryMap() {
+    return initialLoader == null ? CoreEntry.newMap() : initialLoader.load();
   }
 
   private ResourceLoader initResourceLoader() {

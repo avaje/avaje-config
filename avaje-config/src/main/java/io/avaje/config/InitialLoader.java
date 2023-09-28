@@ -88,7 +88,7 @@ final class InitialLoader {
   CoreMap load() {
     loadEnvironmentVars();
     loadLocalFiles();
-    return eval();
+    return entryMap();
   }
 
   void initWatcher(CoreConfiguration configuration) {
@@ -279,8 +279,8 @@ final class InitialLoader {
   /**
    * Evaluate all the configuration entries and return as properties.
    */
-  CoreMap eval() {
-    return loadContext.evalAll();
+  CoreMap entryMap() {
+    return loadContext.entryMap();
   }
 
   /**

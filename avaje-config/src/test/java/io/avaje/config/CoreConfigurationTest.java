@@ -134,7 +134,7 @@ class CoreConfigurationTest {
       .put("myExtraOne", "baz")
       .build();
 
-    assertEquals(conf.get("a", "something"), "1");
+    assertEquals(conf.get("a"), "1");
     assertEquals(conf.get("doesNotExist", "something"), "something");
     assertEquals(conf.get("myExtraMap"), "foo");
     assertEquals(conf.get("myExtraMap.b"), "bar");
@@ -142,6 +142,24 @@ class CoreConfigurationTest {
 
     String userHome = System.getProperty("user.home");
     assertEquals(conf.get("myHome"), "my/" + userHome + "/home");
+  }
+
+  @Test
+  void builder_withResources() {
+    var conf = Configuration.builder()
+      .putAll(properties())
+      .putAll(Map.of("myExtraMap", "foo", "myExtraMap.b", "bar"))
+      .put("myExtraOne", "baz")
+      .includeResourceLoading()
+      .build();
+
+    // loaded from application-test.yaml
+    assertThat(conf.get("myapp.activateFoo")).isEqualTo("true");
+    // loaded explicitly
+    assertThat(conf.get("a")).isEqualTo( "1");
+
+    String userHome = System.getProperty("user.home");
+    assertThat(conf.get("myHome")).isEqualTo("my/" + userHome + "/home");
   }
 
   @Test

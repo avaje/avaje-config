@@ -64,11 +64,9 @@ final class CoreConfiguration implements Configuration {
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    return new CoreConfigurationBuilder().loadResources();
-  }
-
-  CoreConfiguration postLoad() {
-    return postLoad(null);
+    return new CoreConfigurationBuilder()
+      .includeResourceLoading()
+      .build();
   }
 
   CoreConfiguration postLoad(@Nullable InitialLoader loader) {

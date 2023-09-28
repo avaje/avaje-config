@@ -125,9 +125,9 @@ final class InitialLoadContext {
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-  CoreMap evalAll() {
+  CoreMap entryMap() {
     log.log(Level.TRACE, "load from {0}", loadedResources);
-    return CoreExpressionEval.evalFor(map);
+    return map;
   }
 
   /**

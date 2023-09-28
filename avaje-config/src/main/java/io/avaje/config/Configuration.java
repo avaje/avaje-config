@@ -26,7 +26,7 @@ import io.avaje.lang.Nullable;
  *
  *  String topicName = Config.get("app.topic.name");
  *
- *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+ *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
  *
  * }</pre>
  */
@@ -286,7 +286,7 @@ public interface Configuration {
    *
    * <pre>{@code
    *
-   *  List<Integer> codes = Config.getList().ofInt("my.codes", 97, 45);
+   *  List<Integer> codes = Config.list().ofInt("my.codes", 97, 45);
    *
    * }</pre>
    */
@@ -485,7 +485,7 @@ public interface Configuration {
    * <h3>Example</h3>
    * <pre>{@code
    *
-   *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+   *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
    *
    * }</pre>
    */
@@ -678,6 +678,13 @@ public interface Configuration {
      * Optionally set the resource loader to use. If not specified then class path based resource loader is used.
      */
     Builder resourceLoader(ResourceLoader resourceLoader);
+
+    /**
+     * Specify to include standard resource loading.
+     * <p>
+     * This includes the loading of application.properties, application.yaml etc.
+     */
+    Builder includeResourceLoading();
 
     /**
      * Build and return the Configuration.

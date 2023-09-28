@@ -30,7 +30,7 @@ import io.avaje.lang.Nullable;
  *
  *  String topicName = Config.get("app.topic.name");
  *
- *  List<Integer> codes = Config.getList().ofInt("my.codes", 42, 54);
+ *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
  *
  * }</pre>
  */
