@@ -675,6 +675,11 @@ public interface Configuration {
     Builder log(ConfigurationLog log);
 
     /**
+     * Optionally set the resource loader to use. If not specified then class path based resource loader is used.
+     */
+    Builder resourceLoader(ResourceLoader resourceLoader);
+
+    /**
      * Build and return the Configuration.
      * <p>
      * Performs evaluation of property values that contain expressions (e.g. {@code ${user.home}})

@@ -12,6 +12,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private final Map<String, String> sourceMap = new LinkedHashMap<>();
   private ModificationEventRunner eventRunner;
   private ConfigurationLog configurationLog;
+  private ResourceLoader resourceLoader;
 
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
@@ -22,6 +23,12 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   @Override
   public Configuration.Builder log(ConfigurationLog configurationLog) {
     this.configurationLog = configurationLog;
+    return this;
+  }
+
+  @Override
+  public Configuration.Builder resourceLoader(ResourceLoader resourceLoader) {
+    this.resourceLoader = resourceLoader;
     return this;
   }
 
@@ -55,6 +62,17 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     return this;
   }
 
+  Configuration loadResources() {
+    final var runner = initRunner();
+    final var log = initLog();
+
+    log.preInitialisation();
+    final var loader = new InitialLoader(log, initResourceLoader());
+    CoreEntry.CoreMap entries = loader.load();
+
+    return new CoreConfiguration(runner, log, entries).postLoad(loader);
+  }
+
   @Override
   public Configuration build() {
     return new CoreConfiguration(initRunner(), initLog(), initEntries())
@@ -67,23 +85,30 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     return CoreExpressionEval.evalFor(entries);
   }
 
+  private ResourceLoader initResourceLoader() {
+    if (resourceLoader == null) {
+      resourceLoader = ServiceLoader.load(ResourceLoader.class)
+        .findFirst()
+        .orElseGet(DefaultResourceLoader::new);
+    }
+    return resourceLoader;
+  }
+
   private ConfigurationLog initLog() {
-    if (configurationLog != null) {
-      return configurationLog;
-    } else {
-      return ServiceLoader.load(ConfigurationLog.class)
+    if (configurationLog == null) {
+      configurationLog = ServiceLoader.load(ConfigurationLog.class)
         .findFirst()
         .orElseGet(DefaultConfigurationLog::new);
     }
+    return configurationLog;
   }
 
   private ModificationEventRunner initRunner() {
-    if (eventRunner != null) {
-      return eventRunner;
-    } else {
-      return ServiceLoader.load(ModificationEventRunner.class)
+    if (eventRunner == null) {
+      eventRunner = ServiceLoader.load(ModificationEventRunner.class)
         .findFirst()
         .orElseGet(CoreConfiguration.ForegroundEventRunner::new);
     }
+    return eventRunner;
   }
 }

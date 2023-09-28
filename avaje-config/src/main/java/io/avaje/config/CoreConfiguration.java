@@ -64,19 +64,14 @@ final class CoreConfiguration implements Configuration {
    * Initialise the configuration which loads all the property sources.
    */
   static Configuration initialise() {
-    final var runner = ServiceLoader.load(ModificationEventRunner.class).findFirst().orElseGet(ForegroundEventRunner::new);
-    final var log = ServiceLoader.load(ConfigurationLog.class).findFirst().orElseGet(DefaultConfigurationLog::new);
-    log.preInitialisation();
-    final var resourceLoader = ServiceLoader.load(ResourceLoader.class).findFirst().orElseGet(DefaultResourceLoader::new);
-    final var loader = new InitialLoader(log, resourceLoader);
-    return new CoreConfiguration(runner, log, loader.load()).postLoad(loader);
+    return new CoreConfigurationBuilder().loadResources();
   }
 
   CoreConfiguration postLoad() {
     return postLoad(null);
   }
 
-  private CoreConfiguration postLoad(@Nullable InitialLoader loader) {
+  CoreConfiguration postLoad(@Nullable InitialLoader loader) {
     if (loader != null) {
       loadSources(loader.loadedFrom());
       loader.initWatcher(this);
