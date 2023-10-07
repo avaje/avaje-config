@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface ConfigParser {
 
-  default String[] supportedExtension() {
+  default String[] supportedExtensions() {
     return new String[] {};
   }
 

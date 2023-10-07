@@ -7,7 +7,7 @@ import java.util.Map;
 interface YamlLoader extends ConfigParser {
 
   @Override
-  default String[] supportedExtension() {
+  default String[] supportedExtensions() {
     return new String[] {"yml", "yaml"};
   }
 

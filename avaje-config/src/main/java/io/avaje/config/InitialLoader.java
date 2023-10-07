@@ -120,7 +120,7 @@ final class InitialLoader {
       ServiceLoader.load(ConfigParser.class)
           .forEach(
               p -> {
-                for (var ext : p.supportedExtension()) {
+                for (var ext : p.supportedExtensions()) {
                   parserMap.put(ext, p);
                 }
               });
