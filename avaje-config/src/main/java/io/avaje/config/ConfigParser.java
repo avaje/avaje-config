@@ -3,14 +3,12 @@ package io.avaje.config;
 import java.io.InputStream;
 import java.util.Map;
 
-/** Load Yaml config into a flattened map. */
-interface YamlLoader extends ConfigParser {
+public interface ConfigParser {
 
-  @Override
   default String[] supportedExtension() {
-    return new String[] {"yml", "yaml"};
+    return new String[] {};
   }
 
-  @Override
+  /** Load the yaml into a flat map of key value pairs. */
   Map<String, String> load(InputStream is);
 }

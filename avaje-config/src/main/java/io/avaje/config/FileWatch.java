@@ -11,17 +11,17 @@ final class FileWatch {
 
   private final ConfigurationLog log;
   private final Configuration configuration;
-  private final YamlLoader yamlLoader;
+  private final Map<String, ConfigParser> parserMap;
   private final List<Entry> files;
   private final long delay;
   private final long period;
 
-  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, YamlLoader yamlLoader) {
+  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, Map<String, ConfigParser> parserMap) {
     this.log = configuration.log();
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);
     this.period = configuration.getInt("config.watch.period", 10);
-    this.yamlLoader = yamlLoader;
+    this.parserMap = parserMap;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
       log.log(Level.ERROR, "No files to watch?");
@@ -57,7 +57,7 @@ final class FileWatch {
     for (Entry file : files) {
       if (file.reload()) {
         log.log(Level.DEBUG, "reloading configuration from {0}", file);
-        if (file.isYaml()) {
+        if (file.isCustom()) {
           reloadYaml(file, keyValues);
         } else {
           reloadProps(file, keyValues);
@@ -84,11 +84,15 @@ final class FileWatch {
   }
 
   private void reloadYaml(Entry file, Map<String, String> keyValues) {
-    if (yamlLoader == null) {
-      log.log(Level.ERROR, "Unexpected - no yamlLoader to reload config file " + file);
+
+    var parser = parserMap.get(file.extension);
+
+    if (parser == null) {
+      log.log(Level.ERROR, "Unexpected - no parser to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
-        keyValues.putAll(yamlLoader.load(is));
+
+        keyValues.putAll(parser.load(is));
       } catch (Exception e) {
         log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
       }
@@ -97,7 +101,8 @@ final class FileWatch {
 
   private static class Entry {
     private final File file;
-    private final boolean yaml;
+    private final boolean customExtension;
+    private final String extension;
     private long lastMod;
     private long lastLength;
 
@@ -105,7 +110,9 @@ final class FileWatch {
       this.file = file;
       this.lastMod = file.lastModified();
       this.lastLength = file.length();
-      this.yaml = isYaml(file.getName());
+      var name= file.getName();
+      this.extension = name.substring(name.lastIndexOf(".") + 1);
+      this.customExtension = !"properties".equals(extension);
     }
 
     @Override
@@ -113,13 +120,8 @@ final class FileWatch {
       return file.toString();
     }
 
-    boolean isYaml() {
-      return yaml;
-    }
-
-    private boolean isYaml(String name) {
-      final String lowerName = name.toLowerCase();
-      return lowerName.endsWith(".yaml") || lowerName.endsWith(".yml");
+    boolean isCustom() {
+      return customExtension;
     }
 
     boolean reload() {
