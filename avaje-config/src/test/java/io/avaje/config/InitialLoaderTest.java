@@ -56,7 +56,7 @@ class InitialLoaderTest {
   void loadYaml() {
     InitialLoader loader = newInitialLoader();
     loader.loadWithExtensionCheck("test-properties/foo.yml");
-    var properties = loader.eval();
+    var properties = evalFor(loader.entryMap());
 
     assertThat(properties.get("Some.Other.pass").value()).isEqualTo("someDefault");
   }
