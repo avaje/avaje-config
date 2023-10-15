@@ -56,6 +56,7 @@ class FileWatchTest {
     assertThat(config.get("one")).isEqualTo("a");
     assertThat(config.getInt("my.size", 42)).isEqualTo(17);
     assertThat(config.getBool("c.active", false)).isTrue();
+    assertThat(config.enabled("c.active", false)).isTrue();
   }
 
   @Test

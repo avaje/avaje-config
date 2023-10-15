@@ -118,6 +118,48 @@ public interface Configuration {
   String getNullable(String key, @Nullable String defaultValue);
 
   /**
+   * Return boolean configuration value with the given default value.
+   * <p>
+   * This is the same as {@link #getBool( String)}.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   *
+   * <pre>{@code
+   *
+   *   if (configuration.enabled("feature.cleanup")) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  default boolean enabled(String key) {
+    return getBool(key);
+  }
+
+  /**
+   * Return boolean configuration value with the given default value.
+   * <p>
+   * This is the same as {@link #getBool( String, boolean)}.
+   *
+   * <pre>{@code
+   *
+   *   if (configuration.enabled("feature.cleanup", true)) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  default boolean enabled(String key, boolean enabledDefault) {
+    return getBool(key, enabledDefault);
+  }
+
+  /**
    * Return a required boolean configuration value.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.

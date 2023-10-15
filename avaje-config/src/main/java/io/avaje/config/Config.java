@@ -166,8 +166,9 @@ public class Config {
   /**
    * Return boolean configuration value with the given default value.
    * <p>
+   * This is the same as {@link #getBool( String)}.
+   * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
-   * </p>
    *
    * <pre>{@code
    *
@@ -181,11 +182,13 @@ public class Config {
    * @return True when configuration value is true
    */
   public static boolean enabled(String key) {
-    return getBool(key);
+    return data.enabled(key);
   }
 
   /**
    * Return boolean configuration value with the given default value.
+   * <p>
+   * This is the same as {@link #getBool( String, boolean)}.
    *
    * <pre>{@code
    *
@@ -199,7 +202,7 @@ public class Config {
    * @return True when configuration value is true
    */
   public static boolean enabled(String key, boolean enabledDefault) {
-    return getBool(key, enabledDefault);
+    return data.enabled(key, enabledDefault);
   }
 
   /**
