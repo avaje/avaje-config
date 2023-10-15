@@ -307,14 +307,10 @@ final class InitialLoader {
     return loadProperties(resourcePath + ".properties", source) || loadCustom(resourcePath, source);
   }
 
-  /**
-   * Load YAML first and if not found load YML.
-   */
   private boolean loadCustom(String resourcePath, Source source) {
     for (var entry : parserMap.entrySet()) {
       var extension = entry.getKey();
-      if (loadCustomExtension(
-        resourcePath + "." + extension, entry.getValue(), source)) {
+      if (loadCustomExtension(resourcePath + "." + extension, entry.getValue(), source)) {
         return true;
       }
     }
