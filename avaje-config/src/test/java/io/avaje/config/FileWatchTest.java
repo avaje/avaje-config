@@ -1,19 +1,20 @@
 package io.avaje.config;
 
 
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class FileWatchTest {
 
@@ -24,7 +25,9 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    YamlLoader yamlLoader = new YamlLoaderSnake();
+    final FileWatch watch =
+        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -38,7 +41,9 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    YamlLoader yamlLoader = new YamlLoaderSnake();
+    final FileWatch watch =
+        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.getOptional("one")).isEmpty();
@@ -65,7 +70,9 @@ class FileWatchTest {
         fail("File " + file.getAbsolutePath() + " does not exist?");
       }
     }
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    YamlLoader yamlLoader = new YamlLoaderSnake();
+    final FileWatch watch =
+        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
     System.out.println(watch);
 
     // assert not loaded
@@ -92,7 +99,9 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    YamlLoader yamlLoader = new YamlLoaderSnake();
+    final FileWatch watch =
+        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     if (isGithubActions()) {
       File aFile = files.get(0);

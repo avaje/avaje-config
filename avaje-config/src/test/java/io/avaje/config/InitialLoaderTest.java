@@ -20,10 +20,10 @@ class InitialLoaderTest {
 
     InitialLoader loader = newInitialLoader();
     loader.loadProperties("test-properties/application.properties", RESOURCE);
-    loader.loadYamlPath("test-properties/application.yaml", RESOURCE);
+    loader.loadWithExtensionCheck("test-properties/application.yaml");
 
     loader.loadProperties("test-properties/one.properties", RESOURCE);
-    loader.loadYamlPath("test-properties/foo.yml", RESOURCE);
+    loader.loadWithExtensionCheck("test-properties/foo.yml");
 
     var properties = evalFor(loader.entryMap());
 
@@ -55,7 +55,7 @@ class InitialLoaderTest {
   @Test
   void loadYaml() {
     InitialLoader loader = newInitialLoader();
-    loader.loadYamlPath("test-properties/foo.yml", RESOURCE);
+    loader.loadWithExtensionCheck("test-properties/foo.yml");
     var properties = evalFor(loader.entryMap());
 
     assertThat(properties.get("Some.Other.pass").value()).isEqualTo("someDefault");

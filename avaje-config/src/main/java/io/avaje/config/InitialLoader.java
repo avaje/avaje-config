@@ -1,20 +1,24 @@
 package io.avaje.config;
 
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.avaje.config.CoreEntry.CoreMap;
 import io.avaje.lang.Nullable;
-
-import static io.avaje.config.InitialLoader.Source.FILE;
-import static io.avaje.config.InitialLoader.Source.RESOURCE;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -41,12 +45,13 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private YamlLoader yamlLoader;
+  private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
   InitialLoader(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
     this.loadContext = new InitialLoadContext(log, resourceLoader);
-    initYamlLoader();
+
+    initCustomLoaders();
   }
 
   Set<String> loadedFrom() {
@@ -93,18 +98,32 @@ final class InitialLoader {
 
   void initWatcher(CoreConfiguration configuration) {
     if (configuration.getBool("config.watch.enabled", false)) {
-      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), yamlLoader));
+      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), parserMap));
     }
   }
 
-  private void initYamlLoader() {
+  private void initCustomLoaders() {
+
     if (!"true".equals(System.getProperty("skipYaml"))) {
+      YamlLoader yamlLoader;
       try {
         Class.forName("org.yaml.snakeyaml.Yaml");
         yamlLoader = new YamlLoaderSnake();
       } catch (ClassNotFoundException e) {
         yamlLoader = new YamlLoaderSimple();
       }
+      parserMap.put("yml", yamlLoader);
+      parserMap.put("yaml", yamlLoader);
+    }
+
+    if (!"true".equals(System.getProperty("skipCustomParsing"))) {
+      ServiceLoader.load(ConfigParser.class)
+          .forEach(
+              p -> {
+                for (var ext : p.supportedExtensions()) {
+                  parserMap.put(ext, p);
+                }
+              });
     }
   }
 
@@ -163,7 +182,10 @@ final class InitialLoader {
   }
 
   private boolean isValidExtension(String arg) {
-    return arg.endsWith(".yaml") || arg.endsWith(".yml") || arg.endsWith(".properties");
+
+    var extension = arg.substring(arg.lastIndexOf(".") + 1);
+
+    return "properties".equals(extension) || parserMap.containsKey(extension);
   }
 
   /**
@@ -221,11 +243,9 @@ final class InitialLoader {
     if (profiles != null) {
       for (final String path : profiles) {
         final var profile = loadContext.eval(path);
-        if (source != RESOURCE || !profileResourceLoaded.contains(profile)) {
-          if (load("application-" + profile, source)) {
-            profileResourceLoaded.add(profile);
-          }
-        }
+        if ((source != RESOURCE || !profileResourceLoaded.contains(profile)) && load("application-" + profile, source)) {
+        profileResourceLoaded.add(profile);
+      }
       }
     }
   }
@@ -258,21 +278,31 @@ final class InitialLoader {
     String fileName = System.getenv("PROPS_FILE");
     if (fileName == null) {
       fileName = System.getProperty("props.file");
-      if (fileName != null) {
-        if (!loadWithExtensionCheck(fileName)) {
-          log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
-        }
+      if (fileName != null && !loadWithExtensionCheck(fileName)) {
+        log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
       }
     }
   }
 
   boolean loadWithExtensionCheck(String fileName) {
-    if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
-      return loadYamlPath(fileName, RESOURCE) | loadYamlPath(fileName, FILE);
-    } else if (fileName.endsWith("properties")) {
+
+    var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+
+    if ("properties".equals(extension)) {
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
-      throw new IllegalArgumentException("Expecting only yaml or properties file but got [" + fileName + "]");
+      var parser = parserMap.get(extension);
+      if (parser == null) {
+        throw new IllegalArgumentException(
+            "Expecting only properties or "
+                + parserMap.keySet()
+                + " file extensions but got ["
+                + fileName
+                + "]");
+      }
+
+      return loadCustomExtension(fileName, parser, RESOURCE)
+          | loadCustomExtension(fileName, parser, FILE);
     }
   }
 
@@ -283,56 +313,59 @@ final class InitialLoader {
     return loadContext.entryMap();
   }
 
-  /**
-   * Attempt to load a properties and yaml/yml file.
-   * Return true if at least one was loaded.
-   */
+  /** Attempt to load a properties and yaml/yml file. Return true if at least one was loaded. */
   boolean load(String resourcePath, Source source) {
-    final boolean props = loadProperties(resourcePath + ".properties", source);
-    final boolean yaml = loadYaml(resourcePath, source);
-    return props || yaml;
+
+    return loadProperties(resourcePath + ".properties", source) || loadCustom(resourcePath, source);
   }
 
-  /**
-   * Load YAML first and if not found load YML.
-   */
-  private boolean loadYaml(String resourcePath, Source source) {
-    if (loadYamlPath(resourcePath + ".yaml", source)) {
-      return true;
-    } else {
-      return loadYamlPath(resourcePath + ".yml", source);
-    }
-  }
+  /** Load YAML first and if not found load YML. */
+ private boolean loadCustom(String resourcePath, Source source) {
 
-  boolean loadYamlPath(String resourcePath, Source source) {
-    if (yamlLoader != null) {
-      try {
-        try (InputStream is = resource(resourcePath, source)) {
-          if (is != null) {
-            yamlLoader.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
-            return true;
-          }
-        }
-      } catch (Exception e) {
-        throw new RuntimeException("Error loading yaml properties - " + resourcePath, e);
+    for (var entry : parserMap.entrySet()) {
+      var extension = entry.getKey();
+      if (loadCustomExtension(
+          resourcePath + "." + extension, entry.getValue(), source)) {
+        return true;
       }
     }
+    return false;
+  }
+
+  boolean loadCustomExtension(
+      String resourcePath, ConfigParser parser, Source source) {
+
+    try (InputStream is = resource(resourcePath, source)) {
+      if (is != null) {
+        parser
+            .load(is)
+            .forEach(
+                (k, v) ->
+                    loadContext.put(
+                        k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
+        return true;
+      }
+
+    } catch (Exception e) {
+      throw new IllegalStateException("Error loading properties - " + resourcePath, e);
+    }
+
     return false;
   }
 
   boolean loadProperties(String resourcePath, Source source) {
-    try {
-      try (InputStream is = resource(resourcePath, source)) {
-        if (is != null) {
-          loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
-          return true;
-        }
+
+    try (InputStream is = resource(resourcePath, source)) {
+      if (is != null) {
+        loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
+        return true;
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error loading properties - " + resourcePath, e);
+      throw new UncheckedIOException("Error loading properties - " + resourcePath, e);
     }
     return false;
   }
+
 
   private InputStream resource(String resourcePath, Source source) {
     return loadContext.resource(resourcePath, source);
