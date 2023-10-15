@@ -1,8 +1,9 @@
 package io.avaje.config;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,9 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 class FileWatchTest {
 
@@ -26,8 +26,7 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
     YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch =
-        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -42,8 +41,7 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
     YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch =
-        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.getOptional("one")).isEmpty();
@@ -71,8 +69,7 @@ class FileWatchTest {
       }
     }
     YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch =
-        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
     System.out.println(watch);
 
     // assert not loaded
@@ -100,8 +97,7 @@ class FileWatchTest {
     List<File> files = files();
 
     YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch =
-        new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
 
     if (isGithubActions()) {
       File aFile = files.get(0);

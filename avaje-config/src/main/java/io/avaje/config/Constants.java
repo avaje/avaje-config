@@ -2,7 +2,8 @@ package io.avaje.config;
 
 final class Constants {
 
-  private Constants() {}
+  private Constants() {
+  }
 
   static final String USER_PROVIDED = "SetProperty";
   static final String USER_PROVIDED_DEFAULT = "DefaultValue";

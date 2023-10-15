@@ -434,7 +434,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   static String toEnvKey(String key) {
-    return key.replace('.','_').toUpperCase();
+    return key.replace('.', '_').toUpperCase();
   }
 
   private static class ModifyAwareProperties {

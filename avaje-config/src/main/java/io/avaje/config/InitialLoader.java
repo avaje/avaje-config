@@ -1,24 +1,18 @@
 package io.avaje.config;
 
-import static io.avaje.config.InitialLoader.Source.FILE;
-import static io.avaje.config.InitialLoader.Source.RESOURCE;
+import io.avaje.config.CoreEntry.CoreMap;
+import io.avaje.lang.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import io.avaje.config.CoreEntry.CoreMap;
-import io.avaje.lang.Nullable;
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -103,7 +97,6 @@ final class InitialLoader {
   }
 
   private void initCustomLoaders() {
-
     if (!"true".equals(System.getProperty("skipYaml"))) {
       YamlLoader yamlLoader;
       try {
@@ -117,13 +110,11 @@ final class InitialLoader {
     }
 
     if (!"true".equals(System.getProperty("skipCustomParsing"))) {
-      ServiceLoader.load(ConfigParser.class)
-          .forEach(
-              p -> {
-                for (var ext : p.supportedExtensions()) {
-                  parserMap.put(ext, p);
-                }
-              });
+      ServiceLoader.load(ConfigParser.class).forEach(p -> {
+        for (var ext : p.supportedExtensions()) {
+          parserMap.put(ext, p);
+        }
+      });
     }
   }
 
@@ -182,9 +173,7 @@ final class InitialLoader {
   }
 
   private boolean isValidExtension(String arg) {
-
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-
     return "properties".equals(extension) || parserMap.containsKey(extension);
   }
 
@@ -244,8 +233,8 @@ final class InitialLoader {
       for (final String path : profiles) {
         final var profile = loadContext.eval(path);
         if ((source != RESOURCE || !profileResourceLoaded.contains(profile)) && load("application-" + profile, source)) {
-        profileResourceLoaded.add(profile);
-      }
+          profileResourceLoaded.add(profile);
+        }
       }
     }
   }
@@ -285,24 +274,22 @@ final class InitialLoader {
   }
 
   boolean loadWithExtensionCheck(String fileName) {
-
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-
     if ("properties".equals(extension)) {
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parserMap.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-            "Expecting only properties or "
-                + parserMap.keySet()
-                + " file extensions but got ["
-                + fileName
-                + "]");
+          "Expecting only properties or "
+            + parserMap.keySet()
+            + " file extensions but got ["
+            + fileName
+            + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-          | loadCustomExtension(fileName, parser, FILE);
+        | loadCustomExtension(fileName, parser, FILE);
     }
   }
 
@@ -313,48 +300,41 @@ final class InitialLoader {
     return loadContext.entryMap();
   }
 
-  /** Attempt to load a properties and yaml/yml file. Return true if at least one was loaded. */
+  /**
+   * Attempt to load a properties and yaml/yml file. Return true if at least one was loaded.
+   */
   boolean load(String resourcePath, Source source) {
-
     return loadProperties(resourcePath + ".properties", source) || loadCustom(resourcePath, source);
   }
 
-  /** Load YAML first and if not found load YML. */
- private boolean loadCustom(String resourcePath, Source source) {
-
+  /**
+   * Load YAML first and if not found load YML.
+   */
+  private boolean loadCustom(String resourcePath, Source source) {
     for (var entry : parserMap.entrySet()) {
       var extension = entry.getKey();
       if (loadCustomExtension(
-          resourcePath + "." + extension, entry.getValue(), source)) {
+        resourcePath + "." + extension, entry.getValue(), source)) {
         return true;
       }
     }
     return false;
   }
 
-  boolean loadCustomExtension(
-      String resourcePath, ConfigParser parser, Source source) {
-
+  boolean loadCustomExtension(String resourcePath, ConfigParser parser, Source source) {
     try (InputStream is = resource(resourcePath, source)) {
       if (is != null) {
-        parser
-            .load(is)
-            .forEach(
-                (k, v) ->
-                    loadContext.put(
-                        k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
+        parser.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
         return true;
       }
 
     } catch (Exception e) {
       throw new IllegalStateException("Error loading properties - " + resourcePath, e);
     }
-
     return false;
   }
 
   boolean loadProperties(String resourcePath, Source source) {
-
     try (InputStream is = resource(resourcePath, source)) {
       if (is != null) {
         loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
@@ -365,7 +345,6 @@ final class InitialLoader {
     }
     return false;
   }
-
 
   private InputStream resource(String resourcePath, Source source) {
     return loadContext.resource(resourcePath, source);

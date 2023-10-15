@@ -84,14 +84,11 @@ final class FileWatch {
   }
 
   private void reloadYaml(Entry file, Map<String, String> keyValues) {
-
     var parser = parserMap.get(file.extension);
-
     if (parser == null) {
       log.log(Level.ERROR, "Unexpected - no parser to reload config file " + file);
     } else {
       try (InputStream is = file.inputStream()) {
-
         keyValues.putAll(parser.load(is));
       } catch (Exception e) {
         log.log(Level.ERROR, "Unexpected error reloading config file " + file, e);
@@ -110,7 +107,7 @@ final class FileWatch {
       this.file = file;
       this.lastMod = file.lastModified();
       this.lastLength = file.length();
-      var name= file.getName();
+      var name = file.getName();
       this.extension = name.substring(name.lastIndexOf(".") + 1);
       this.customExtension = !"properties".equals(extension);
     }

@@ -1,13 +1,16 @@
 package io.avaje.config;
 
+import io.avaje.config.CoreEntry.CoreMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.System.Logger.Level;
-import java.util.*;
-
-import io.avaje.config.CoreEntry.CoreMap;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -143,9 +146,7 @@ final class InitialLoadContext {
 
   String profiles() {
     final var configEntry = map.get("config.profiles");
-    final var configProfile =
-        configEntry == null ? System.getProperty("config.profiles") : configEntry.value();
-
+    final var configProfile = configEntry == null ? System.getProperty("config.profiles") : configEntry.value();
     if (configProfile != null) {
       return configProfile;
     }

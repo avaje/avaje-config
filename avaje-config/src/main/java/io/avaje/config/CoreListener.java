@@ -16,7 +16,7 @@ final class CoreListener {
   }
 
   void accept(CoreModificationEvent event) {
-    if (keys == null || keys.length == 0  || containsKey(event)) {
+    if (keys == null || keys.length == 0 || containsKey(event)) {
       listener.accept(event);
     }
   }

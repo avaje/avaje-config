@@ -1,6 +1,7 @@
 package io.avaje.config;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;

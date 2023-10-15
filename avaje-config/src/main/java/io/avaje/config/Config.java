@@ -1,5 +1,8 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
@@ -10,9 +13,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
-
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
 
 /**
  * Provides application Configuration based on loading properties and yaml files
@@ -154,7 +154,7 @@ public class Config {
    * This is an alternative to {@link #getOptional(String)} for cases where
    * we prefer to work with null values rather than Optional.
    *
-   * @param key The configuration key
+   * @param key          The configuration key
    * @param defaultValue The default value that can be null
    * @return The configured value or null if not set
    */
