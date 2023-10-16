@@ -11,17 +11,17 @@ final class FileWatch {
 
   private final ConfigurationLog log;
   private final Configuration configuration;
-  private final Map<String, ConfigParser> parserMap;
+  private final Parsers parsers;
   private final List<Entry> files;
   private final long delay;
   private final long period;
 
-  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, Map<String, ConfigParser> parserMap) {
+  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, Parsers parsers) {
     this.log = configuration.log();
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);
     this.period = configuration.getInt("config.watch.period", 10);
-    this.parserMap = parserMap;
+    this.parsers = parsers;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {
       log.log(Level.ERROR, "No files to watch?");
@@ -84,7 +84,7 @@ final class FileWatch {
   }
 
   private void reloadYaml(Entry file, Map<String, String> keyValues) {
-    var parser = parserMap.get(file.extension);
+    var parser = parsers.get(file.extension);
     if (parser == null) {
       log.log(Level.ERROR, "Unexpected - no parser to reload config file " + file);
     } else {

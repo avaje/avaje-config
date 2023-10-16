@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,8 +24,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -40,8 +38,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.getOptional("one")).isEmpty();
@@ -69,8 +66,7 @@ class FileWatchTest {
         fail("File " + file.getAbsolutePath() + " does not exist?");
       }
     }
-    YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
     System.out.println(watch);
 
     // assert not loaded
@@ -97,8 +93,7 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
-    YamlLoader yamlLoader = new YamlLoaderSnake();
-    final FileWatch watch = new FileWatch(config, files, Map.of("yml", yamlLoader, "yaml", yamlLoader));
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     if (isGithubActions()) {
       File aFile = files.get(0);

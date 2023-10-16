@@ -39,13 +39,12 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Map<String, ConfigParser> parserMap = new HashMap<>();
+  private final Parsers parsers;
 
   InitialLoader(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
     this.loadContext = new InitialLoadContext(log, resourceLoader);
-
-    initCustomLoaders();
+    this.parsers = new Parsers();
   }
 
   Set<String> loadedFrom() {
@@ -92,29 +91,7 @@ final class InitialLoader {
 
   void initWatcher(CoreConfiguration configuration) {
     if (configuration.getBool("config.watch.enabled", false)) {
-      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), parserMap));
-    }
-  }
-
-  private void initCustomLoaders() {
-    if (!"true".equals(System.getProperty("skipYaml"))) {
-      YamlLoader yamlLoader;
-      try {
-        Class.forName("org.yaml.snakeyaml.Yaml");
-        yamlLoader = new YamlLoaderSnake();
-      } catch (ClassNotFoundException e) {
-        yamlLoader = new YamlLoaderSimple();
-      }
-      parserMap.put("yml", yamlLoader);
-      parserMap.put("yaml", yamlLoader);
-    }
-
-    if (!"true".equals(System.getProperty("skipCustomParsing"))) {
-      ServiceLoader.load(ConfigParser.class).forEach(p -> {
-        for (var ext : p.supportedExtensions()) {
-          parserMap.put(ext, p);
-        }
-      });
+      configuration.setWatcher(new FileWatch(configuration, loadContext.loadedFiles(), parsers));
     }
   }
 
@@ -174,7 +151,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parserMap.containsKey(extension);
+    return "properties".equals(extension) || parsers.supportsExtension(extension);
   }
 
   /**
@@ -278,11 +255,11 @@ final class InitialLoader {
     if ("properties".equals(extension)) {
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
-      var parser = parserMap.get(extension);
+      var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
           "Expecting only properties or "
-            + parserMap.keySet()
+            + parsers.supportedExtensions()
             + " file extensions but got ["
             + fileName
             + "]");
@@ -308,7 +285,7 @@ final class InitialLoader {
   }
 
   private boolean loadCustom(String resourcePath, Source source) {
-    for (var entry : parserMap.entrySet()) {
+    for (var entry : parsers.entrySet()) {
       var extension = entry.getKey();
       if (loadCustomExtension(resourcePath + "." + extension, entry.getValue(), source)) {
         return true;
