@@ -1,9 +1,9 @@
-name: avaje-config native image
+name: native image build
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '40 0 1 1 6'
+    - cron: '40 1 1 1 6'
 
 jobs:
   build:
