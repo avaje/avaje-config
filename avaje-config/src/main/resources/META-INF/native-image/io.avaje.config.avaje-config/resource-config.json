@@ -1,22 +1,13 @@
 {
  "resources": [
   {
-   "pattern": "application.properties"
+   "pattern": "application.*properties"
   },
   {
-   "pattern": "application.yaml"
+   "pattern": "application.*yaml"
   },
   {
-   "pattern": "application.yml"
-  },
-  {
-   "pattern": "application-*.properties"
-  },
-  {
-   "pattern": "application-*.yaml"
-  },
-  {
-   "pattern": "application-*.yml"
+   "pattern": "application.*yml"
   }
  ]
 }
