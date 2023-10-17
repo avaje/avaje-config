@@ -8,6 +8,15 @@
   },
   {
    "pattern": "application.yml"
+  },
+  {
+   "pattern": "application-*.properties"
+  },
+  {
+   "pattern": "application-*.yaml"
+  },
+  {
+   "pattern": "application-*.yml"
   }
  ]
 }
