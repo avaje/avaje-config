@@ -15,20 +15,7 @@
 
   <modules>
     <module>avaje-config</module>
-<!--    <module>tests</module>-->
   </modules>
-
-<!--  <profiles>-->
-<!--    <profile>-->
-<!--      <id>central</id>-->
-<!--    </profile>-->
-<!--    <profile>-->
-<!--      <id>native</id>-->
-<!--      <modules>-->
-<!--        <module>tests</module>-->
-<!--      </modules>-->
-<!--    </profile>-->
-<!--  </profiles>-->
 
 </project>
 
