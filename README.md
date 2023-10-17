@@ -1,6 +1,7 @@
 [![Build](https://github.com/avaje/avaje-config/actions/workflows/build.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/build.yml)
 [![Maven Central : avaje-config](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.avaje/avaje-config)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/avaje/avaje-config/blob/master/LICENSE)
+[![native image build](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml)
 
 # [Avaje Config](https://avaje.io/config/)
 
