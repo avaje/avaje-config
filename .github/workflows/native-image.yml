@@ -36,4 +36,4 @@ jobs:
         mvn clean install -DskipTests
         cd tests/test-native-image
         mvn clean package -Pnative
-        ./target/test-native -Davaje.profiles=admin
+        ./target/test-native-image -Davaje.profiles=admin
