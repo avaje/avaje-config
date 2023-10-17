@@ -1,0 +1,39 @@
+name: avaje-config native image
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '40 0 1 1 6'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '21'
+        distribution: 'graalvm'
+        cache: 'maven'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Versions
+      run: |
+        echo "GRAALVM_HOME: $GRAALVM_HOME"
+        echo "JAVA_HOME: $JAVA_HOME"
+        java --version
+        native-image --version
+    - name: Build with Maven
+      run: |
+        mvn clean install -DskipTests
+        cd tests/test-native-image
+        mvn clean package -Pnative
+        ./target/test-native

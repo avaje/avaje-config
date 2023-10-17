@@ -8,27 +8,11 @@
     <relativePath/>
   </parent>
 
-  <groupId>io.avaje</groupId>
-  <artifactId>tests-config-reactor</artifactId>
-  <version>1</version>
+  <artifactId>tests</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>avaje-config</module>
-<!--    <module>tests</module>-->
+    <module>test-native-image</module>
   </modules>
 
-<!--  <profiles>-->
-<!--    <profile>-->
-<!--      <id>central</id>-->
-<!--    </profile>-->
-<!--    <profile>-->
-<!--      <id>native</id>-->
-<!--      <modules>-->
-<!--        <module>tests</module>-->
-<!--      </modules>-->
-<!--    </profile>-->
-<!--  </profiles>-->
-
 </project>
-

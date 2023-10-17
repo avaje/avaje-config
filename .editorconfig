@@ -12,5 +12,5 @@ trim_trailing_whitespace = true
 spaces_around_operators = true
 
 [*.json]
-indent_size = 0
-indent_style = tab
+indent_size = 1
+indent_style = space
