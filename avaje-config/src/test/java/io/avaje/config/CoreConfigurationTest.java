@@ -67,7 +67,9 @@ class CoreConfigurationTest {
     assertThat(foo.size()).isEqualTo(3);
     assertThat(foo.getInt("bar")).isEqualTo(42);
     assertThat(foo.getBool("t")).isTrue();
+    assertThat(foo.enabled("t")).isTrue();
     assertThat(foo.get("f")).isEqualTo("false");
+    assertThat(foo.enabled("f")).isEqualTo(false);
     assertThat(foo.getOptional("a")).isEmpty();
   }
 
@@ -172,9 +174,13 @@ class CoreConfigurationTest {
   void getBool() {
     assertTrue(data.getBool("foo.t", true));
     assertTrue(data.getBool("foo.t", false));
+    assertTrue(data.enabled("foo.t", true));
+    assertTrue(data.enabled("foo.t", false));
 
     assertFalse(data.getBool("foo.f", true));
     assertFalse(data.getBool("foo.f", false));
+    assertFalse(data.enabled("foo.f", true));
+    assertFalse(data.enabled("foo.f", false));
   }
 
   @Test

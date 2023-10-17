@@ -24,7 +24,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -38,7 +38,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.getOptional("one")).isEmpty();
@@ -53,6 +53,7 @@ class FileWatchTest {
     assertThat(config.get("one")).isEqualTo("a");
     assertThat(config.getInt("my.size", 42)).isEqualTo(17);
     assertThat(config.getBool("c.active", false)).isTrue();
+    assertThat(config.enabled("c.active", false)).isTrue();
   }
 
   @Test
@@ -65,7 +66,7 @@ class FileWatchTest {
         fail("File " + file.getAbsolutePath() + " does not exist?");
       }
     }
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
     System.out.println(watch);
 
     // assert not loaded
@@ -92,7 +93,7 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
-    final FileWatch watch = new FileWatch(config, files, new YamlLoaderSnake());
+    final FileWatch watch = new FileWatch(config, files, new Parsers());
 
     if (isGithubActions()) {
       File aFile = files.get(0);

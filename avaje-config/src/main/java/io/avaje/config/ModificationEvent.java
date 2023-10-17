@@ -48,7 +48,7 @@ public interface ModificationEvent {
     /**
      * Set a property value.
      *
-     * @param key The property key
+     * @param key   The property key
      * @param value The new value of the property
      */
     Builder put(String key, String value);

@@ -1,16 +1,7 @@
 package io.avaje.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.StringJoiner;
+import java.io.*;
+import java.util.*;
 
 /**
  * Simple YAML parser for loading yaml based config.

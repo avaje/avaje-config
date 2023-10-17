@@ -1,20 +1,16 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
-
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
@@ -120,6 +116,48 @@ public interface Configuration {
    */
   @Nullable
   String getNullable(String key, @Nullable String defaultValue);
+
+  /**
+   * Return boolean configuration value with the given default value.
+   * <p>
+   * This is the same as {@link #getBool( String)}.
+   * <p>
+   * IllegalStateException is thrown if the value is not defined in configuration.
+   *
+   * <pre>{@code
+   *
+   *   if (configuration.enabled("feature.cleanup")) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  default boolean enabled(String key) {
+    return getBool(key);
+  }
+
+  /**
+   * Return boolean configuration value with the given default value.
+   * <p>
+   * This is the same as {@link #getBool( String, boolean)}.
+   *
+   * <pre>{@code
+   *
+   *   if (configuration.enabled("feature.cleanup", true)) {
+   *     ...
+   *   }
+   *
+   * }</pre>
+   *
+   * @param key The configuration key
+   * @return The configured value
+   */
+  default boolean enabled(String key, boolean enabledDefault) {
+    return getBool(key, enabledDefault);
+  }
 
   /**
    * Return a required boolean configuration value.
@@ -256,7 +294,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
@@ -265,7 +303,7 @@ public interface Configuration {
   /**
    * Apply a mapping function to the value returned.
    *
-   * @param key The configuration key
+   * @param key             The configuration key
    * @param mappingFunction the mapping function to execute
    * @return The mapped value
    */
@@ -401,7 +439,7 @@ public interface Configuration {
    *
    * }</pre>
    *
-   * @param key  The configuration key we want to detect changes to
+   * @param key                          The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChange(String key, Consumer<String> singlePropertyChangeListener);
@@ -412,7 +450,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key  The configuration key we want to detect changes to
+   * @param key                          The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeInt(String key, IntConsumer singlePropertyChangeListener);
@@ -423,7 +461,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key  The configuration key we want to detect changes to
+   * @param key                          The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeLong(String key, LongConsumer singlePropertyChangeListener);
@@ -434,7 +472,7 @@ public interface Configuration {
    * Use this when we are only interested in changes to a single configuration property.
    * If we are interested in multiple properties we should use {@link #onChange(Consumer, String...)}
    *
-   * @param key  The configuration key we want to detect changes to
+   * @param key                          The configuration key we want to detect changes to
    * @param singlePropertyChangeListener The callback handling to fire when the configuration changes.
    */
   void onChangeBool(String key, Consumer<Boolean> singlePropertyChangeListener);
@@ -549,7 +587,7 @@ public interface Configuration {
      * Apply a mapping function to the values for the given key, returning an empty
      * collection if the configuration is not defined.
      *
-     * @param key The configuration key
+     * @param key             The configuration key
      * @param mappingFunction the mapping function to execute on each value
      * @return The configured and mapped values
      */
@@ -626,7 +664,7 @@ public interface Configuration {
      * Apply a mapping function to the values for the given key, returning an empty collection if
      * the configuration is not defined.
      *
-     * @param key The configuration key
+     * @param key             The configuration key
      * @param mappingFunction the mapping function to execute on each value
      * @return The configured and mapped values
      */
