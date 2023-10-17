@@ -1,0 +1,13 @@
+{
+	"resources": [
+		{
+			"pattern": "application.properties"
+		},
+		{
+			"pattern": "application.yaml"
+		},
+		{
+			"pattern": "application.yml"
+		}
+	]
+}
