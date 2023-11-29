@@ -126,7 +126,7 @@ class ConfigTest {
     assertThat(System.getProperty("myapp.bar.barDouble")).isEqualTo("33.3");
 
     assertThat(properties).containsKeys("config.load.systemProperties", "config.watch.enabled", "myExternalLoader", "myapp.activateFoo", "myapp.bar.barDouble", "myapp.bar.barRules", "myapp.fooHome", "myapp.fooName", "system.excluded.properties");
-    assertThat(properties).hasSize(11);
+    assertThat(properties).hasSize(12);
   }
 
   @Test
