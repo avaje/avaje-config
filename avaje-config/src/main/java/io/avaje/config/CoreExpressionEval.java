@@ -18,6 +18,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
    * Used to detect the end of an expression.
    */
   private static final String END = "}";
+  private static final String DOCKER_HOST = "docker.host";
 
   private CoreEntry.CoreMap sourceMap;
   private Properties sourceProperties;
@@ -148,6 +149,10 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
       } else {
         if (defaultValue != null) {
           buf.append(defaultValue);
+        } else if (DOCKER_HOST.equals(expression)) {
+          final String dockerHost = DockerHost.host();
+          buf.append(dockerHost);
+          System.setProperty("docker.host", dockerHost);
         } else {
           buf.append(START).append(expression).append(END);
         }
