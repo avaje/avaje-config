@@ -1,4 +1,5 @@
 myapp:
+  testHost: ${docker.host}
   activateFoo: true
   fooName: Hello
   fooHome: ${HOME}/config
