@@ -15,6 +15,7 @@
 
   <modules>
     <module>avaje-config</module>
+    <module>avaje-aws-appconfig</module>
   </modules>
 
 </project>
