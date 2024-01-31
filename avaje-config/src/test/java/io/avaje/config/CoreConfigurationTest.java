@@ -359,6 +359,44 @@ class CoreConfigurationTest {
   }
 
   @Test
+  void onChangeMap() {
+    AtomicInteger count = new AtomicInteger();
+    StringBuilder sb = new StringBuilder();
+    data.onChange("modify", newValue -> {
+      count.incrementAndGet();
+      sb.append(newValue).append(",");
+    });
+
+    var map = Map.of("modify", "change1", "a", "2");
+    data.eventBuilder("myTest")
+      .putAll(map)
+      .publish();
+
+    assertThat(count.get()).isEqualTo(1);
+    assertThat(sb.toString()).isEqualTo("change1,");
+  }
+
+  @Test
+  void onChangeProperties() {
+    AtomicInteger count = new AtomicInteger();
+    StringBuilder sb = new StringBuilder();
+    data.onChange("modify", newValue -> {
+      count.incrementAndGet();
+      sb.append(newValue).append(",");
+    });
+
+    var properties = new Properties();
+    properties.setProperty("modify", "change1");
+    properties.setProperty("a", "2");
+    data.eventBuilder("myTest")
+      .putAll(properties)
+      .publish();
+
+    assertThat(count.get()).isEqualTo(1);
+    assertThat(sb.toString()).isEqualTo("change1,");
+  }
+
+  @Test
   void onChange() {
     AtomicInteger count = new AtomicInteger();
     StringBuilder sb = new StringBuilder();

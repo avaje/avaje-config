@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.BiConsumer;
 
 import static java.util.Objects.requireNonNull;
@@ -18,6 +19,15 @@ final class CoreEventBuilder implements ModificationEvent.Builder {
     this.name = name;
     this.origin = origin;
     this.snapshot = snapshot; // at the moment we don't mutate the snapshot so could just use the original map
+  }
+
+  @Override
+  public ModificationEvent.Builder putAll(Properties properties) {
+    properties.forEach((key, value) -> {
+      requireNonNull(value);
+      put(key.toString(), value.toString());
+    });
+    return this;
   }
 
   @Override
