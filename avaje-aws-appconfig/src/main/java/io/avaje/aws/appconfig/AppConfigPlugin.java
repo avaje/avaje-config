@@ -19,6 +19,7 @@ public final class AppConfigPlugin implements ConfigurationSource {
   public void load(Configuration configuration) {
     if (!configuration.getBool("aws.appconfig.enabled", true)) {
       log.log(INFO, "AppConfigPlugin is not enabled");
+      return;
     }
 
     var loader = new Loader(configuration);
