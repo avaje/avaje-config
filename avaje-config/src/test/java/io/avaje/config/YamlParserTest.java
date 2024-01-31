@@ -13,6 +13,18 @@ class YamlParserTest {
   private final YamlLoaderSnake load = new YamlLoaderSnake();
 
   @Test
+  void simpleYamlParserMultiLoad() {
+    YamlLoaderSimple parser = new YamlLoaderSimple();
+    Map<String, String> load1 = parser.load(res("/yaml/basic.yaml"));
+    assertThat(load1).hasSize(5);
+    basic(load1);
+
+    Map<String, String> load2 = parser.load(res("/yaml/key-comment.yaml"));
+    assertThat(load2).hasSize(4);
+    assertThat(load2).containsOnlyKeys("k1","k2","k3", "k4");
+  }
+
+  @Test
   void basic() {
     basic(parseYaml2("/yaml/basic.yaml"));
     basic(parseYaml("/yaml/basic.yaml"));
