@@ -41,10 +41,10 @@ final class InitialLoader {
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Parsers parsers;
 
-  InitialLoader(ConfigurationLog log, ResourceLoader resourceLoader) {
+  InitialLoader(Parsers parsers, ConfigurationLog log, ResourceLoader resourceLoader) {
+    this.parsers = parsers;
     this.log = log;
     this.loadContext = new InitialLoadContext(log, resourceLoader);
-    this.parsers = new Parsers();
   }
 
   Set<String> loadedFrom() {

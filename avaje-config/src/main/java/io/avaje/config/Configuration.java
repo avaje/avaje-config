@@ -507,6 +507,24 @@ public interface Configuration {
   void evalModify(Properties properties);
 
   /**
+   * Return the parser for the given extension.
+   *
+   * <pre>{@code
+   *
+   *   // obtain a yaml parser
+   *   ConfigParser yamlParser = configuration.parser("yaml").orElseThrow();
+   *
+   *   // parse some yaml content
+   *   Map<String,String> keyValues = yamlParser.load(inputStream)
+   *
+   *   // put the keyValues into the configuration
+   *   configuration.putAll(keyValues);
+   *
+   * }</pre>
+   */
+  Optional<ConfigParser> parser(String extension);
+
+  /**
    * Expression evaluation.
    */
   interface ExpressionEval {

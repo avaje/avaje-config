@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
 @NonNullApi
 final class CoreConfiguration implements Configuration {
 
+  private final Parsers parsers;
   private final ConfigurationLog log;
   private final ModifyAwareProperties properties;
   private final ReentrantLock lock = new ReentrantLock();
@@ -40,13 +41,20 @@ final class CoreConfiguration implements Configuration {
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries) {
-    this(eventRunner, log, entries, "");
-  }
-
-  CoreConfiguration(ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries, String prefix) {
+  CoreConfiguration(Parsers parsers, ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries) {
+    this.parsers = parsers;
     this.eventRunner = eventRunner;
     this.log = log;
+    this.properties = new ModifyAwareProperties(entries);
+    this.listValue = new CoreListValue(this);
+    this.setValue = new CoreSetValue(this);
+    this.pathPrefix = "";
+  }
+
+  CoreConfiguration(CoreConfiguration parent, CoreEntry.CoreMap entries, String prefix) {
+    this.parsers = parent.parsers;
+    this.eventRunner = parent.eventRunner;
+    this.log = parent.log;
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -57,7 +65,7 @@ final class CoreConfiguration implements Configuration {
    * For testing purposes.
    */
   CoreConfiguration(CoreEntry.CoreMap entries) {
-    this(new ForegroundEventRunner(), new DefaultConfigurationLog(), entries, "");
+    this(new Parsers(), new ForegroundEventRunner(), new DefaultConfigurationLog(), entries);
   }
 
   /**
@@ -124,6 +132,11 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
+  @Override
+  public Optional<ConfigParser> parser(String extension) {
+    return Optional.ofNullable(parsers.get(extension));
+  }
+
   String eval(String value) {
     return properties.eval(value);
   }
@@ -177,7 +190,7 @@ final class CoreConfiguration implements Configuration {
         newEntryMap.put("", entry);
       }
     });
-    return new CoreConfiguration(eventRunner, log, newEntryMap, dotPrefix);
+    return new CoreConfiguration(this, newEntryMap, dotPrefix);
   }
 
   @Override
