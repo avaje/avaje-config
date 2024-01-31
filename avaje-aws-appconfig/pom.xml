@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>0.1</version>
+  <version>0.2-SNAPSHOT</version>
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.11</version>
+      <version>3.12-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
