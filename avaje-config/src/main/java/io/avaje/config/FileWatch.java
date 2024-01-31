@@ -20,7 +20,7 @@ final class FileWatch {
     this.log = configuration.log();
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);
-    this.period = configuration.getInt("config.watch.period", 10);
+    this.period = configuration.getLong("config.watch.period", 10);
     this.parsers = parsers;
     this.files = initFiles(loadedFiles);
     if (files.isEmpty()) {

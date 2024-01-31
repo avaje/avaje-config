@@ -75,11 +75,12 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   public Configuration build() {
     final var runner = initRunner();
     final var log = initLog();
+    final var parsers = new Parsers();
     if (includeResourceLoading) {
       log.preInitialisation();
-      initialLoader = new InitialLoader(log, initResourceLoader());
+      initialLoader = new InitialLoader(parsers, log, initResourceLoader());
     }
-    return new CoreConfiguration(runner, log, initEntries()).postLoad(initialLoader);
+    return new CoreConfiguration(parsers, runner, log, initEntries()).postLoad(initialLoader);
   }
 
   private CoreEntry.CoreMap initEntries() {

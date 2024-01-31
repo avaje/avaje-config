@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Map;
 
 /**
@@ -14,9 +15,17 @@ public interface ConfigParser {
   String[] supportedExtensions();
 
   /**
-   * Loads a file into a flat map of key value pairs.
+   * Parse content into key value pairs.
    *
-   * @param is stream of file contents
+   * @param reader configuration contents
+   * @return Key-Value pairs of all the configs
+   */
+  Map<String, String> load(Reader reader);
+
+  /**
+   * Parse content into key value pairs.
+   *
+   * @param is configuration contents
    * @return Key-Value pairs of all the configs
    */
   Map<String, String> load(InputStream is);

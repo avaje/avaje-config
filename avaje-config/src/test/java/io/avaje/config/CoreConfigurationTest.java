@@ -3,6 +3,7 @@ package io.avaje.config;
 import io.avaje.config.CoreEntry.CoreMap;
 import org.junit.jupiter.api.Test;
 
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +42,20 @@ class CoreConfigurationTest {
 
   private CoreConfiguration createConfig(CoreEntry.CoreMap entries) {
     return new CoreConfiguration(entries);
+  }
+
+  @Test
+  void parser() {
+    Configuration base = createSample();
+
+    ConfigParser yamlParser = base.parser("yaml").orElseThrow();
+
+    var ris = new StringReader("my.key: \n  other: 42\n  more.again: 52");
+    Map<String, String> keyValues = yamlParser.load(ris);
+    base.putAll(keyValues);
+
+    assertThat(base.get("my.key.other")).isEqualTo("42");
+    assertThat(base.getLong("my.key.more.again")).isEqualTo(52);
   }
 
   @Test

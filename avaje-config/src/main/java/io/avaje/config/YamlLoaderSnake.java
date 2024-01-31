@@ -3,6 +3,7 @@ package io.avaje.config;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,11 +21,20 @@ final class YamlLoaderSnake implements YamlLoader {
     this.yaml = new Yaml();
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
+  public Map<String, String> load(Reader reader) {
+    return load(yaml.loadAll(reader));
+  }
+
   @Override
   public Map<String, String> load(InputStream is) {
+    return load(yaml.loadAll(is));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, String> load(Iterable<Object> source) {
     Load load = new Load();
-    for (Object map : yaml.loadAll(is)) {
+    for (Object map : source) {
       load.loadMap((Map<String, Object>) map, null);
     }
     return load.map();

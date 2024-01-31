@@ -9,6 +9,11 @@ import java.util.*;
 final class YamlLoaderSimple implements YamlLoader {
 
   @Override
+  public Map<String, String> load(Reader reader) {
+    return new Load().load(reader);
+  }
+
+  @Override
   public Map<String, String> load(InputStream is) {
     return new Load().load(is);
   }
@@ -39,7 +44,11 @@ final class YamlLoaderSimple implements YamlLoader {
     private int multiLineIndent;
 
     private Map<String, String> load(InputStream is) {
-      try (LineNumberReader lineReader = new LineNumberReader(new InputStreamReader(is))) {
+      return load(new InputStreamReader(is));
+    }
+
+    private Map<String, String> load(Reader reader) {
+      try (LineNumberReader lineReader = new LineNumberReader(reader)) {
         String line;
         do {
           line = lineReader.readLine();
