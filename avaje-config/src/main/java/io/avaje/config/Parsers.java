@@ -13,6 +13,7 @@ final class Parsers {
   private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
   Parsers() {
+    parserMap.put("properties", new PropertiesParser());
     if (!"true".equals(System.getProperty("skipYaml"))) {
       initYamlParser();
     }

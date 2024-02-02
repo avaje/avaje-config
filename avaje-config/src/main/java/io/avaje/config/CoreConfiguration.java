@@ -18,6 +18,7 @@ import java.util.function.LongConsumer;
 
 import static io.avaje.config.Constants.SYSTEM_PROPS;
 import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
+import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -384,12 +385,12 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
-    listeners.add(new CoreListener(eventListener, keys));
+    listeners.add(new CoreListener(log, eventListener, keys));
   }
 
   private OnChangeListener onChange(String key) {
     requireNonNull(key, "key is required");
-    return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
+    return callbacks.computeIfAbsent(key, s -> new OnChangeListener(log));
   }
 
   @Override
@@ -433,7 +434,12 @@ final class CoreConfiguration implements Configuration {
 
   private static class OnChangeListener {
 
+    private final ConfigurationLog log;
     private final List<Consumer<String>> callbacks = new ArrayList<>();
+
+    OnChangeListener(ConfigurationLog log) {
+      this.log = log;
+    }
 
     void register(Consumer<String> callback) {
       callbacks.add(callback);
@@ -441,7 +447,11 @@ final class CoreConfiguration implements Configuration {
 
     void fireOnChange(String value) {
       for (Consumer<String> callback : callbacks) {
-        callback.accept(value);
+        try {
+          callback.accept(value);
+        } catch (Exception e) {
+          log.log(ERROR, "Error during onChange notification", e);
+        }
       }
     }
   }
