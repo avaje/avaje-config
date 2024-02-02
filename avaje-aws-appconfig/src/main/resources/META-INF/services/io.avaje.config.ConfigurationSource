@@ -1,1 +1,1 @@
-io.avaje.aws.appconfig.AppConfigPlugin
+io.avaje.config.awsappconfig.AwsAppConfigPlugin

@@ -1,6 +1,6 @@
-package io.avaje.aws.appconfig;
+package io.avaje.config.awsappconfig;
 
-public interface AppConfigFetcher {
+interface AppConfigFetcher {
 
   static AppConfigFetcher.Builder builder() {
     return new DAppConfigFetcher.Builder();
