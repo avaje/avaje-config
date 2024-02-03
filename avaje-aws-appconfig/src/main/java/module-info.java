@@ -1,10 +1,10 @@
-import io.avaje.aws.appconfig.AppConfigPlugin;
+import io.avaje.config.awsappconfig.AwsAppConfigPlugin;
 
-module io.avaje.aws.appconfig {
+module io.avaje.config.awsappconfig {
 
-  exports io.avaje.aws.appconfig;
+  exports io.avaje.config.awsappconfig;
 
   requires io.avaje.config;
   requires java.net.http;
-  provides io.avaje.config.ConfigurationSource with AppConfigPlugin;
+  provides io.avaje.config.ConfigurationSource with AwsAppConfigPlugin;
 }

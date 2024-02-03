@@ -18,6 +18,7 @@ import java.util.function.LongConsumer;
 
 import static io.avaje.config.Constants.SYSTEM_PROPS;
 import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
+import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -35,16 +36,18 @@ final class CoreConfiguration implements Configuration {
   private final CoreListValue listValue;
   private final CoreSetValue setValue;
   private final ModificationEventRunner eventRunner;
+  private final List<ConfigurationSource> sources;
 
   private boolean loadedSystemProperties;
   private FileWatch watcher;
   private Timer timer;
   private final String pathPrefix;
 
-  CoreConfiguration(Parsers parsers, ModificationEventRunner eventRunner, ConfigurationLog log, CoreEntry.CoreMap entries) {
-    this.parsers = parsers;
-    this.eventRunner = eventRunner;
-    this.log = log;
+  CoreConfiguration(CoreComponents components, CoreEntry.CoreMap entries) {
+    this.parsers = components.parsers();
+    this.eventRunner = components.runner();
+    this.log = components.log();
+    this.sources = components.sources();
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -55,6 +58,7 @@ final class CoreConfiguration implements Configuration {
     this.parsers = parent.parsers;
     this.eventRunner = parent.eventRunner;
     this.log = parent.log;
+    this.sources = parent.sources;
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -65,7 +69,7 @@ final class CoreConfiguration implements Configuration {
    * For testing purposes.
    */
   CoreConfiguration(CoreEntry.CoreMap entries) {
-    this(new Parsers(), new ForegroundEventRunner(), new DefaultConfigurationLog(), entries);
+    this(new CoreComponents(), entries);
   }
 
   /**
@@ -107,7 +111,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   private void loadSources(Set<String> names) {
-    for (final ConfigurationSource source : ServiceLoader.load(ConfigurationSource.class)) {
+    for (ConfigurationSource source : sources) {
       source.load(this);
       names.add("ConfigurationSource:" + source.getClass().getCanonicalName());
     }
@@ -171,6 +175,13 @@ final class CoreConfiguration implements Configuration {
   public void loadIntoSystemProperties() {
     properties.loadIntoSystemProperties(set().of("system.excluded.properties"));
     loadedSystemProperties = true;
+  }
+
+  @Override
+  public void reloadSources() {
+    for (ConfigurationSource source : sources) {
+      source.reload();
+    }
   }
 
   @Override
@@ -384,12 +395,12 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public void onChange(Consumer<ModificationEvent> eventListener, String... keys) {
-    listeners.add(new CoreListener(eventListener, keys));
+    listeners.add(new CoreListener(log, eventListener, keys));
   }
 
   private OnChangeListener onChange(String key) {
     requireNonNull(key, "key is required");
-    return callbacks.computeIfAbsent(key, s -> new OnChangeListener());
+    return callbacks.computeIfAbsent(key, s -> new OnChangeListener(log));
   }
 
   @Override
@@ -433,7 +444,12 @@ final class CoreConfiguration implements Configuration {
 
   private static class OnChangeListener {
 
+    private final ConfigurationLog log;
     private final List<Consumer<String>> callbacks = new ArrayList<>();
+
+    OnChangeListener(ConfigurationLog log) {
+      this.log = log;
+    }
 
     void register(Consumer<String> callback) {
       callbacks.add(callback);
@@ -441,7 +457,11 @@ final class CoreConfiguration implements Configuration {
 
     void fireOnChange(String value) {
       for (Consumer<String> callback : callbacks) {
-        callback.accept(value);
+        try {
+          callback.accept(value);
+        } catch (Exception e) {
+          log.log(ERROR, "Error during onChange notification", e);
+        }
       }
     }
   }

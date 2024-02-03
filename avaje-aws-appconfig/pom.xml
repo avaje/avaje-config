@@ -10,7 +10,8 @@
     <relativePath/>
   </parent>
 
-  <artifactId>avaje-aws-appconfig</artifactId>
+  <groupId>io.avaje</groupId>
+  <artifactId>avaje-config-aws-appconfig</artifactId>
   <version>0.3-SNAPSHOT</version>
 
   <properties>

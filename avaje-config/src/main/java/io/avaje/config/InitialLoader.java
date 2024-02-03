@@ -41,9 +41,9 @@ final class InitialLoader {
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Parsers parsers;
 
-  InitialLoader(Parsers parsers, ConfigurationLog log, ResourceLoader resourceLoader) {
-    this.parsers = parsers;
-    this.log = log;
+  InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
+    this.parsers = components.parsers();
+    this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
   }
 

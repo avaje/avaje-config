@@ -1,9 +1,7 @@
 package io.avaje.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -76,11 +74,16 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     final var runner = initRunner();
     final var log = initLog();
     final var parsers = new Parsers();
+    final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
+      .map(ServiceLoader.Provider::get)
+      .collect(Collectors.toList());
+
+    var components = new CoreComponents(runner, log, parsers, sources);
     if (includeResourceLoading) {
       log.preInitialisation();
-      initialLoader = new InitialLoader(parsers, log, initResourceLoader());
+      initialLoader = new InitialLoader(components, initResourceLoader());
     }
-    return new CoreConfiguration(parsers, runner, log, initEntries()).postLoad(initialLoader);
+    return new CoreConfiguration(components, initEntries()).postLoad(initialLoader);
   }
 
   private CoreEntry.CoreMap initEntries() {

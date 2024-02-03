@@ -1,11 +1,12 @@
-package io.avaje.aws.appconfig;
+package io.avaje.config.awsappconfig;
 
 final class DResult implements AppConfigFetcher.Result {
 
   private final String version;
   private final String contentType;
   private final String body;
-  public DResult(String version, String contentType, String body) {
+
+  DResult(String version, String contentType, String body) {
     this.version = version;
     this.contentType = contentType;
     this.body = body;

@@ -483,6 +483,15 @@ public interface Configuration {
   void loadIntoSystemProperties();
 
   /**
+   * Trigger a {@link ConfigurationSource#reload()} on all the sources.
+   * <p>
+   * Generally configuration sources will schedule a periodic refresh of their
+   * configuration but there are cases like Lambda where it can be useful to
+   * trigger a refresh explicitly (e.g. on Lambda invocation).
+   */
+  void reloadSources();
+
+  /**
    * Return the number of configuration properties.
    */
   int size();

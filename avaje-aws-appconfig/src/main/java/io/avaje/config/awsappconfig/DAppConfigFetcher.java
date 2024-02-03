@@ -1,4 +1,4 @@
-package io.avaje.aws.appconfig;
+package io.avaje.config.awsappconfig;
 
 import java.io.IOException;
 import java.net.URI;

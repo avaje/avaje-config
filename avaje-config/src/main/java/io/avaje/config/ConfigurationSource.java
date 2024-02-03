@@ -23,4 +23,15 @@ public interface ConfigurationSource {
    * @param configuration The configuration with initially properties.
    */
   void load(Configuration configuration);
+
+  /**
+   * Explicitly reload the configuration source.
+   * <p>
+   * Generally the configuration source will schedule a periodic refresh of its
+   * configuration but there are cases like Lambda where it can be useful to
+   * trigger a refresh explicitly and manually (e.g. on Lambda invocation).
+   */
+  default void reload() {
+    // do nothing by default
+  }
 }
