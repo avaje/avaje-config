@@ -180,7 +180,7 @@ class CoreConfigurationTest {
     assertThat(conf.get("myHome")).isEqualTo("my/" + userHome + "/home");
 
     MyExternalLoader.reset();
-    conf.refresh();
+    conf.reloadSources();
     assertThat(MyExternalLoader.refreshCalled()).isTrue();
   }
 

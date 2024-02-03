@@ -178,9 +178,9 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public void refresh() {
+  public void reloadSources() {
     for (ConfigurationSource source : sources) {
-      source.refresh();
+      source.reload();
     }
   }
 

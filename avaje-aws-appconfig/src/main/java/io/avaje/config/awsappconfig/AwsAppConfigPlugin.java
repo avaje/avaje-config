@@ -34,7 +34,7 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
   }
 
   @Override
-  public void refresh() {
+  public void reload() {
     if (loader != null) {
       loader.reload();
     }

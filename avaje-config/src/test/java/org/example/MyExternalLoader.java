@@ -22,7 +22,7 @@ public class MyExternalLoader implements ConfigurationSource {
   }
 
   @Override
-  public void refresh() {
+  public void reload() {
     refreshCalled = true;
   }
 
