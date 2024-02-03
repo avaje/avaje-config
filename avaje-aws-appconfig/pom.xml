@@ -12,7 +12,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config-aws-appconfig</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.12-SNAPSHOT</version>
+      <version>3.12-RC1</version>
       <scope>provided</scope>
     </dependency>
 
