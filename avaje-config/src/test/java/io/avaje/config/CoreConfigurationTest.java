@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import io.avaje.config.CoreEntry.CoreMap;
+import org.example.MyExternalLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
@@ -177,6 +178,10 @@ class CoreConfigurationTest {
 
     String userHome = System.getProperty("user.home");
     assertThat(conf.get("myHome")).isEqualTo("my/" + userHome + "/home");
+
+    MyExternalLoader.reset();
+    conf.refresh();
+    assertThat(MyExternalLoader.refreshCalled()).isTrue();
   }
 
   @Test

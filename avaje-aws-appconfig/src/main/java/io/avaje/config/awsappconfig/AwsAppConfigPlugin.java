@@ -5,7 +5,10 @@ import io.avaje.config.Configuration;
 import io.avaje.config.ConfigurationSource;
 
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -18,15 +21,23 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
 
   private static final System.Logger log = System.getLogger("io.avaje.config.AwsAppConfig");
 
+  private Loader loader;
+
   @Override
   public void load(Configuration configuration) {
     if (!configuration.enabled("aws.appconfig.enabled", true)) {
       log.log(INFO, "AwsAppConfig plugin is disabled");
       return;
     }
-    var loader = new Loader(configuration);
-    loader.schedule();
+    loader = new Loader(configuration);
     loader.reload();
+  }
+
+  @Override
+  public void refresh() {
+    if (loader != null) {
+      loader.reload();
+    }
   }
 
   static final class Loader {
@@ -35,13 +46,15 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
     private final AppConfigFetcher fetcher;
     private final ConfigParser yamlParser;
     private final ConfigParser propertiesParser;
-    private final long frequency;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final AtomicReference<Instant> validUntil;
+    private final long nextRefreshSeconds;
 
     private String currentVersion = "none";
 
     Loader(Configuration configuration) {
+      this.validUntil = new AtomicReference<>(Instant.now().minusSeconds(1));
       this.configuration = configuration;
-      this.frequency = configuration.getLong("aws.appconfig.frequency", 60L);
       this.propertiesParser = configuration.parser("properties").orElseThrow();
       this.yamlParser = configuration.parser("yaml").orElse(null);
       if (yamlParser == null) {
@@ -57,14 +70,31 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
         .environment(env)
         .configuration(con)
         .build();
-    }
 
-    void schedule() {
-      configuration.schedule(frequency * 1000L, frequency * 1000L, this::reload);
+      boolean pollEnabled = configuration.enabled("aws.appconfig.poll.enabled", true);
+      long pollSeconds = configuration.getLong("aws.appconfig.poll.seconds", 45L);
+      this.nextRefreshSeconds = configuration.getLong("aws.appconfig.refresh.seconds", pollSeconds - 1);
+      if (pollEnabled) {
+        configuration.schedule(pollSeconds * 1000L, pollSeconds * 1000L, this::reload);
+      }
     }
 
     void reload() {
+      if (reloadRequired()) {
+        performReload();
+      }
+    }
+
+    private boolean reloadRequired() {
+      return validUntil.get().isAfter(Instant.now());
+    }
+
+    private void performReload() {
+      lock.lock();
       try {
+        if (!reloadRequired()) {
+          return;
+        }
         AppConfigFetcher.Result result = fetcher.fetch();
         if (currentVersion.equals(result.version())) {
           log.log(TRACE, "AwsAppConfig unchanged, version {0}", currentVersion);
@@ -75,14 +105,18 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
           }
           Map<String, String> keyValues = parse(result);
           configuration.eventBuilder("AwsAppConfig")
-              .putAll(keyValues)
-              .publish();
+            .putAll(keyValues)
+            .publish();
           currentVersion = result.version();
           debugLog(result, keyValues.size());
         }
+        // move the next valid until time
+        validUntil.set(Instant.now().plusSeconds(nextRefreshSeconds));
 
       } catch (Exception e) {
         log.log(ERROR, "Error fetching or processing AwsAppConfig", e);
+      } finally {
+        lock.unlock();
       }
     }
 

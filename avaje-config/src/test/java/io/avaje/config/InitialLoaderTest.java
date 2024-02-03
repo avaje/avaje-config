@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InitialLoaderTest {
 
   private static InitialLoader newInitialLoader() {
-    return new InitialLoader(new Parsers(), new DefaultConfigurationLog(), new DefaultResourceLoader());
+    return new InitialLoader(new CoreComponents(), new DefaultResourceLoader());
   }
 
   @Test

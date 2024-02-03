@@ -483,6 +483,15 @@ public interface Configuration {
   void loadIntoSystemProperties();
 
   /**
+   * Trigger a refresh on all {@link ConfigurationSource}.
+   * <p>
+   * Generally configuration sources will schedule a periodic refresh of their
+   * configuration but there are cases like Lambda where it can be useful to
+   * trigger a refresh explicitly (e.g. on Lambda invocation).
+   */
+  void refresh();
+
+  /**
    * Return the number of configuration properties.
    */
   int size();

@@ -5,6 +5,8 @@ import io.avaje.config.ConfigurationSource;
 
 public class MyExternalLoader implements ConfigurationSource {
 
+  static boolean refreshCalled;
+
   @Override
   public void load(Configuration configuration) {
 
@@ -19,4 +21,16 @@ public class MyExternalLoader implements ConfigurationSource {
     configuration.schedule(500, 500, () -> System.out.println("MyExternalLoader task .."));
   }
 
+  @Override
+  public void refresh() {
+    refreshCalled = true;
+  }
+
+  public static boolean refreshCalled() {
+    return refreshCalled;
+  }
+
+  public static void reset() {
+    refreshCalled = false;
+  }
 }
