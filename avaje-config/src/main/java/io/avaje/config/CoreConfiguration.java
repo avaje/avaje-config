@@ -205,6 +205,11 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public Set<String> keys() {
+    return properties.entries.keys();
+  }
+
+  @Override
   public ListValue list() {
     return listValue;
   }

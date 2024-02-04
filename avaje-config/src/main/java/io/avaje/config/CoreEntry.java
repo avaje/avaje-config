@@ -162,6 +162,10 @@ final class CoreEntry {
       return false;
     }
 
+    Set<String> keys() {
+      return entryMap.keySet();
+    }
+
     boolean containsKey(String key) {
       return entryMap.containsKey(key);
     }
