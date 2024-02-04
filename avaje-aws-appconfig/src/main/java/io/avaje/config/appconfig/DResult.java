@@ -1,4 +1,4 @@
-package io.avaje.config.awsappconfig;
+package io.avaje.config.appconfig;
 
 final class DResult implements AppConfigFetcher.Result {
 

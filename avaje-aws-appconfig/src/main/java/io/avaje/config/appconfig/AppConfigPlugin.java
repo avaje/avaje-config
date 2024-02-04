@@ -1,5 +1,6 @@
-package io.avaje.config.awsappconfig;
+package io.avaje.config.appconfig;
 
+import io.avaje.applog.AppLog;
 import io.avaje.config.ConfigParser;
 import io.avaje.config.Configuration;
 import io.avaje.config.ConfigurationSource;
@@ -17,9 +18,9 @@ import static java.lang.System.Logger.Level.*;
  * <p>
  * By default, will periodically reload the configuration if it has changed.
  */
-public final class AwsAppConfigPlugin implements ConfigurationSource {
+public final class AppConfigPlugin implements ConfigurationSource {
 
-  private static final System.Logger log = System.getLogger("io.avaje.config.AwsAppConfig");
+  private static final System.Logger log = AppLog.getLogger("io.avaje.config.AwsAppConfig");
 
   private Loader loader;
 
@@ -86,7 +87,7 @@ public final class AwsAppConfigPlugin implements ConfigurationSource {
     }
 
     private boolean reloadRequired() {
-      return validUntil.get().isAfter(Instant.now());
+      return validUntil.get().isBefore(Instant.now());
     }
 
     private void performReload() {
