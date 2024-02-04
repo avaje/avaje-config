@@ -492,6 +492,11 @@ public interface Configuration {
   void reloadSources();
 
   /**
+   * Return the property keys in this configuration.
+   */
+  Set<String> keys();
+
+  /**
    * Return the number of configuration properties.
    */
   int size();

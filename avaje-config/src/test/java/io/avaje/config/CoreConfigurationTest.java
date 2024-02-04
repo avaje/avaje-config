@@ -80,6 +80,7 @@ class CoreConfigurationTest {
     CoreConfiguration base = createSample();
     Configuration foo = base.forPath("foo");
 
+    assertThat(foo.keys()).contains("bar", "t", "f");
     assertThat(foo.size()).isEqualTo(3);
     assertThat(foo.getInt("bar")).isEqualTo(42);
     assertThat(foo.getBool("t")).isTrue();
