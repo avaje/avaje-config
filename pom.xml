@@ -16,6 +16,7 @@
   <modules>
     <module>avaje-config</module>
     <module>avaje-aws-appconfig</module>
+    <module>avaje-dynamic-logback</module>
   </modules>
 
 </project>

@@ -37,6 +37,7 @@ final class CoreConfiguration implements Configuration {
   private final CoreSetValue setValue;
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources;
+  private final List<ConfigurationPlugin> plugins;
 
   private boolean loadedSystemProperties;
   private FileWatch watcher;
@@ -48,6 +49,7 @@ final class CoreConfiguration implements Configuration {
     this.eventRunner = components.runner();
     this.log = components.log();
     this.sources = components.sources();
+    this.plugins = components.plugins();
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -59,6 +61,7 @@ final class CoreConfiguration implements Configuration {
     this.eventRunner = parent.eventRunner;
     this.log = parent.log;
     this.sources = parent.sources;
+    this.plugins = parent.plugins;
     this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
@@ -89,9 +92,16 @@ final class CoreConfiguration implements Configuration {
     initSystemProperties();
     if (loader != null) {
       logMessage(loader);
+      applyPlugins();
     }
     log.postInitialisation();
     return this;
+  }
+
+  private void applyPlugins() {
+    for (ConfigurationPlugin plugin : plugins) {
+      plugin.apply(this);
+    }
   }
 
   ConfigurationLog log() {

@@ -9,12 +9,14 @@ final class CoreComponents {
   private final ConfigurationLog log;
   private final Parsers parsers;
   private final List<ConfigurationSource> sources;
+  private final List<ConfigurationPlugin> plugins;
 
-  CoreComponents(ModificationEventRunner runner, ConfigurationLog log, Parsers parsers, List<ConfigurationSource> sources) {
+  CoreComponents(ModificationEventRunner runner, ConfigurationLog log, Parsers parsers, List<ConfigurationSource> sources, List<ConfigurationPlugin> plugins) {
     this.runner = runner;
     this.log = log;
     this.parsers = parsers;
     this.sources = sources;
+    this.plugins = plugins;
   }
 
   CoreComponents() {
@@ -22,6 +24,7 @@ final class CoreComponents {
     this.log = new DefaultConfigurationLog();
     this.parsers = new Parsers();
     this.sources = Collections.emptyList();
+    this.plugins = Collections.emptyList();
   }
 
   Parsers parsers() {
@@ -38,5 +41,9 @@ final class CoreComponents {
 
   List<ConfigurationSource> sources() {
     return sources;
+  }
+
+  List<ConfigurationPlugin> plugins() {
+    return plugins;
   }
 }
