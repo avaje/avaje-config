@@ -72,9 +72,9 @@ public final class AppConfigPlugin implements ConfigurationSource {
         .configuration(con)
         .build();
 
-      boolean pollEnabled = configuration.enabled("aws.appconfig.poll.enabled", true);
-      long pollSeconds = configuration.getLong("aws.appconfig.poll.seconds", 45L);
-      this.nextRefreshSeconds = configuration.getLong("aws.appconfig.refresh.seconds", pollSeconds - 1);
+      boolean pollEnabled = configuration.enabled("aws.appconfig.pollingEnabled", true);
+      long pollSeconds = configuration.getLong("aws.appconfig.pollingSeconds", 45L);
+      this.nextRefreshSeconds = configuration.getLong("aws.appconfig.refreshSeconds", pollSeconds - 1);
       if (pollEnabled) {
         configuration.schedule(pollSeconds * 1000L, pollSeconds * 1000L, this::reload);
       }
