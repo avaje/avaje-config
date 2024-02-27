@@ -77,8 +77,11 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
       .map(ServiceLoader.Provider::get)
       .collect(Collectors.toList());
+    final var plugins = ServiceLoader.load(ConfigurationPlugin.class).stream()
+      .map(ServiceLoader.Provider::get)
+      .collect(Collectors.toList());
 
-    var components = new CoreComponents(runner, log, parsers, sources);
+    var components = new CoreComponents(runner, log, parsers, sources, plugins);
     if (includeResourceLoading) {
       log.preInitialisation();
       initialLoader = new InitialLoader(components, initResourceLoader());

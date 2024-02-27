@@ -8,6 +8,7 @@ module io.avaje.config {
 
   uses io.avaje.config.ConfigParser;
   uses io.avaje.config.ConfigurationLog;
+  uses io.avaje.config.ConfigurationPlugin;
   uses io.avaje.config.ModificationEventRunner;
   uses io.avaje.config.ConfigurationSource;
   uses io.avaje.config.ResourceLoader;
