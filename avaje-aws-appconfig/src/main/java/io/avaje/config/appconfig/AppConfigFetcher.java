@@ -1,5 +1,7 @@
 package io.avaje.config.appconfig;
 
+import java.net.URI;
+
 interface AppConfigFetcher {
 
   static AppConfigFetcher.Builder builder() {
@@ -7,6 +9,8 @@ interface AppConfigFetcher {
   }
 
   Result fetch() throws FetchException;
+
+  URI uri();
 
   class FetchException extends Exception {
 

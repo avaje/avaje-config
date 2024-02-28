@@ -10,6 +10,7 @@ import io.avaje.config.ModificationEvent;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Plugin to dynamically adjust the log levels via configuration changes.
@@ -25,6 +26,7 @@ public final class LogbackPlugin implements ConfigurationPlugin {
     for (String key : config.keys()) {
       String rawLevel = config.getNullable(key);
       setLogLevel(key, loggerContext, rawLevel);
+      log.log(TRACE, "log level {0} for {1}", rawLevel, key);
     }
     configuration.onChange(this::onChangeAny);
   }
@@ -32,7 +34,6 @@ public final class LogbackPlugin implements ConfigurationPlugin {
   private static void setLogLevel(String key, LoggerContext loggerContext, String level) {
     Logger logger = loggerContext.getLogger(key);
     if (logger != null && level != null) {
-      log.log(DEBUG, "logger change for {0} to {1}", key, level);
       logger.setLevel(Level.toLevel(level));
     }
   }
@@ -43,8 +44,10 @@ public final class LogbackPlugin implements ConfigurationPlugin {
     modificationEvent.modifiedKeys().stream()
       .filter(key -> key.startsWith("log.level."))
       .forEach(key -> {
-        String rawLevel = config.getNullable(key.substring(10));
-        setLogLevel(key, loggerContext, rawLevel);
+        String logKey = key.substring(10);
+        String rawLevel = config.getNullable(key);
+        setLogLevel(logKey, loggerContext, rawLevel);
+        log.log(DEBUG, "set log level {0} for {1}", rawLevel, logKey);
       });
   }
 

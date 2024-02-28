@@ -64,13 +64,15 @@ public final class AppConfigPlugin implements ConfigurationSource {
 
       var app = configuration.get("aws.appconfig.application");
       var env = configuration.get("aws.appconfig.environment");
-      var con = configuration.get("aws.appconfig.configuration", env + "-" + app);
+      var con = configuration.get("aws.appconfig.configuration", "default");
 
       this.fetcher = AppConfigFetcher.builder()
         .application(app)
         .environment(env)
         .configuration(con)
         .build();
+
+      log.log(DEBUG, "AwsAppConfig uri {0}", fetcher.uri());
 
       boolean pollEnabled = configuration.enabled("aws.appconfig.pollingEnabled", true);
       long pollSeconds = configuration.getLong("aws.appconfig.pollingSeconds", 45L);
