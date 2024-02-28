@@ -23,18 +23,17 @@ public final class LogbackPlugin implements ConfigurationPlugin {
     final var loggerContext = loggerContext();
     final var config = configuration.forPath("log.level");
     for (String key : config.keys()) {
-      String rawLevel = configuration.get(key);
+      String rawLevel = config.getNullable(key);
       setLogLevel(key, loggerContext, rawLevel);
     }
     configuration.onChange(this::onChangeAny);
   }
 
-  private static void setLogLevel(String key, LoggerContext loggerContext, String rawLevel) {
-    String logKey = key.substring(10);
-    Logger logger = loggerContext.getLogger(logKey);
-    if (logger != null) {
-      log.log(DEBUG, "logger change for {0} to {1}", logKey, rawLevel);
-      logger.setLevel(Level.toLevel(rawLevel));
+  private static void setLogLevel(String key, LoggerContext loggerContext, String level) {
+    Logger logger = loggerContext.getLogger(key);
+    if (logger != null && level != null) {
+      log.log(DEBUG, "logger change for {0} to {1}", key, level);
+      logger.setLevel(Level.toLevel(level));
     }
   }
 
@@ -44,7 +43,7 @@ public final class LogbackPlugin implements ConfigurationPlugin {
     modificationEvent.modifiedKeys().stream()
       .filter(key -> key.startsWith("log.level."))
       .forEach(key -> {
-        String rawLevel = config.get(key);
+        String rawLevel = config.getNullable(key.substring(10));
         setLogLevel(key, loggerContext, rawLevel);
       });
   }
