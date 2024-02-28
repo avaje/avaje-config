@@ -18,6 +18,11 @@ final class DAppConfigFetcher implements AppConfigFetcher {
   }
 
   @Override
+  public URI uri() {
+    return uri;
+  }
+
+  @Override
   public AppConfigFetcher.Result fetch() throws FetchException {
     HttpRequest request = HttpRequest.newBuilder()
       .uri(uri)
