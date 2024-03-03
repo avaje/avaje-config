@@ -123,7 +123,7 @@ final class CoreConfiguration implements Configuration {
   private void loadSources(Set<String> names) {
     for (ConfigurationSource source : sources) {
       source.load(this);
-      names.add("ConfigurationSource:" + source.getClass().getCanonicalName());
+      names.add("ConfigurationSource:" + source.getClass().getSimpleName());
     }
   }
 
