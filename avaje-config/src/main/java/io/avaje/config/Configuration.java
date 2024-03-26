@@ -16,14 +16,31 @@ import java.util.function.LongConsumer;
 /**
  * Configuration API for accessing property values and registering onChange listeners.
  *
- * <h3>Examples</h3>
+ * <h3>Obtain the "default" configuration</h3>
  * <pre>{@code
  *
- *  int port = Config.getInt("app.port", 8090);
+ *  Configuration defaultConfiguration = Config.asConfiguration();
  *
- *  String topicName = Config.get("app.topic.name");
+ * }</pre>
  *
- *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
+ * <h3>Build a configuration</h3>
+ * <pre>{@code
+ *
+ *  var configuration = Configuration.builder()
+ *    .put("myKey", "myValue")
+ *    .load(someFile)           // load a yaml or properties file
+ *    .load(someResource)       // load a yaml or properties resource from the classpath
+ *    .build();
+ *
+ * }</pre>
+ *
+ * <h3>Use Configuration</h3>
+ * <pre>{@code
+ *
+ *  Configuration defaultConfiguration = Config.asConfiguration();
+ *
+ *  int port = defaultConfiguration.getInt("port", 8080);
+ *  String host = defaultConfiguration.get("host", "localhost");
  *
  * }</pre>
  */

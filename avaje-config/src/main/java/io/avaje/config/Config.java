@@ -18,12 +18,35 @@ import java.util.function.LongConsumer;
  * Provides application Configuration based on loading properties and yaml files
  * as well as plugins that supply properties (like dynamic configuration loaded from a db).
  * <p>
+ * The "Default" configuration automatically loads from known files and resources and
+ * is available via {@link Config#asConfiguration()}. The methods on Config are convenience
+ * methods that use the underlying "Default" configuration.
+ * <p>
+ * Refer to <a href="https://avaje.io/config/#loading">config loading</a> for details
+ * on the "Default" configuration sources which include:
+ * <ol>
+ *   <li> - application.properties & application.yaml resources & files</li>
+ *   <li> - system property load.properties</li>
+ *   <li> - command line arguments</li>
+ *   <li> - plugins (like the AWS AppConfig plugin)</li>
+ * </ol>
+ *
+ * <p>
+ * Configuration can also be built giving full control - refer to {@link Configuration#builder()}.
+ *
+ * <p>
  * The application can register onChange listeners to handle changes to configuration
  * properties at runtime. Plugins or code can dynamically load and change properties and
  * this can fire any registered callback handlers.
- * </p>
  *
- * <h3>Examples</h3>
+ * <h3>Obtain the "default" configuration</h3>
+ * <pre>{@code
+ *
+ *  Configuration defaultConfiguration = Config.asConfiguration();
+ *
+ * }</pre>
+ *
+ * <h3>"Default" configuration usage examples</h3>
  * <pre>{@code
  *
  *  int port = Config.getInt("app.port", 8090);
@@ -31,6 +54,27 @@ import java.util.function.LongConsumer;
  *  String topicName = Config.get("app.topic.name");
  *
  *  List<Integer> codes = Config.list().ofInt("my.codes", 42, 54);
+ *
+ * }</pre>
+ *
+ * <h3>Build a configuration</h3>
+ * <pre>{@code
+ *
+ *  var configuration = Configuration.builder()
+ *    .put("myKey", "myValue")
+ *    .load(someFile)           // load a yaml or properties file
+ *    .load(someResource)       // load a yaml or properties resource from the classpath
+ *    .build();
+ *
+ * }</pre>
+ *
+ * <h3>Use Configuration</h3>
+ * <pre>{@code
+ *
+ *  Configuration defaultConfiguration = Config.asConfiguration();
+ *
+ *  int port = defaultConfiguration.getInt("port", 8080);
+ *  String host = defaultConfiguration.get("host", "localhost");
  *
  * }</pre>
  */
