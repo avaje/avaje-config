@@ -3,6 +3,7 @@ package io.avaje.config;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
@@ -733,6 +734,24 @@ public interface Configuration {
      * Put entries into the configuration from properties.
      */
     Builder putAll(Properties source);
+
+    /**
+     * Load the resource using the extension to determine the parser to use.
+     * <p>
+     * By default, resources with {@code .properties} and {@code .yaml} extensions are supported.
+     *
+     * @param resource The resource with configuration content
+     */
+    Builder load(String resource);
+
+    /**
+     * Load the file using the file extension to determine the parser to use.
+     * <p>
+     * By default, files with {@code .properties} and {@code .yaml} extensions are supported.
+     *
+     * @param file The file with configuration content
+     */
+    Builder load(File file);
 
     /**
      * Optionally set the event runner to use . If not specified a foreground runner will be used.

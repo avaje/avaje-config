@@ -1,17 +1,24 @@
 package io.avaje.config;
 
-import java.util.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
+  private final Parsers parsers = new Parsers();
   private final Map<String, String> sourceMap = new LinkedHashMap<>();
+  private ResourceLoader resourceLoader = initialiseResourceLoader();
   private ModificationEventRunner eventRunner;
   private ConfigurationLog configurationLog;
-  private ResourceLoader resourceLoader;
-
   private boolean includeResourceLoading;
   private InitialLoader initialLoader;
 
@@ -64,6 +71,45 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   @Override
+  public Configuration.Builder load(String resource) {
+    final var configParser = parser(resource);
+    try {
+      try (var inputStream = resourceLoader.getResourceAsStream(resource)) {
+        putAll(configParser.load(inputStream));
+        return this;
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  @Override
+  public Configuration.Builder load(File file) {
+    final var configParser = parser(file.getName());
+    try {
+      try (var reader = new FileReader(file)) {
+        putAll(configParser.load(reader));
+        return this;
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  private ConfigParser parser(String name) {
+    int pos = name.lastIndexOf('.');
+    if (pos == -1) {
+      throw new IllegalArgumentException("Unable to determine the extension for " + name);
+    }
+    var extension = name.substring(pos + 1);
+    ConfigParser configParser = parsers.get(extension);
+    if (configParser == null) {
+      throw new IllegalArgumentException("No parser registered for extension " + extension);
+    }
+    return configParser;
+  }
+
+  @Override
   public Configuration.Builder includeResourceLoading() {
     this.includeResourceLoading = true;
     return this;
@@ -73,7 +119,6 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   public Configuration build() {
     final var runner = initRunner();
     final var log = initLog();
-    final var parsers = new Parsers();
     final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
       .map(ServiceLoader.Provider::get)
       .collect(Collectors.toList());
@@ -84,7 +129,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     var components = new CoreComponents(runner, log, parsers, sources, plugins);
     if (includeResourceLoading) {
       log.preInitialisation();
-      initialLoader = new InitialLoader(components, initResourceLoader());
+      initialLoader = new InitialLoader(components, resourceLoader);
     }
     return new CoreConfiguration(components, initEntries()).postLoad(initialLoader);
   }
@@ -99,13 +144,10 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     return initialLoader == null ? CoreEntry.newMap() : initialLoader.load();
   }
 
-  private ResourceLoader initResourceLoader() {
-    if (resourceLoader == null) {
-      resourceLoader = ServiceLoader.load(ResourceLoader.class)
-        .findFirst()
-        .orElseGet(DefaultResourceLoader::new);
-    }
-    return resourceLoader;
+  private static ResourceLoader initialiseResourceLoader() {
+    return ServiceLoader.load(ResourceLoader.class)
+      .findFirst()
+      .orElseGet(DefaultResourceLoader::new);
   }
 
   private ConfigurationLog initLog() {

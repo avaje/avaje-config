@@ -53,14 +53,14 @@ final class Parsers {
    * Return the ConfigParser for the given extension.
    */
   ConfigParser get(String extension) {
-    return parserMap.get(extension);
+    return parserMap.get(extension.toLowerCase());
   }
 
   /**
    * Return true if the extension has a matching parser.
    */
   boolean supportsExtension(String extension) {
-    return parserMap.containsKey(extension);
+    return parserMap.containsKey(extension.toLowerCase());
   }
 
   /**
