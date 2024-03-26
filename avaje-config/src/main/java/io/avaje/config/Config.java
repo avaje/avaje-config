@@ -30,11 +30,14 @@ import java.util.function.LongConsumer;
  *   <li> - command line arguments</li>
  *   <li> - plugins (like the AWS AppConfig plugin)</li>
  * </ol>
+ *
+ * <p>
+ * Configuration can also be built giving full control - refer to {@link Configuration#builder()}.
+ *
  * <p>
  * The application can register onChange listeners to handle changes to configuration
  * properties at runtime. Plugins or code can dynamically load and change properties and
  * this can fire any registered callback handlers.
- * </p>
  *
  * <h3>Obtain the "default" configuration</h3>
  * <pre>{@code
