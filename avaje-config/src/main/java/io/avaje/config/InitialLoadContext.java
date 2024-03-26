@@ -137,6 +137,10 @@ final class InitialLoadContext {
    * Read the special properties that can point to an external properties source.
    */
   String indirectLocation() {
+    String location = System.getProperty("load.properties");
+    if (location != null) {
+      return location;
+    }
     var indirectLocation = map.get("load.properties");
     if (indirectLocation == null) {
       indirectLocation = map.get("load.properties.override");
