@@ -70,6 +70,11 @@ final class CoreEntry {
     this.source = source;
   }
 
+  @Override
+  public String toString() {
+    return '{' + value + " source:" + source + '}';
+  }
+
   boolean needsEvaluation() {
     return value != null && value.contains("${");
   }

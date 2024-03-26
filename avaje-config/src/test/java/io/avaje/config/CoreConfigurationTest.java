@@ -4,6 +4,7 @@ import io.avaje.config.CoreEntry.CoreMap;
 import org.example.MyExternalLoader;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -147,10 +148,13 @@ class CoreConfigurationTest {
 
   @Test
   void builder() {
+    var fileSource = new File("./src/test/resources/yaml/minimal.yaml");
     var conf = Configuration.builder()
       .putAll(properties())
       .putAll(Map.of("myExtraMap", "foo", "myExtraMap.b", "bar"))
       .put("myExtraOne", "baz")
+      .load(fileSource)
+      .load("hi.properties")
       .build();
 
     assertEquals(conf.get("a"), "1");
@@ -158,6 +162,8 @@ class CoreConfigurationTest {
     assertEquals(conf.get("myExtraMap"), "foo");
     assertEquals(conf.get("myExtraMap.b"), "bar");
     assertEquals(conf.get("myExtraOne"), "baz");
+    assertEquals(conf.get("my.name"), "Nom");
+    assertEquals(conf.get("hi.iAmInProps"), "There it is");
 
     String userHome = System.getProperty("user.home");
     assertEquals(conf.get("myHome"), "my/" + userHome + "/home");
