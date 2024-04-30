@@ -118,6 +118,12 @@ class ConfigTest {
     assertThat(properties.getProperty("myapp.fooName")).isEqualTo("Hello");
     assertThat(properties.getProperty("myapp.fooHome")).isEqualTo(home + "/config");
 
+    var entry = Config.asConfiguration().entry("myapp.fooName");
+    assertThat(entry).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("resource:application-test.yaml");
+      assertThat(e.value()).isEqualTo("Hello");
+    });
+
     assertThat(Config.get("myExternalLoader")).isEqualTo("wasExecuted");
 
     assertThat(properties.getProperty("config.load.systemProperties")).isEqualTo("true");

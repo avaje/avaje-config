@@ -59,10 +59,16 @@ class CoreConfigurationTest {
     assertThat(base.getLong("my.key.more.again")).isEqualTo(52);
 
     var entry = base.entry("my.key.other");
-    assertThat(entry).isPresent().hasValueSatisfying( e -> assertThat(e.value()).isEqualTo("42"));
+    assertThat(entry).isPresent().hasValueSatisfying( e -> {
+      assertThat(e.source()).isEqualTo("event:PutAll");
+      assertThat(e.value()).isEqualTo("42");
+    });
 
     var entry2 = base.entry("my.key.more.again");
-    assertThat(entry2).isPresent().hasValueSatisfying( e -> assertThat(e.value()).isEqualTo("52"));
+    assertThat(entry2).isPresent().hasValueSatisfying( e -> {
+      assertThat(e.source()).isEqualTo("event:PutAll");
+      assertThat(e.value()).isEqualTo("52");
+    });
 
     var entry3 = base.entry("my.key.DoesNotExist");
     assertThat(entry3).isEmpty();
