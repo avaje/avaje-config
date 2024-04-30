@@ -21,6 +21,12 @@ class ConfigTest {
     System.setProperty("MySystemProp0", "bar");
     assertThat(Config.get("MySystemProp0", "foo")).isEqualTo("bar");
 
+    var entry = Config.asConfiguration().entry("MySystemProp0");
+    assertThat(entry).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("SystemProperty");
+      assertThat(e.value()).isEqualTo("bar");
+    });
+
     // cached the initial value, still bar even when system property changed
     System.setProperty("MySystemProp0", "bazz");
     assertThat(Config.get("MySystemProp0")).isEqualTo("bar");
