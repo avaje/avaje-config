@@ -12,8 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CoreConfigurationTest {
@@ -58,6 +57,15 @@ class CoreConfigurationTest {
 
     assertThat(base.get("my.key.other")).isEqualTo("42");
     assertThat(base.getLong("my.key.more.again")).isEqualTo(52);
+
+    var entry = base.entry("my.key.other");
+    assertThat(entry).isPresent().hasValueSatisfying( e -> assertThat(e.value()).isEqualTo("42"));
+
+    var entry2 = base.entry("my.key.more.again");
+    assertThat(entry2).isPresent().hasValueSatisfying( e -> assertThat(e.value()).isEqualTo("52"));
+
+    var entry3 = base.entry("my.key.DoesNotExist");
+    assertThat(entry3).isEmpty();
   }
 
   @Test
@@ -71,6 +79,9 @@ class CoreConfigurationTest {
     final Properties loaded = configuration.asProperties();
     assertThat(loaded.get("a")).isEqualTo("1");
     assertThat(loaded.get("SetViaSystemProperty")).isNull();
+
+    Optional<Configuration.Entry> entry = configuration.entry("SetViaSystemProperty");
+    assertThat(entry).isEmpty();
 
     System.clearProperty("SetViaSystemProperty");
     System.clearProperty("foo.bar");

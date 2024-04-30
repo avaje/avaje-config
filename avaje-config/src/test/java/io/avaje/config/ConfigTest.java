@@ -37,6 +37,9 @@ class ConfigTest {
   void getNullable() {
     assertThat(Config.getNullable("IDoNotExist0")).isNull();
     assertThat(Config.getNullable("IDoNotExist0", System.getenv("AlsoDoNotExist"))).isNull();
+
+    var entry = Config.asConfiguration().entry("IDoNotExist0");
+    assertThat(entry).isEmpty();
   }
 
   @Test

@@ -74,6 +74,11 @@ public interface Configuration {
   Configuration forPath(String pathPrefix);
 
   /**
+   * Return the entry for the given key.
+   */
+  Optional<Entry> entry(String key);
+
+  /**
    * Return a required configuration value as String.
    * <p>
    * IllegalStateException is thrown if the value is not defined in configuration.
@@ -799,5 +804,21 @@ public interface Configuration {
      * and returns the configuration.
      */
     Configuration build();
+  }
+
+  /**
+   * A configuration entry.
+   */
+  interface Entry {
+
+    /**
+     * Return the source of the entry.
+     */
+    String source();
+
+    /**
+     * Return the String value of the entry.
+     */
+    String value();
   }
 }
