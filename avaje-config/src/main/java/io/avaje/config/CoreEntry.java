@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
  * Configuration entry.
  */
 @NonNullApi
-final class CoreEntry {
+final class CoreEntry implements Configuration.Entry {
 
   /**
    * Entry used to represent no entry / null.
@@ -79,7 +79,8 @@ final class CoreEntry {
     return value != null && value.contains("${");
   }
 
-  String value() {
+  @Override
+  public String value() {
     return value;
   }
 
@@ -87,7 +88,8 @@ final class CoreEntry {
     return boolValue;
   }
 
-  String source() {
+  @Override
+  public String source() {
     return source;
   }
 

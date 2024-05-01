@@ -243,6 +243,11 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
+  public Optional<Configuration.Entry> entry(String key) {
+    return properties.optionalEntry(key);
+  }
+
+  @Override
   public String get(String key) {
     return required(key);
   }
@@ -524,6 +529,16 @@ final class CoreConfiguration implements Configuration {
 
     CoreEntry entry(String key, String defaultValue) {
       return _entry(key, defaultValue);
+    }
+
+    /**
+     * Return the underlying entry for a given key WITHOUT creating it if it does not exist.
+     * This also excludes entries that represent a null value.
+     */
+    Optional<Entry> optionalEntry(String key) {
+      return Optional.ofNullable(entries.get(key))
+        .filter(entry -> !entry.isNull())
+        .map(entry -> entry);
     }
 
     /**

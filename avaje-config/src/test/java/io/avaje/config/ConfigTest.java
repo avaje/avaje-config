@@ -21,6 +21,12 @@ class ConfigTest {
     System.setProperty("MySystemProp0", "bar");
     assertThat(Config.get("MySystemProp0", "foo")).isEqualTo("bar");
 
+    var entry = Config.asConfiguration().entry("MySystemProp0");
+    assertThat(entry).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("SystemProperty");
+      assertThat(e.value()).isEqualTo("bar");
+    });
+
     // cached the initial value, still bar even when system property changed
     System.setProperty("MySystemProp0", "bazz");
     assertThat(Config.get("MySystemProp0")).isEqualTo("bar");
@@ -37,6 +43,9 @@ class ConfigTest {
   void getNullable() {
     assertThat(Config.getNullable("IDoNotExist0")).isNull();
     assertThat(Config.getNullable("IDoNotExist0", System.getenv("AlsoDoNotExist"))).isNull();
+
+    var entry = Config.asConfiguration().entry("IDoNotExist0");
+    assertThat(entry).isEmpty();
   }
 
   @Test
@@ -114,6 +123,12 @@ class ConfigTest {
     final Properties properties = Config.asProperties();
     assertThat(properties.getProperty("myapp.fooName")).isEqualTo("Hello");
     assertThat(properties.getProperty("myapp.fooHome")).isEqualTo(home + "/config");
+
+    var entry = Config.asConfiguration().entry("myapp.fooName");
+    assertThat(entry).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("resource:application-test.yaml");
+      assertThat(e.value()).isEqualTo("Hello");
+    });
 
     assertThat(Config.get("myExternalLoader")).isEqualTo("wasExecuted");
 
