@@ -104,12 +104,7 @@ final class InitialLoadContext {
   }
 
   private InputStream resourceStream(String resourcePath) {
-    InputStream is = resourceLoader.getResourceAsStream(resourcePath);
-    if (is == null) {
-      // search the module path for top level resource
-      is = ClassLoader.getSystemResourceAsStream(resourcePath);
-    }
-    return is;
+    return resourceLoader.getResourceAsStream(resourcePath);
   }
 
   /**
