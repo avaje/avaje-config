@@ -10,7 +10,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>3.15-SNAPSHOT</version>
+  <version>3.15-RC1</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
