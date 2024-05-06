@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
+@NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private final Parsers parsers = new Parsers();
@@ -75,7 +78,9 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     final var configParser = parser(resource);
     try {
       try (var inputStream = resourceLoader.getResourceAsStream(resource)) {
-        putAll(configParser.load(inputStream));
+        if (inputStream != null) {
+          putAll(configParser.load(inputStream));
+        }
         return this;
       }
     } catch (IOException e) {
@@ -85,6 +90,9 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration.Builder load(File file) {
+    if (!file.exists()) {
+      return this;
+    }
     final var configParser = parser(file.getName());
     try {
       try (var reader = new FileReader(file)) {

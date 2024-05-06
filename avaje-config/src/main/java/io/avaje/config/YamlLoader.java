@@ -1,11 +1,14 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.io.InputStream;
 import java.util.Map;
 
 /**
  * Load Yaml config into a flattened map.
  */
+@NonNullApi
 interface YamlLoader extends ConfigParser {
 
   @Override

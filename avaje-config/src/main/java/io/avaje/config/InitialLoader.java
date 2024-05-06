@@ -18,7 +18,6 @@ import static io.avaje.config.InitialLoader.Source.RESOURCE;
  * Loads the configuration from known/expected locations.
  * <p>
  * Defines the loading order of resources and files.
- * </p>
  */
 final class InitialLoader {
 
@@ -27,7 +26,7 @@ final class InitialLoader {
   /**
    * Return the Expression evaluator using the given properties.
    */
-  public static Configuration.ExpressionEval evalFor(Properties properties) {
+  static Configuration.ExpressionEval evalFor(Properties properties) {
     return new CoreExpressionEval(properties);
   }
 

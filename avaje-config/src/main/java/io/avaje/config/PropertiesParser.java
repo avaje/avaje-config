@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+@NonNullApi
 final class PropertiesParser implements ConfigParser {
 
   private static final String[] extensions = new String[]{"properties"};

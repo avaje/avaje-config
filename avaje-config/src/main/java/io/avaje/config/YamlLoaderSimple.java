@@ -1,11 +1,14 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
+
 import java.io.*;
 import java.util.*;
 
 /**
  * Simple YAML parser for loading yaml based config.
  */
+@NonNullApi
 final class YamlLoaderSimple implements YamlLoader {
 
   @Override
