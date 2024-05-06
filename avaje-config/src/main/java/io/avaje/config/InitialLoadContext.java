@@ -2,10 +2,7 @@ package io.avaje.config;
 
 import io.avaje.config.CoreEntry.CoreMap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -99,7 +96,7 @@ final class InitialLoadContext {
           loadedResources.add("file:" + resourcePath);
           loadedFiles.add(file);
         } catch (FileNotFoundException e) {
-          throw new IllegalStateException(e);
+          throw new UncheckedIOException(e);
         }
       }
     }
