@@ -181,6 +181,16 @@ class CoreConfigurationTest {
     assertEquals(conf.get("myExtraOne"), "baz");
     assertEquals(conf.get("my.name"), "Nom");
     assertEquals(conf.get("hi.iAmInProps"), "There it is");
+    var entry = conf.entry("hi.iAmInProps");
+    assertThat(entry).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("resource:hi.properties");
+      assertThat(e.value()).isEqualTo("There it is");
+    });
+    var entryFile = conf.entry("my.name");
+    assertThat(entryFile).isPresent().get().satisfies(e -> {
+      assertThat(e.source()).isEqualTo("file:minimal.yaml");
+      assertThat(e.value()).isEqualTo("Nom");
+    });
 
     String userHome = System.getProperty("user.home");
     assertEquals(conf.get("myHome"), "my/" + userHome + "/home");
