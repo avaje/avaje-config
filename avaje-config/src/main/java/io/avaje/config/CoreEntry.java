@@ -119,6 +119,13 @@ final class CoreEntry implements Configuration.Entry {
       });
     }
 
+    /**
+     * Add all the entries from another source.
+     */
+    void addAll(CoreMap source) {
+      entryMap.putAll(source.entryMap);
+    }
+
     int size() {
       return entryMap.size();
     }

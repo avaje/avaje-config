@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -18,7 +17,7 @@ import static java.util.Objects.requireNonNull;
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private final Parsers parsers = new Parsers();
-  private final Map<String, String> sourceMap = new LinkedHashMap<>();
+  private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private ResourceLoader resourceLoader = initialiseResourceLoader();
   private ModificationEventRunner eventRunner;
   private ConfigurationLog configurationLog;
@@ -47,7 +46,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   public Configuration.Builder put(String key, String value) {
     requireNonNull(key);
     requireNonNull(value);
-    sourceMap.put(key, value);
+    sourceMap.put(key, value, "initial");
     return this;
   }
 
@@ -56,7 +55,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     requireNonNull(source);
     source.forEach((key, value) -> {
       if (key != null && value != null) {
-        put(key, value.toString());
+        sourceMap.put(key, value.toString(), "initial");
       }
     });
     return this;
@@ -67,7 +66,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     requireNonNull(source);
     source.forEach((key, value) -> {
       if (key != null && value != null) {
-        put(key.toString(), value.toString());
+        sourceMap.put(key.toString(), value.toString(), "initial");
       }
     });
     return this;
@@ -79,7 +78,8 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     try {
       try (var inputStream = resourceLoader.getResourceAsStream(resource)) {
         if (inputStream != null) {
-          putAll(configParser.load(inputStream));
+          var source = "resource:" + resource;
+          configParser.load(inputStream).forEach((k, v) -> sourceMap.put(k, v, source));
         }
         return this;
       }
@@ -96,7 +96,8 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     final var configParser = parser(file.getName());
     try {
       try (var reader = new FileReader(file)) {
-        putAll(configParser.load(reader));
+        var source = "file:" + file.getName();
+        configParser.load(reader).forEach((k, v) -> sourceMap.put(k, v, source));
         return this;
       }
     } catch (IOException e) {
@@ -144,7 +145,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private CoreEntry.CoreMap initEntries() {
     final var entries = initEntryMap();
-    sourceMap.forEach((key, value) -> entries.put(key, value, "initial"));
+    entries.addAll(sourceMap);
     return CoreExpressionEval.evalFor(entries);
   }
 
