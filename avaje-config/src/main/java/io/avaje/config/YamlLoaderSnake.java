@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import io.avaje.lang.NonNullApi;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -11,8 +12,8 @@ import java.util.Map;
  * Loads configuration from Yml into the load context.
  * <p>
  * Note that this ignores 'lists' so just reads 'maps' and scalar values.
- * </p>
  */
+@NonNullApi
 final class YamlLoaderSnake implements YamlLoader {
 
   private final Yaml yaml;
