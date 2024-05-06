@@ -9,6 +9,11 @@ final class DefaultResourceLoader implements ResourceLoader {
 
   @Override
   public InputStream getResourceAsStream(String resourcePath) {
-    return getClass().getResourceAsStream("/" + resourcePath);
+    var inputStream = getClass().getResourceAsStream("/" + resourcePath);
+    if (inputStream == null) {
+      // search the module path for top level resource
+      inputStream = ClassLoader.getSystemResourceAsStream(resourcePath);
+    }
+    return inputStream;
   }
 }
