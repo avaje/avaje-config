@@ -7,12 +7,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.lang.System.Logger.Level;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Loads the configuration from known/expected locations.
@@ -179,7 +179,7 @@ final class InitialLoader {
     int before = loadContext.size();
     load("application-test", RESOURCE);
     if (loadProperties("test-ebean.properties", RESOURCE)) {
-      log.log(Level.WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
+      log.log(WARNING, "Loading properties from test-ebean.properties is deprecated. Please migrate to application-test.yaml or application-test.properties instead.");
     }
     return loadContext.size() > before;
   }
@@ -235,7 +235,7 @@ final class InitialLoader {
   private void loadMain(Source source) {
     load("application", source);
     if (loadProperties("ebean.properties", source)) {
-      log.log(Level.WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
+      log.log(WARNING, "Loading properties from ebean.properties is deprecated. Please migrate to use application.yaml or application.properties instead.");
     }
   }
 
@@ -244,7 +244,7 @@ final class InitialLoader {
     if (fileName == null) {
       fileName = System.getProperty("props.file");
       if (fileName != null && !loadWithExtensionCheck(fileName)) {
-        log.log(Level.WARNING, "Unable to find file {0} to load properties", fileName);
+        log.log(WARNING, "Unable to find file {0} to load properties", fileName);
       }
     }
   }
@@ -296,10 +296,10 @@ final class InitialLoader {
   boolean loadCustomExtension(String resourcePath, ConfigParser parser, Source source) {
     try (InputStream is = resource(resourcePath, source)) {
       if (is != null) {
-        parser.load(is).forEach((k, v) -> loadContext.put(k, v, (source == RESOURCE ? "resource:" : "file:") + resourcePath));
+        var sourceName = (source == RESOURCE ? "resource:" : "file:") + resourcePath;
+        parser.load(is).forEach((k, v) -> loadContext.put(k, v, sourceName));
         return true;
       }
-
     } catch (Exception e) {
       throw new IllegalStateException("Error loading properties - " + resourcePath, e);
     }

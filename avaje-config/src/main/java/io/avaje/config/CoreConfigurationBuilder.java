@@ -11,42 +11,48 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 import static java.util.Objects.requireNonNull;
 
 @NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
+  private ConfigurationLog log = initialiseLog();
   private final Parsers parsers = new Parsers();
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private ResourceLoader resourceLoader = initialiseResourceLoader();
   private ModificationEventRunner eventRunner;
-  private ConfigurationLog configurationLog;
   private boolean includeResourceLoading;
   private InitialLoader initialLoader;
 
+  private static ConfigurationLog initialiseLog() {
+    return ServiceLoader.load(ConfigurationLog.class)
+        .findFirst()
+        .orElseGet(DefaultConfigurationLog::new);
+  }
+
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
-    this.eventRunner = eventRunner;
+    this.eventRunner = requireNonNull(eventRunner);
     return this;
   }
 
   @Override
-  public Configuration.Builder log(ConfigurationLog configurationLog) {
-    this.configurationLog = configurationLog;
+  public Configuration.Builder log(ConfigurationLog log) {
+    this.log = requireNonNull(log);
     return this;
   }
 
   @Override
   public Configuration.Builder resourceLoader(ResourceLoader resourceLoader) {
-    this.resourceLoader = resourceLoader;
+    this.resourceLoader = requireNonNull(resourceLoader);
     return this;
   }
 
   @Override
   public Configuration.Builder put(String key, String value) {
-    requireNonNull(key);
-    requireNonNull(value);
-    sourceMap.put(key, value, "initial");
+    sourceMap.put(requireNonNull(key), requireNonNull(value), "initial");
     return this;
   }
 
@@ -77,9 +83,12 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     final var configParser = parser(resource);
     try {
       try (var inputStream = resourceLoader.getResourceAsStream(resource)) {
-        if (inputStream != null) {
+        if (inputStream == null) {
+          log.log(INFO, "Configuration resource:{0} not found", resource);
+        } else {
           var source = "resource:" + resource;
           configParser.load(inputStream).forEach((k, v) -> sourceMap.put(k, v, source));
+          log.log(DEBUG, "loaded {0}", source);
         }
         return this;
       }
@@ -91,6 +100,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   @Override
   public Configuration.Builder load(File file) {
     if (!file.exists()) {
+      log.log(INFO, "Configuration file:{0} not found", file);
       return this;
     }
     final var configParser = parser(file.getName());
@@ -98,6 +108,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
       try (var reader = new FileReader(file)) {
         var source = "file:" + file.getName();
         configParser.load(reader).forEach((k, v) -> sourceMap.put(k, v, source));
+        log.log(DEBUG, "loaded {0}", source);
         return this;
       }
     } catch (IOException e) {
@@ -127,7 +138,6 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   @Override
   public Configuration build() {
     final var runner = initRunner();
-    final var log = initLog();
     final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
       .map(ServiceLoader.Provider::get)
       .collect(Collectors.toList());
@@ -157,15 +167,6 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     return ServiceLoader.load(ResourceLoader.class)
       .findFirst()
       .orElseGet(DefaultResourceLoader::new);
-  }
-
-  private ConfigurationLog initLog() {
-    if (configurationLog == null) {
-      configurationLog = ServiceLoader.load(ConfigurationLog.class)
-        .findFirst()
-        .orElseGet(DefaultConfigurationLog::new);
-    }
-    return configurationLog;
   }
 
   private ModificationEventRunner initRunner() {
