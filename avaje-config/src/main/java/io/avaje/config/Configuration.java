@@ -760,6 +760,8 @@ public interface Configuration {
     /**
      * Load the resource using the extension to determine the parser to use.
      * <p>
+     * If the resource is not found then nothing is loaded.
+     * <p>
      * By default, resources with {@code .properties} and {@code .yaml} extensions are supported.
      *
      * @param resource The resource with configuration content
@@ -768,6 +770,8 @@ public interface Configuration {
 
     /**
      * Load the file using the file extension to determine the parser to use.
+     * <p>
+     * If the file does not exist then nothing is loaded.
      * <p>
      * By default, files with {@code .properties} and {@code .yaml} extensions are supported.
      *
