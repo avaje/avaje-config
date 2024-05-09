@@ -172,6 +172,8 @@ class CoreConfigurationTest {
       .put("myExtraOne", "baz")
       .load(fileSource)
       .load("hi.properties")
+      .load("i-dont-exist.properties")
+      .load(new File("i-dont-exist-file.properties"))
       .build();
 
     assertEquals(conf.get("a"), "1");
