@@ -6,13 +6,8 @@ module io.avaje.config {
   requires transitive io.avaje.applog;
   requires static org.yaml.snakeyaml;
 
-  requires static transitive io.avaje.spi;
+  requires static io.avaje.spi;
 
-  uses io.avaje.config.ConfigParser;
-  uses io.avaje.config.ConfigurationLog;
-  uses io.avaje.config.ConfigurationPlugin;
-  uses io.avaje.config.ModificationEventRunner;
-  uses io.avaje.config.ConfigurationSource;
-  uses io.avaje.config.ResourceLoader;
+  uses io.avaje.config.ConfigSPI;
 
 }
