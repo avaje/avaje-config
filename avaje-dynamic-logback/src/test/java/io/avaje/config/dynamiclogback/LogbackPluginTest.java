@@ -14,7 +14,7 @@ class LogbackPluginTest {
       .build();
 
     var plugin = new LogbackPlugin();
-    plugin.apply(config);
+    plugin.postInitialization(config);
 
     config.putAll(Map.of("log.level.other.Foo", "INFO", "log.level.my.Bar", "TRACE"));
   }

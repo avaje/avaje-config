@@ -92,15 +92,14 @@ final class CoreConfiguration implements Configuration {
     initSystemProperties();
     if (loader != null) {
       logMessage(loader);
-      applyPlugins();
     }
-    log.postInitialisation();
+    applyPlugins();
     return this;
   }
 
   private void applyPlugins() {
     for (ConfigurationPlugin plugin : plugins) {
-      plugin.apply(this);
+      plugin.postInitialization(this);
     }
   }
 

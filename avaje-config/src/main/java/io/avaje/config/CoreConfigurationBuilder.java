@@ -1,35 +1,56 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
-import static java.util.Objects.requireNonNull;
+import io.avaje.config.CoreConfiguration.ForegroundEventRunner;
+import io.avaje.lang.NonNullApi;
 
 @NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
-  private ConfigurationLog log = initialiseLog();
+  private static ConfigurationLog spiLog;
+  private static ResourceLoader spiResourceLoader;
+  private static ModificationEventRunner spiEventRunner;
+  private static final List<ConfigurationSource> SOURCES= new ArrayList<>();
+  private static final List<ConfigurationPlugin> PLUGINS= new ArrayList<>();
+
+  private ConfigurationLog log = spiLog;
   private final Parsers parsers = new Parsers();
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
-  private ResourceLoader resourceLoader = initialiseResourceLoader();
-  private ModificationEventRunner eventRunner;
+  private ResourceLoader resourceLoader = spiResourceLoader;
+  private ModificationEventRunner eventRunner = spiEventRunner;
   private boolean includeResourceLoading;
   private InitialLoader initialLoader;
 
-  private static ConfigurationLog initialiseLog() {
-    return ServiceLoader.load(ConfigurationLog.class)
-        .findFirst()
-        .orElseGet(DefaultConfigurationLog::new);
+  static {
+    for (var spi : ServiceLoader.load(ConfigSPI.class)) {
+      if (spi instanceof ConfigurationSource) {
+        SOURCES.add((ConfigurationSource) spi);
+      } else if (spi instanceof ConfigurationPlugin) {
+        PLUGINS.add((ConfigurationPlugin) spi);
+      } else if (spi instanceof ConfigurationLog) {
+        spiLog = (ConfigurationLog) spi;
+      } else if (spi instanceof ResourceLoader) {
+        spiResourceLoader = (ResourceLoader) spi;
+      } else if (spi instanceof ModificationEventRunner) {
+        spiEventRunner = (ModificationEventRunner) spi;
+      }
+    }
+    spiLog = spiLog == null ? new DefaultConfigurationLog() : spiLog;
+    spiResourceLoader = spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
+    spiEventRunner = spiEventRunner == null ? new ForegroundEventRunner() : spiEventRunner;
   }
 
   @Override
@@ -59,22 +80,24 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   @Override
   public Configuration.Builder putAll(Map<String, ?> source) {
     requireNonNull(source);
-    source.forEach((key, value) -> {
-      if (key != null && value != null) {
-        sourceMap.put(key, value.toString(), "initial");
-      }
-    });
+    source.forEach(
+        (key, value) -> {
+          if (key != null && value != null) {
+            sourceMap.put(key, value.toString(), "initial");
+          }
+        });
     return this;
   }
 
   @Override
   public Configuration.Builder putAll(Properties source) {
     requireNonNull(source);
-    source.forEach((key, value) -> {
-      if (key != null && value != null) {
-        sourceMap.put(key.toString(), value.toString(), "initial");
-      }
-    });
+    source.forEach(
+        (key, value) -> {
+          if (key != null && value != null) {
+            sourceMap.put(key.toString(), value.toString(), "initial");
+          }
+        });
     return this;
   }
 
@@ -137,17 +160,12 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration build() {
-    final var runner = initRunner();
-    final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
-      .map(ServiceLoader.Provider::get)
-      .collect(Collectors.toList());
-    final var plugins = ServiceLoader.load(ConfigurationPlugin.class).stream()
-      .map(ServiceLoader.Provider::get)
-      .collect(Collectors.toList());
 
-    var components = new CoreComponents(runner, log, parsers, sources, plugins);
+    var components = new CoreComponents(eventRunner, log, parsers, SOURCES, PLUGINS);
     if (includeResourceLoading) {
-      log.preInitialisation();
+      for (var plugin : PLUGINS) {
+        plugin.preInitialisation();
+      }
       initialLoader = new InitialLoader(components, resourceLoader);
     }
     return new CoreConfiguration(components, initEntries()).postLoad(initialLoader);
@@ -161,20 +179,5 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private CoreEntry.CoreMap initEntryMap() {
     return initialLoader == null ? CoreEntry.newMap() : initialLoader.load();
-  }
-
-  private static ResourceLoader initialiseResourceLoader() {
-    return ServiceLoader.load(ResourceLoader.class)
-      .findFirst()
-      .orElseGet(DefaultResourceLoader::new);
-  }
-
-  private ModificationEventRunner initRunner() {
-    if (eventRunner == null) {
-      eventRunner = ServiceLoader.load(ModificationEventRunner.class)
-        .findFirst()
-        .orElseGet(CoreConfiguration.ForegroundEventRunner::new);
-    }
-    return eventRunner;
   }
 }

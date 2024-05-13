@@ -1,4 +1,4 @@
-import io.avaje.config.ConfigurationPlugin;
+import io.avaje.config.ConfigSPI;
 import io.avaje.config.dynamiclogback.LogbackPlugin;
 
 module io.avaje.config.dynamic.logback {
@@ -11,5 +11,5 @@ module io.avaje.config.dynamic.logback {
   requires static ch.qos.logback.core;
   requires static ch.qos.logback.classic;
 
-  provides ConfigurationPlugin with LogbackPlugin;
+  provides ConfigSPI with LogbackPlugin;
 }

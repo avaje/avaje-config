@@ -9,7 +9,7 @@ package io.avaje.config;
  * The default is for event listener notification to be executed using the same thread
  * that is making the modifications to the configuration.
  */
-public interface ModificationEventRunner {
+public interface ModificationEventRunner extends ConfigSPI {
 
   /**
    * Run the task of notifying all the event listeners of a modification event

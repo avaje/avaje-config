@@ -35,11 +35,16 @@ final class Parsers {
   }
 
   private void initParsers() {
-    ServiceLoader.load(ConfigParser.class).forEach(p -> {
-      for (var ext : p.supportedExtensions()) {
-        parserMap.put(ext, p);
-      }
-    });
+    ServiceLoader.load(ConfigSPI.class)
+        .forEach(
+            spi -> {
+              if (spi instanceof ConfigParser) {
+                ConfigParser p = (ConfigParser) spi;
+                for (var ext : p.supportedExtensions()) {
+                  parserMap.put(ext, p);
+                }
+              }
+            });
   }
 
   /**

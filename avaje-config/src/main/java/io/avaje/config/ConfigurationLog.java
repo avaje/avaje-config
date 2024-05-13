@@ -9,21 +9,7 @@ import java.lang.System.Logger.Level;
  * control how the events are logged. For example, it might delay logging messages
  * until logging implementation has finished configuration.
  */
-public interface ConfigurationLog {
-
-  /**
-   * Invoked when the configuration is being initialised.
-   */
-  default void preInitialisation() {
-    // do nothing by default
-  }
-
-  /**
-   * Invoked when the initialisation of configuration has been completed.
-   */
-  default void postInitialisation() {
-    // do nothing by default
-  }
+public interface ConfigurationLog extends ConfigSPI {
 
   /**
    * Log an event with the given level, message, and thrown exception.
