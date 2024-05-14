@@ -12,6 +12,20 @@ import java.lang.System.Logger.Level;
 public interface ConfigurationLog extends ConfigSPI {
 
   /**
+   * Invoked when the configuration is being initialised.
+   */
+  default void preInitialisation() {
+    // do nothing by default
+  }
+
+  /**
+   * Invoked when the initialisation of configuration has been completed.
+   */
+  default void postInitialisation() {
+    // do nothing by default
+  }
+
+  /**
    * Log an event with the given level, message, and thrown exception.
    */
   void log(Level level, String message, Throwable thrown);

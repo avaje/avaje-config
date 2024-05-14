@@ -80,24 +80,22 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   @Override
   public Configuration.Builder putAll(Map<String, ?> source) {
     requireNonNull(source);
-    source.forEach(
-        (key, value) -> {
-          if (key != null && value != null) {
-            sourceMap.put(key, value.toString(), "initial");
-          }
-        });
+    source.forEach((key, value) -> {
+      if (key != null && value != null) {
+        sourceMap.put(key, value.toString(), "initial");
+      }
+    });
     return this;
   }
 
   @Override
   public Configuration.Builder putAll(Properties source) {
     requireNonNull(source);
-    source.forEach(
-        (key, value) -> {
-          if (key != null && value != null) {
-            sourceMap.put(key.toString(), value.toString(), "initial");
-          }
-        });
+    source.forEach((key, value) -> {
+      if (key != null && value != null) {
+        sourceMap.put(key.toString(), value.toString(), "initial");
+      }
+    });
     return this;
   }
 
@@ -163,9 +161,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
     var components = new CoreComponents(eventRunner, log, parsers, SOURCES, PLUGINS);
     if (includeResourceLoading) {
-      for (var plugin : PLUGINS) {
-        plugin.preInitialisation();
-      }
+      log.preInitialisation();
       initialLoader = new InitialLoader(components, resourceLoader);
     }
     return new CoreConfiguration(components, initEntries()).postLoad(initialLoader);

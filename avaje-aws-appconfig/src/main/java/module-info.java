@@ -8,5 +8,6 @@ module io.avaje.config.appconfig {
   requires io.avaje.config;
   requires java.net.http;
   requires transitive io.avaje.applog;
+  requires static io.avaje.spi;
   provides ConfigSPI with AppConfigPlugin;
 }

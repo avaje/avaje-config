@@ -23,7 +23,7 @@ public final class LogbackPlugin implements ConfigurationPlugin {
   private static final System.Logger log = AppLog.getLogger(LogbackPlugin.class);
 
   @Override
-  public void postInitialization(Configuration configuration) {
+  public void apply(Configuration configuration) {
     final var loggerContext = loggerContext();
     final var config = configuration.forPath("log.level");
     for (String key : config.keys()) {
