@@ -12,7 +12,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>1.0</version>
+  <version>1.1-RC1</version>
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
@@ -31,7 +31,7 @@
       <version>4.0-RC1</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-spi-service</artifactId>
