@@ -1,4 +1,4 @@
-import io.avaje.config.ConfigSPI;
+import io.avaje.config.ConfigExtension;
 import io.avaje.config.appconfig.AppConfigPlugin;
 
 module io.avaje.config.appconfig {
@@ -9,5 +9,5 @@ module io.avaje.config.appconfig {
   requires java.net.http;
   requires transitive io.avaje.applog;
   requires static io.avaje.spi;
-  provides ConfigSPI with AppConfigPlugin;
+  provides ConfigExtension with AppConfigPlugin;
 }

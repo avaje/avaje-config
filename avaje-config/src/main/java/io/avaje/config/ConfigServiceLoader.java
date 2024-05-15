@@ -27,7 +27,7 @@ final class ConfigServiceLoader {
     ConfigurationLog _log = null;
     ResourceLoader _resourceLoader = null;
 
-    for (var spi : ServiceLoader.load(ConfigSPI.class)) {
+    for (var spi : ServiceLoader.load(ConfigExtension.class)) {
       if (spi instanceof ConfigurationSource) {
         sources.add((ConfigurationSource) spi);
       } else if (spi instanceof ConfigurationPlugin) {

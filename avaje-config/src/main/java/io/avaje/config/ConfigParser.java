@@ -10,7 +10,7 @@ import java.util.Map;
  * Load a config file into a flattened map.
  */
 @NonNullApi
-public interface ConfigParser extends ConfigSPI {
+public interface ConfigParser extends ConfigExtension {
 
   /**
    * File extensions Supported by this parser

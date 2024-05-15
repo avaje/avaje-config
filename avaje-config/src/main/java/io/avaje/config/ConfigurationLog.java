@@ -9,7 +9,7 @@ import java.lang.System.Logger.Level;
  * control how the events are logged. For example, it might delay logging messages
  * until logging implementation has finished configuration.
  */
-public interface ConfigurationLog extends ConfigSPI {
+public interface ConfigurationLog extends ConfigExtension {
 
   /**
    * Invoked when the configuration is being initialised.

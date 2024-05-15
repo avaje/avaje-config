@@ -8,6 +8,6 @@ module io.avaje.config {
 
   requires static io.avaje.spi;
 
-  uses io.avaje.config.ConfigSPI;
+  uses io.avaje.config.ConfigExtension;
 
 }
