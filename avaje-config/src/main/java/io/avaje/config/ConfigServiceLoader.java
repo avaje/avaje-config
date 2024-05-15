@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * Load all the services via ServiceLoader.
+ * Load all the avaje-config extensions via ServiceLoader using the single
+ * common ConfigExtension interface.
  */
 final class ConfigServiceLoader {
 
