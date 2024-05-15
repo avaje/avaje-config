@@ -20,12 +20,13 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
-  private final List<ConfigParser> parsers = new ArrayList<>();
+  private final Parsers parsers;
 
   ConfigServiceLoader() {
     ModificationEventRunner _eventRunner = null;
     ConfigurationLog _log = null;
     ResourceLoader _resourceLoader = null;
+    List<ConfigParser> otherParsers = new ArrayList<>();
 
     for (var spi : ServiceLoader.load(ConfigExtension.class)) {
       if (spi instanceof ConfigurationSource) {
@@ -33,7 +34,7 @@ final class ConfigServiceLoader {
       } else if (spi instanceof ConfigurationPlugin) {
         plugins.add((ConfigurationPlugin) spi);
       } else if (spi instanceof ConfigParser) {
-        parsers.add((ConfigParser) spi);
+        otherParsers.add((ConfigParser) spi);
       } else if (spi instanceof ConfigurationLog) {
         _log = (ConfigurationLog) spi;
       } else if (spi instanceof ResourceLoader) {
@@ -46,6 +47,11 @@ final class ConfigServiceLoader {
     this.log = _log == null ? new DefaultConfigurationLog() : _log;
     this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
     this.eventRunner = _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
+    this.parsers = new Parsers(otherParsers);
+  }
+
+  Parsers parsers() {
+    return parsers;
   }
 
   ConfigurationLog log() {
@@ -66,9 +72,5 @@ final class ConfigServiceLoader {
 
   List<ConfigurationPlugin> plugins() {
     return plugins;
-  }
-
-  List<ConfigParser> parsers() {
-    return parsers;
   }
 }

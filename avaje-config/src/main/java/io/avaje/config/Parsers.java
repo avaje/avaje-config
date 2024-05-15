@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,13 +12,13 @@ final class Parsers {
 
   private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
-  Parsers() {
+  Parsers(List<ConfigParser> otherParsers) {
     parserMap.put("properties", new PropertiesParser());
     if (!"true".equals(System.getProperty("skipYaml"))) {
       initYamlParser();
     }
     if (!"true".equals(System.getProperty("skipCustomParsing"))) {
-      initParsers();
+      initParsers(otherParsers);
     }
   }
 
@@ -33,8 +34,8 @@ final class Parsers {
     parserMap.put("yaml", yamlLoader);
   }
 
-  private void initParsers() {
-    for (ConfigParser parser : ConfigServiceLoader.get().parsers()) {
+  private void initParsers(List<ConfigParser> otherParsers) {
+    for (ConfigParser parser : otherParsers) {
       for (var ext : parser.supportedExtensions()) {
         parserMap.put(ext, parser);
       }

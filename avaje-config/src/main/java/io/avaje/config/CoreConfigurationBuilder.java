@@ -16,9 +16,9 @@ import static java.util.Objects.requireNonNull;
 @NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
-  private final Parsers parsers = new Parsers();
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
+  private final Parsers parsers = serviceLoader.parsers();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();

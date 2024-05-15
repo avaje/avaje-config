@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -24,7 +25,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new Parsers());
+    final FileWatch watch = fileWatch(config, files);
 
     assertThat(config.size()).isEqualTo(2);
     // not touched
@@ -38,7 +39,7 @@ class FileWatchTest {
 
     CoreConfiguration config = newConfig();
     List<File> files = files();
-    final FileWatch watch = new FileWatch(config, files, new Parsers());
+    final FileWatch watch = fileWatch(config, files);
 
     assertThat(config.size()).isEqualTo(2);
     assertThat(config.getOptional("one")).isEmpty();
@@ -66,7 +67,7 @@ class FileWatchTest {
         fail("File " + file.getAbsolutePath() + " does not exist?");
       }
     }
-    final FileWatch watch = new FileWatch(config, files, new Parsers());
+    final FileWatch watch = fileWatch(config, files);
     System.out.println(watch);
 
     // assert not loaded
@@ -93,7 +94,7 @@ class FileWatchTest {
     CoreConfiguration config = newConfig();
     List<File> files = files();
 
-    final FileWatch watch = new FileWatch(config, files, new Parsers());
+    final FileWatch watch = fileWatch(config, files);
 
     if (isGithubActions()) {
       File aFile = files.get(0);
@@ -135,6 +136,10 @@ class FileWatchTest {
     assertThat(config.get("one")).isEqualTo("a");
   }
 
+  private static FileWatch fileWatch(CoreConfiguration config, List<File> files) {
+    return new FileWatch(config, files, new Parsers(Collections.emptyList()));
+  }
+
   private void writeContent(String content) throws IOException {
     sleep(20);
     File aProps = new File("./src/test/resources/watch/a.properties");
@@ -144,9 +149,6 @@ class FileWatchTest {
     FileWriter fw = new FileWriter(aProps);
     fw.write(content);
     fw.close();
-//    if (!aProps.setLastModified(System.currentTimeMillis())) {
-//      System.err.println("setLastModified not successful");
-//    }
   }
 
   private void sleep(int millis) {
