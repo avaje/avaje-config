@@ -2,7 +2,6 @@ package io.avaje.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -35,16 +34,11 @@ final class Parsers {
   }
 
   private void initParsers() {
-    ServiceLoader.load(ConfigSPI.class)
-        .forEach(
-            spi -> {
-              if (spi instanceof ConfigParser) {
-                ConfigParser p = (ConfigParser) spi;
-                for (var ext : p.supportedExtensions()) {
-                  parserMap.put(ext, p);
-                }
-              }
-            });
+    for (ConfigParser parser : ConfigServiceLoader.get().parsers()) {
+      for (var ext : parser.supportedExtensions()) {
+        parserMap.put(ext, parser);
+      }
+    }
   }
 
   /**

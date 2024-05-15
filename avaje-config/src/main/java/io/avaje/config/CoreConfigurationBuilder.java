@@ -1,57 +1,29 @@
 package io.avaje.config;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
-import static java.util.Objects.requireNonNull;
+import io.avaje.lang.NonNullApi;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceLoader;
 
-import io.avaje.config.CoreConfiguration.ForegroundEventRunner;
-import io.avaje.lang.NonNullApi;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+import static java.util.Objects.requireNonNull;
 
 @NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
-  private static ConfigurationLog spiLog;
-  private static ResourceLoader spiResourceLoader;
-  private static ModificationEventRunner spiEventRunner;
-  private static final List<ConfigurationSource> SOURCES= new ArrayList<>();
-  private static final List<ConfigurationPlugin> PLUGINS= new ArrayList<>();
-
-  private ConfigurationLog log = spiLog;
   private final Parsers parsers = new Parsers();
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
-  private ResourceLoader resourceLoader = spiResourceLoader;
-  private ModificationEventRunner eventRunner = spiEventRunner;
+  private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
+  private ConfigurationLog log = serviceLoader.log();
+  private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
+  private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
   private boolean includeResourceLoading;
   private InitialLoader initialLoader;
-
-  static {
-    for (var spi : ServiceLoader.load(ConfigSPI.class)) {
-      if (spi instanceof ConfigurationSource) {
-        SOURCES.add((ConfigurationSource) spi);
-      } else if (spi instanceof ConfigurationPlugin) {
-        PLUGINS.add((ConfigurationPlugin) spi);
-      } else if (spi instanceof ConfigurationLog) {
-        spiLog = (ConfigurationLog) spi;
-      } else if (spi instanceof ResourceLoader) {
-        spiResourceLoader = (ResourceLoader) spi;
-      } else if (spi instanceof ModificationEventRunner) {
-        spiEventRunner = (ModificationEventRunner) spi;
-      }
-    }
-    spiLog = spiLog == null ? new DefaultConfigurationLog() : spiLog;
-    spiResourceLoader = spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
-    spiEventRunner = spiEventRunner == null ? new ForegroundEventRunner() : spiEventRunner;
-  }
 
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
@@ -158,8 +130,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration build() {
-
-    var components = new CoreComponents(eventRunner, log, parsers, SOURCES, PLUGINS);
+    var components = new CoreComponents(eventRunner, log, parsers, serviceLoader.sources(), serviceLoader.plugins());
     if (includeResourceLoading) {
       log.preInitialisation();
       initialLoader = new InitialLoader(components, resourceLoader);
