@@ -1,9 +1,10 @@
 package io.avaje.config.appconfig;
 
-import io.avaje.applog.AppLog;
-import io.avaje.config.ConfigParser;
-import io.avaje.config.Configuration;
-import io.avaje.config.ConfigurationSource;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.StringReader;
 import java.time.Instant;
@@ -11,13 +12,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.lang.System.Logger.Level.*;
+import io.avaje.applog.AppLog;
+import io.avaje.config.ConfigParser;
+import io.avaje.config.Configuration;
+import io.avaje.config.ConfigurationSource;
+import io.avaje.spi.ServiceProvider;
 
 /**
  * Plugin that loads AWS AppConfig as Yaml or Properties.
  * <p>
  * By default, will periodically reload the configuration if it has changed.
  */
+@ServiceProvider
 public final class AppConfigPlugin implements ConfigurationSource {
 
   private static final System.Logger log = AppLog.getLogger("io.avaje.config.AwsAppConfig");

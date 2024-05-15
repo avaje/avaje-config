@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
@@ -18,19 +16,14 @@ import static java.util.Objects.requireNonNull;
 @NonNullApi
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
-  private ConfigurationLog log = initialiseLog();
-  private final Parsers parsers = new Parsers();
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
-  private ResourceLoader resourceLoader = initialiseResourceLoader();
-  private ModificationEventRunner eventRunner;
+  private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
+  private final Parsers parsers = serviceLoader.parsers();
+  private ConfigurationLog log = serviceLoader.log();
+  private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
+  private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
   private boolean includeResourceLoading;
   private InitialLoader initialLoader;
-
-  private static ConfigurationLog initialiseLog() {
-    return ServiceLoader.load(ConfigurationLog.class)
-        .findFirst()
-        .orElseGet(DefaultConfigurationLog::new);
-  }
 
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
@@ -137,15 +130,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration build() {
-    final var runner = initRunner();
-    final var sources = ServiceLoader.load(ConfigurationSource.class).stream()
-      .map(ServiceLoader.Provider::get)
-      .collect(Collectors.toList());
-    final var plugins = ServiceLoader.load(ConfigurationPlugin.class).stream()
-      .map(ServiceLoader.Provider::get)
-      .collect(Collectors.toList());
-
-    var components = new CoreComponents(runner, log, parsers, sources, plugins);
+    var components = new CoreComponents(eventRunner, log, parsers, serviceLoader.sources(), serviceLoader.plugins());
     if (includeResourceLoading) {
       log.preInitialisation();
       initialLoader = new InitialLoader(components, resourceLoader);
@@ -161,20 +146,5 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private CoreEntry.CoreMap initEntryMap() {
     return initialLoader == null ? CoreEntry.newMap() : initialLoader.load();
-  }
-
-  private static ResourceLoader initialiseResourceLoader() {
-    return ServiceLoader.load(ResourceLoader.class)
-      .findFirst()
-      .orElseGet(DefaultResourceLoader::new);
-  }
-
-  private ModificationEventRunner initRunner() {
-    if (eventRunner == null) {
-      eventRunner = ServiceLoader.load(ModificationEventRunner.class)
-        .findFirst()
-        .orElseGet(CoreConfiguration.ForegroundEventRunner::new);
-    }
-    return eventRunner;
   }
 }

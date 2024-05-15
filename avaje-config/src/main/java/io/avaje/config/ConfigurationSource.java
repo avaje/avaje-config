@@ -3,7 +3,7 @@ package io.avaje.config;
 /**
  * Additional source to load and update configuration.
  */
-public interface ConfigurationSource {
+public interface ConfigurationSource extends ConfigExtension {
 
   /**
    * Load additional configuration.

@@ -13,7 +13,7 @@ import java.io.InputStream;
  * Note there is a fallback to use {@link ClassLoader#getSystemResourceAsStream(String)}
  * if the ResourceLoader returns null.
  */
-public interface ResourceLoader {
+public interface ResourceLoader extends ConfigExtension {
 
   /**
    * Return the InputStream for the given resource or null if it can not be found.

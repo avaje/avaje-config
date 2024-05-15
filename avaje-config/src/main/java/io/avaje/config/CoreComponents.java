@@ -19,10 +19,11 @@ final class CoreComponents {
     this.plugins = plugins;
   }
 
+  /** For testing only */
   CoreComponents() {
     this.runner = new CoreConfiguration.ForegroundEventRunner();
     this.log = new DefaultConfigurationLog();
-    this.parsers = new Parsers();
+    this.parsers = new Parsers(Collections.emptyList());
     this.sources = Collections.emptyList();
     this.plugins = Collections.emptyList();
   }

@@ -28,8 +28,15 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.15-RC1</version>
+      <version>4.0-RC1</version>
       <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-spi-service</artifactId>
+      <version>1.4</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>

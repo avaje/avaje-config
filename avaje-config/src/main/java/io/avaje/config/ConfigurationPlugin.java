@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 /**
  * Plugin that is initiated after the configuration has been loaded.
  */
-public interface ConfigurationPlugin {
+public interface ConfigurationPlugin extends ConfigExtension {
 
   /**
    * Apply the plugin. Typically, a plugin might read configuration and do something
