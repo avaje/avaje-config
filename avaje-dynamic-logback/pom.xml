@@ -31,7 +31,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-spi-service</artifactId>
-      <version>1.4</version>
+      <version>1.7</version>
       <optional>true</optional>
     </dependency>
 
