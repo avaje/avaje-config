@@ -12,7 +12,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-dynamic-logback</artifactId>
-  <version>1.1-RC1</version>
+  <version>1.1</version>
 
   <url>https://github.com/avaje/avaje-config/tree/master/avaje-dynamic-logback</url>
 
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>4.0-RC1</version>
+      <version>4.0</version>
     </dependency>
 
     <dependency>
