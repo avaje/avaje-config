@@ -446,7 +446,7 @@ final class CoreConfiguration implements Configuration {
   @Override
   public void setProperty(String key, String newValue) {
     requireNonNull(key, "key is required");
-    requireNonNull(newValue, "newValue is required, use clearProperty()");
+    requireNonNull(newValue, "newValue is required, use clearProperty() to remove a property");
     eventBuilder("SetProperty").put(key, newValue).publish();
   }
 
