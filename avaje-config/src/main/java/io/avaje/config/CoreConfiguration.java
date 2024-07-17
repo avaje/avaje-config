@@ -1,7 +1,9 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import static io.avaje.config.Constants.SYSTEM_PROPS;
+import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.util.Objects.requireNonNull;
 
 import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
@@ -16,15 +18,13 @@ import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
-import static io.avaje.config.Constants.SYSTEM_PROPS;
-import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
-import static java.lang.System.Logger.Level.ERROR;
-import static java.util.Objects.requireNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Core implementation of Configuration.
  */
-@NonNullApi
+@NullMarked
 final class CoreConfiguration implements Configuration {
 
   private final Parsers parsers;

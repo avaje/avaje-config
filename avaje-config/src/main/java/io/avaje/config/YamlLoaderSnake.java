@@ -1,19 +1,19 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.jspecify.annotations.NullMarked;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Loads configuration from Yml into the load context.
  * <p>
  * Note that this ignores 'lists' so just reads 'maps' and scalar values.
  */
-@NonNullApi
+@NullMarked
 final class YamlLoaderSnake implements YamlLoader {
 
   private final Yaml yaml;

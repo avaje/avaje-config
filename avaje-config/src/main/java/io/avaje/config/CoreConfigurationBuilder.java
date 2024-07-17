@@ -1,6 +1,8 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileReader;
@@ -9,11 +11,9 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
-import static java.util.Objects.requireNonNull;
+import org.jspecify.annotations.NullMarked;
 
-@NonNullApi
+@NullMarked
 final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();

@@ -1,14 +1,24 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.StringJoiner;
 
-import java.io.*;
-import java.util.*;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Simple YAML parser for loading yaml based config.
  */
-@NonNullApi
+@NullMarked
 final class YamlLoaderSimple implements YamlLoader {
 
   @Override

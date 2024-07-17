@@ -1,18 +1,18 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import static java.util.Objects.requireNonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import static java.util.Objects.requireNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Configuration entry.
  */
-@NonNullApi
+@NullMarked
 final class CoreEntry implements Configuration.Entry {
 
   /**

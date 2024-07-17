@@ -1,15 +1,15 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Load a config file into a flattened map.
  */
-@NonNullApi
+@NullMarked
 public interface ConfigParser extends ConfigExtension {
 
   /**

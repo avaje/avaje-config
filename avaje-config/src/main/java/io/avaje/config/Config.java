@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
@@ -13,6 +10,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides application Configuration based on loading properties and yaml files
@@ -78,7 +78,7 @@ import java.util.function.LongConsumer;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public class Config {
 
   private static final Configuration data = CoreConfiguration.initialise();
