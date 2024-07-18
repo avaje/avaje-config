@@ -1,8 +1,8 @@
 package io.avaje.config;
 
-import io.avaje.lang.Nullable;
-
 import java.io.InputStream;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Plugin API for loading resources typically from the classpath or module path.

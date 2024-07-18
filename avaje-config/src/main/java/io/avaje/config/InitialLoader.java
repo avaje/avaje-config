@@ -1,7 +1,8 @@
 package io.avaje.config;
 
-import io.avaje.config.CoreEntry.CoreMap;
-import io.avaje.lang.Nullable;
+import static io.avaje.config.InitialLoader.Source.FILE;
+import static io.avaje.config.InitialLoader.Source.RESOURCE;
+import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,15 +11,17 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static io.avaje.config.InitialLoader.Source.FILE;
-import static io.avaje.config.InitialLoader.Source.RESOURCE;
-import static java.lang.System.Logger.Level.WARNING;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import io.avaje.config.CoreEntry.CoreMap;
 
 /**
  * Loads the configuration from known/expected locations.
  * <p>
  * Defines the loading order of resources and files.
  */
+@NullMarked
 final class InitialLoader {
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");

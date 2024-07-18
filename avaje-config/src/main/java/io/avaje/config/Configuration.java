@@ -1,8 +1,5 @@
 package io.avaje.config;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -12,6 +9,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Configuration API for accessing property values and registering onChange listeners.
@@ -44,7 +44,7 @@ import java.util.function.LongConsumer;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public interface Configuration {
 
   /**

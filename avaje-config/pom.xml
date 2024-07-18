@@ -27,9 +27,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-lang</artifactId>
-      <version>1.1</version>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -83,17 +83,17 @@
         <artifactId>maven-repository-plugin</artifactId>
         <version>2.4</version>
       </plugin>
-<!--      <plugin>-->
-<!--        <groupId>org.sonatype.plugins</groupId>-->
-<!--        <artifactId>nexus-staging-maven-plugin</artifactId>-->
-<!--        <version>1.7.0</version>-->
-<!--        <extensions>true</extensions>-->
-<!--        <configuration>-->
-<!--          <serverId>ossrh</serverId>-->
-<!--          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
-<!--          <autoReleaseAfterClose>${nexus.staging.autoReleaseAfterClose}</autoReleaseAfterClose>-->
-<!--        </configuration>-->
-<!--      </plugin>-->
+      <!--      <plugin>-->
+      <!--        <groupId>org.sonatype.plugins</groupId>-->
+      <!--        <artifactId>nexus-staging-maven-plugin</artifactId>-->
+      <!--        <version>1.7.0</version>-->
+      <!--        <extensions>true</extensions>-->
+      <!--        <configuration>-->
+      <!--          <serverId>ossrh</serverId>-->
+      <!--          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
+      <!--          <autoReleaseAfterClose>${nexus.staging.autoReleaseAfterClose}</autoReleaseAfterClose>-->
+      <!--        </configuration>-->
+      <!--      </plugin>-->
     </plugins>
   </build>
 
