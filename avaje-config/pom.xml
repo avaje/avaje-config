@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>4.3</version>
+    <version>4.4</version>
     <relativePath/>
   </parent>
 
@@ -19,7 +19,7 @@
   </scm>
 
   <properties>
-    <snakeyaml.version>2.2</snakeyaml.version>
+    <snakeyaml.version>2.3</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
