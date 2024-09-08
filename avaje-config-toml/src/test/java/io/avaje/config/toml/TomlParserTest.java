@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class TomlParserTest {
+class TomlParserTest {
 
   @Test
   void supportedExtensions() {
