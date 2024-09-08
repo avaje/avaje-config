@@ -1,3 +1,5 @@
+import io.avaje.config.toml.TomlParser;
+
 module io.avaje.config.toml {
 
   requires io.avaje.config;
@@ -5,6 +7,6 @@ module io.avaje.config.toml {
 
   exports io.avaje.config.toml;
 
-  uses io.avaje.config.ConfigExtension;
+  provides io.avaje.config.ConfigExtension with TomlParser;
 
 }

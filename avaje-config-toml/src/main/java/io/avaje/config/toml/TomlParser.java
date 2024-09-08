@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @NullMarked
-final class TomlParser implements ConfigParser {
+public final class TomlParser implements ConfigParser {
 
   private static final String[] extensions = {"toml"};
 
