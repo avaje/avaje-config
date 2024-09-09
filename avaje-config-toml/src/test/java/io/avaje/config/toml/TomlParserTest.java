@@ -18,11 +18,17 @@ class TomlParserTest {
   }
 
   private static String input() {
-    return "key3 = \"c\"\n" +
+    return "key = \"c\"\n" +
       "\n" +
       "[one]\n" +
-      "key = \"a\"\n" +
-      "key2 = \"b\"\n";
+      "key1 = \"a\"\n" +
+      "key2 = \"b\"\n" +
+      "key3 = [\"a\", \"b\", \"c\"]\n" +
+      "[two]\n" +
+      "local_datetime = 2024-09-09T15:30:00\n" +
+      "local_date = 2024-09-09\n" +
+      "local_time = 15:30:00\n" +
+      "offset_datetime = 2024-09-09T15:30:00+02:00";
   }
 
   @Test
@@ -30,11 +36,21 @@ class TomlParserTest {
     var parser = new TomlParser();
     Map<String, String> map = parser.load(new StringReader(input()));
 
-    assertThat(map).hasSize(3);
-    assertThat(map).containsOnlyKeys("one.key", "one.key2", "key3");
-    assertThat(map).containsEntry("one.key", "a");
+    assertThat(map).hasSize(8);
+    assertThat(map).containsOnlyKeys("key",
+      "one.key1", "one.key2", "one.key3",
+      "two.local_datetime", "two.local_date", "two.local_time", "two.offset_datetime");
+
+    assertThat(map).containsEntry("key", "c");
+
+    assertThat(map).containsEntry("one.key1", "a");
     assertThat(map).containsEntry("one.key2", "b");
-    assertThat(map).containsEntry("key3", "c");
+    assertThat(map).containsEntry("one.key3", "a;b;c");
+
+    assertThat(map).containsEntry("two.local_datetime", "2024-09-09T15:30");
+    assertThat(map).containsEntry("two.local_date", "2024-09-09");
+    assertThat(map).containsEntry("two.local_time", "15:30");
+    assertThat(map).containsEntry("two.offset_datetime", "2024-09-09T15:30+02:00");
   }
 
   @Test
@@ -42,10 +58,20 @@ class TomlParserTest {
     var parser = new TomlParser();
     Map<String, String> map = parser.load(new ByteArrayInputStream(input().getBytes(StandardCharsets.UTF_8)));
 
-    assertThat(map).hasSize(3);
-    assertThat(map).containsOnlyKeys("one.key", "one.key2", "key3");
-    assertThat(map).containsEntry("one.key", "a");
+    assertThat(map).hasSize(8);
+    assertThat(map).containsOnlyKeys("key",
+      "one.key1", "one.key2", "one.key3",
+      "two.local_datetime", "two.local_date", "two.local_time", "two.offset_datetime");
+
+    assertThat(map).containsEntry("key", "c");
+
+    assertThat(map).containsEntry("one.key1", "a");
     assertThat(map).containsEntry("one.key2", "b");
-    assertThat(map).containsEntry("key3", "c");
+    assertThat(map).containsEntry("one.key3", "a;b;c");
+
+    assertThat(map).containsEntry("two.local_datetime", "2024-09-09T15:30");
+    assertThat(map).containsEntry("two.local_date", "2024-09-09");
+    assertThat(map).containsEntry("two.local_time", "15:30");
+    assertThat(map).containsEntry("two.offset_datetime", "2024-09-09T15:30+02:00");
   }
 }
