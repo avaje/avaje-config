@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Holds the non-properties ConfigParsers.
+ * Holds the ConfigParsers for various extension types.
  */
-final class Parsers {
+public final class ConfigParsers {
 
   private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
-  Parsers(List<ConfigParser> otherParsers) {
+  ConfigParsers(List<ConfigParser> otherParsers) {
     parserMap.put("properties", new PropertiesParser());
     if (!"true".equals(System.getProperty("skipYaml"))) {
       initYamlParser();
@@ -45,28 +45,28 @@ final class Parsers {
   /**
    * Return the extension ConfigParser pairs.
    */
-  Set<Map.Entry<String, ConfigParser>> entrySet() {
+  public Set<Map.Entry<String, ConfigParser>> entrySet() {
     return parserMap.entrySet();
   }
 
   /**
    * Return the ConfigParser for the given extension.
    */
-  ConfigParser get(String extension) {
+  public ConfigParser get(String extension) {
     return parserMap.get(extension.toLowerCase());
   }
 
   /**
    * Return true if the extension has a matching parser.
    */
-  boolean supportsExtension(String extension) {
+  public boolean supportsExtension(String extension) {
     return parserMap.containsKey(extension.toLowerCase());
   }
 
   /**
    * Return the set of supported extensions.
    */
-  Set<String> supportedExtensions() {
+  public Set<String> supportedExtensions() {
     return parserMap.keySet();
   }
 }

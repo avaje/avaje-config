@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * Load all the avaje-config extensions via ServiceLoader using the single
- * common ConfigExtension interface.
+ * Load all the avaje-config extensions via ServiceLoader using the single common ConfigExtension
+ * interface.
  */
 final class ConfigServiceLoader {
 
@@ -21,13 +21,15 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
-  private final Parsers parsers;
+  private final URILoaders uriLoaders;
+  private final ConfigParsers parsers;
 
   ConfigServiceLoader() {
     ModificationEventRunner _eventRunner = null;
     ConfigurationLog _log = null;
     ResourceLoader _resourceLoader = null;
     List<ConfigParser> otherParsers = new ArrayList<>();
+    List<URIConfigLoader> loaders = new ArrayList<>();
 
     for (var spi : ServiceLoader.load(ConfigExtension.class)) {
       if (spi instanceof ConfigurationSource) {
@@ -36,6 +38,8 @@ final class ConfigServiceLoader {
         plugins.add((ConfigurationPlugin) spi);
       } else if (spi instanceof ConfigParser) {
         otherParsers.add((ConfigParser) spi);
+      } else if (spi instanceof URIConfigLoader) {
+        loaders.add((URIConfigLoader) spi);
       } else if (spi instanceof ConfigurationLog) {
         _log = (ConfigurationLog) spi;
       } else if (spi instanceof ResourceLoader) {
@@ -47,12 +51,18 @@ final class ConfigServiceLoader {
 
     this.log = _log == null ? new DefaultConfigurationLog() : _log;
     this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
-    this.eventRunner = _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
-    this.parsers = new Parsers(otherParsers);
+    this.eventRunner =
+        _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
+    this.parsers = new ConfigParsers(otherParsers);
+    this.uriLoaders = new URILoaders(loaders);
   }
 
-  Parsers parsers() {
+  ConfigParsers parsers() {
     return parsers;
+  }
+
+  public URILoaders uriLoaders() {
+    return uriLoaders;
   }
 
   ConfigurationLog log() {

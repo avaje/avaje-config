@@ -11,12 +11,12 @@ final class FileWatch {
 
   private final ConfigurationLog log;
   private final Configuration configuration;
-  private final Parsers parsers;
+  private final ConfigParsers parsers;
   private final List<Entry> files;
   private final long delay;
   private final long period;
 
-  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, Parsers parsers) {
+  FileWatch(CoreConfiguration configuration, List<File> loadedFiles, ConfigParsers parsers) {
     this.log = configuration.log();
     this.configuration = configuration;
     this.delay = configuration.getLong("config.watch.delay", 60);

@@ -3,11 +3,13 @@ package io.avaje.config;
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -41,10 +43,12 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Parsers parsers;
+  private final ConfigParsers parsers;
+  private final URILoaders uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
+    this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
   }
@@ -253,8 +257,17 @@ final class InitialLoader {
   }
 
   boolean loadWithExtensionCheck(String fileName) {
+
+    // no need to custom URL load regular cp and file schemes
+    fileName = fileName.replace("classpath:/", "").replace("file:/", "");
+    if (fileName.contains(":/")) {
+
+      return loadURI(fileName);
+    }
+
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
+
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
@@ -270,6 +283,23 @@ final class InitialLoader {
       return loadCustomExtension(fileName, parser, RESOURCE)
         | loadCustomExtension(fileName, parser, FILE);
     }
+  }
+
+  private boolean loadURI(String uriPath) {
+    var uri = URI.create(uriPath);
+    final var scheme = uri.getScheme();
+    var loader = uriLoaders.get(scheme);
+    if (loader != null) {
+      loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, "uri scheme " + scheme));
+      return true;
+    }
+
+    throw new IllegalArgumentException(
+        "Expecting only properties or "
+            + uriLoaders.supportedSchemes().stream().map(s -> s + ":/").collect(joining(","))
+            + " uris but got ["
+            + uriPath
+            + "]");
   }
 
   /**
