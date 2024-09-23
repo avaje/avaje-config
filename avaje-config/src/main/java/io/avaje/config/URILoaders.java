@@ -12,7 +12,6 @@ public final class URILoaders {
   private final Map<String, URIConfigLoader> parserMap = new HashMap<>();
 
   URILoaders(List<URIConfigLoader> loaders) {
-    parserMap.put("env", new EnvLoader());
     for (var parser : loaders) {
 
       parserMap.put(parser.supportedScheme(), parser);
