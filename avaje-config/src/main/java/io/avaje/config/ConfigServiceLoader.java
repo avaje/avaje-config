@@ -53,7 +53,7 @@ final class ConfigServiceLoader {
     this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
     this.eventRunner =
         _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
-    this.parsers = new ConfigParsers(otherParsers);
+    this.parsers = new Parsers(otherParsers);
     this.uriLoaders = new URILoaders(loaders);
   }
 

@@ -3,16 +3,30 @@ package io.avaje.config;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-/**
- * Holds the ConfigParsers for various extension types.
- */
-public final class ConfigParsers {
+public interface ConfigParsers {
+
+  /** Return the ConfigParser for the given extension. */
+  ConfigParser get(String extension);
+
+  /** Return true if the extension has a matching parser. */
+  boolean supportsExtension(String extension);
+
+  /** Return the set of supported extensions. */
+  Set<String> supportedExtensions();
+
+  /** Return the extension ConfigParser pairs. */
+  Set<Entry<String, ConfigParser>> entrySet();
+}
+
+/** Holds the ConfigParsers for various extension types. */
+final class Parsers implements ConfigParsers {
 
   private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
-  ConfigParsers(List<ConfigParser> otherParsers) {
+  Parsers(List<ConfigParser> otherParsers) {
     parserMap.put("properties", new PropertiesParser());
     if (!"true".equals(System.getProperty("skipYaml"))) {
       initYamlParser();
@@ -42,30 +56,22 @@ public final class ConfigParsers {
     }
   }
 
-  /**
-   * Return the extension ConfigParser pairs.
-   */
+  @Override
   public Set<Map.Entry<String, ConfigParser>> entrySet() {
     return parserMap.entrySet();
   }
 
-  /**
-   * Return the ConfigParser for the given extension.
-   */
+  @Override
   public ConfigParser get(String extension) {
     return parserMap.get(extension.toLowerCase());
   }
 
-  /**
-   * Return true if the extension has a matching parser.
-   */
+  @Override
   public boolean supportsExtension(String extension) {
     return parserMap.containsKey(extension.toLowerCase());
   }
 
-  /**
-   * Return the set of supported extensions.
-   */
+  @Override
   public Set<String> supportedExtensions() {
     return parserMap.keySet();
   }

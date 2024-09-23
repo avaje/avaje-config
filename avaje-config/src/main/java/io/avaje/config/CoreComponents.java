@@ -30,7 +30,7 @@ final class CoreComponents {
   CoreComponents() {
     this.runner = new CoreConfiguration.ForegroundEventRunner();
     this.log = new DefaultConfigurationLog();
-    this.parsers = new ConfigParsers(List.of());
+    this.parsers = new Parsers(List.of());
     this.uriLoaders = new URILoaders(List.of());
     this.sources = List.of();
     this.plugins = List.of();
