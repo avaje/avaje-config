@@ -137,7 +137,7 @@ class FileWatchTest {
   }
 
   private static FileWatch fileWatch(CoreConfiguration config, List<File> files) {
-    return new FileWatch(config, files, new ConfigParsers(Collections.emptyList()));
+    return new FileWatch(config, files, new Parsers(Collections.emptyList()));
   }
 
   private void writeContent(String content) throws IOException {
