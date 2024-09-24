@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /** Holds the non-properties ConfigParsers. */
-public final class URILoaders {
+final class URILoaders {
 
   private final Map<String, URIConfigLoader> parserMap = new HashMap<>();
 
