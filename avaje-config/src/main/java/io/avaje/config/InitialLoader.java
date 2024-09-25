@@ -41,6 +41,7 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
+  private final Set<String> loadProperties = new HashSet<>();
   private final Parsers parsers;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
@@ -188,12 +189,14 @@ final class InitialLoader {
   }
 
   /**
-   * Load configuration defined by a <em>load.properties</em> entry in properties file.
+   * Recursively Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
-    if (paths != null) {
+    if (paths != null && !loadProperties.contains(paths)) {
       loadViaPaths(paths);
+      loadProperties.add(paths);
+      loadViaIndirection();
     }
   }
 
@@ -220,7 +223,9 @@ final class InitialLoader {
 
   private void loadViaPaths(String paths) {
     for (String path : splitPaths(paths)) {
-      loadWithExtensionCheck(loadContext.eval(path));
+      if (loadProperties.add(path)) {
+        loadWithExtensionCheck(loadContext.eval(path));
+      }
     }
   }
 
