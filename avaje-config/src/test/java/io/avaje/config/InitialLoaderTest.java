@@ -138,4 +138,12 @@ class InitialLoaderTest {
       System.clearProperty("suppressTestResource");
     }
   }
+
+  @Test
+  void load_withLoadPropertyChain() {
+      InitialLoader loader = newInitialLoader();
+      loader.loadWithExtensionCheck("test-properties/chain/main.properties");
+      var properties = evalFor(loader.load());
+      assertThat(properties.get("override").value()).isEqualTo("d");
+  }
 }
