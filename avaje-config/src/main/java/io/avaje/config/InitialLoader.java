@@ -198,12 +198,19 @@ final class InitialLoader {
       var stack = new ArrayDeque<String>();
       splitAndAddPaths(stack, paths);
       String path;
+      var sentinel = 0;
       while ((path = stack.poll()) != null) {
         loadWithExtensionCheck(loadContext.eval(path));
         var newPath = loadContext.indirectLocation();
         if (!paths.equals(newPath)) {
           paths = newPath;
           splitAndAddPaths(stack, paths);
+        }
+
+        sentinel++;
+        if (sentinel == 69) {
+          throw new IllegalStateException(
+              "Failed to resolve load.properties after 69 iterations. Perhaps Circular load.properties reference?");
         }
       }
     }
