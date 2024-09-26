@@ -194,7 +194,7 @@ final class InitialLoader {
    */
   private void loadViaIndirection(ArrayDeque<String> stack, String previous) {
     String paths = loadContext.indirectLocation();
-    if (!previous.equals(paths)) {
+    if (!previous.equals(paths) && paths != null) {
       var split = splitPaths(paths);
       for (int i = split.length - 1; i >= 0; i--) {
         stack.addFirst(split[i]);
