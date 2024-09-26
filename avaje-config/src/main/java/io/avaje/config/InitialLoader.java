@@ -110,7 +110,6 @@ final class InitialLoader {
    */
   void loadLocalFiles() {
     loadMain(RESOURCE);
-    loadViaProfiles(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
     // load additional profile RESOURCE(s) if added via loadMain()
@@ -259,7 +258,7 @@ final class InitialLoader {
   boolean loadWithExtensionCheck(String fileName) {
 
     // no need to custom URL load regular cp and file schemes
-    fileName = fileName.replace("classpath:/", "").replace("file:/", "");
+    fileName = fileName.replaceFirst("classpath:/", "").replaceFirst("file:/", "");
     if (fileName.contains(":/")) {
 
       return loadURI(fileName);
