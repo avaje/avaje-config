@@ -41,7 +41,6 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Set<String> loadProperties = new HashSet<>();
   private final Parsers parsers;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
@@ -114,7 +113,7 @@ final class InitialLoader {
     loadViaProfiles(RESOURCE);
     loadViaProfiles(FILE);
     loadViaSystemProperty();
-    loadViaIndirection();
+    loadViaIndirection(new ArrayDeque<>(),"");
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
@@ -148,7 +147,9 @@ final class InitialLoader {
 
   private void loadCommandLineArg(String arg) {
     if (isValidExtension(arg)) {
-      loadViaPaths(arg);
+      for (String path : splitPaths(arg)) {
+        loadWithExtensionCheck(loadContext.eval(path));
+      }
     }
   }
 
@@ -191,14 +192,22 @@ final class InitialLoader {
   /**
    * Recursively Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
-  private void loadViaIndirection() {
+  private void loadViaIndirection(ArrayDeque<String> stack, String previous) {
     String paths = loadContext.indirectLocation();
-    if (paths != null && !loadProperties.contains(paths)) {
-      loadViaPaths(paths);
-      loadProperties.add(paths);
-      loadViaIndirection();
+    if (!previous.equals(paths)) {
+      var split = splitPaths(paths);
+      for (int i = split.length - 1; i >= 0; i--) {
+        stack.addFirst(split[i]);
+      }
+      String path = stack.poll();
+      while (path != null) {
+        loadWithExtensionCheck(loadContext.eval(path));
+        loadViaIndirection(stack, paths);
+        path = stack.poll();
+      }
     }
   }
+
 
   @Nullable
   private String[] profiles() {
@@ -217,14 +226,6 @@ final class InitialLoader {
         if ((source != RESOURCE || !profileResourceLoaded.contains(profile)) && load("application-" + profile, source)) {
           profileResourceLoaded.add(profile);
         }
-      }
-    }
-  }
-
-  private void loadViaPaths(String paths) {
-    for (String path : splitPaths(paths)) {
-      if (loadProperties.add(path)) {
-        loadWithExtensionCheck(loadContext.eval(path));
       }
     }
   }
