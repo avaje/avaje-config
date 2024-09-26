@@ -192,22 +192,29 @@ final class InitialLoader {
   /**
    * Recursively Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
-  private void loadViaIndirection(ArrayDeque<String> stack, String previous) {
+  private void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
-    if (!previous.equals(paths) && paths != null) {
-      var split = splitPaths(paths);
-      for (int i = split.length - 1; i >= 0; i--) {
-        stack.addFirst(split[i]);
-      }
-      String path = stack.poll();
-      while (path != null) {
+    if (paths != null) {
+      var stack = new ArrayDeque<String>();
+      splitAndAddPaths(stack, paths);
+      String path;
+      while ((path = stack.poll()) != null) {
         loadWithExtensionCheck(loadContext.eval(path));
-        loadViaIndirection(stack, paths);
-        path = stack.poll();
+        var newPath = loadContext.indirectLocation();
+        if (!paths.equals(newPath)) {
+          paths = newPath;
+          splitAndAddPaths(stack, paths);
+        }
       }
     }
   }
 
+  private void splitAndAddPaths(ArrayDeque<String> stack, String paths) {
+    var split = splitPaths(paths);
+    for (int i = split.length - 1; i >= 0; i--) {
+      stack.addFirst(split[i]);
+    }
+  }
 
   @Nullable
   private String[] profiles() {

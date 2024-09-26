@@ -142,8 +142,12 @@ class InitialLoaderTest {
   @Test
   void load_withLoadPropertyChain() {
       InitialLoader loader = newInitialLoader();
-      loader.loadWithExtensionCheck("test-properties/chain/main.properties");
-      var properties = evalFor(loader.load());
-      assertThat(properties.get("override").value()).isEqualTo("d");
+    loader.loadWithExtensionCheck("test-properties/chain/main.properties");
+    var properties = evalFor(loader.load());
+    assertThat(properties.get("value.a").value()).isEqualTo("true");
+    assertThat(properties.get("value.b").value()).isEqualTo("true");
+    assertThat(properties.get("value.c").value()).isEqualTo("true");
+    assertThat(properties.get("value.d").value()).isEqualTo("true");
+    assertThat(properties.get("override").value()).isEqualTo("d");
   }
 }
