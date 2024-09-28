@@ -44,7 +44,7 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Map<String, ConfigParser> parsers;
-  private final URILoaders uriLoaders;
+  private final Map<String, URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
@@ -295,7 +295,7 @@ final class InitialLoader {
 
     throw new IllegalArgumentException(
         "Expecting only properties or "
-            + uriLoaders.supportedSchemes().stream().map(s -> s + ":/").collect(joining(","))
+            + uriLoaders.keySet().stream().map(s -> s + ":/").collect(joining(","))
             + " uris but got ["
             + uriPath
             + "]");

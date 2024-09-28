@@ -1,11 +1,14 @@
 package io.avaje.config;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 
 /**
  * Load all the avaje-config extensions via ServiceLoader using the single common ConfigExtension
@@ -24,7 +27,7 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
-  private final URILoaders uriLoaders;
+  private final Map<String, URIConfigLoader> uriLoaders;
   private final Map<String, ConfigParser> parsers;
 
   ConfigServiceLoader() {
@@ -39,8 +42,7 @@ final class ConfigServiceLoader {
         sources.add((ConfigurationSource) spi);
       } else if (spi instanceof ConfigurationPlugin) {
         plugins.add((ConfigurationPlugin) spi);
-      } else if (spi instanceof ConfigParser
-          && !"true".equals(System.getProperty("skipCustomParsing"))) {
+      } else if (spi instanceof ConfigParser && !Boolean.getBoolean("skipCustomParsing")) {
         otherParsers.add((ConfigParser) spi);
       } else if (spi instanceof URIConfigLoader) {
         loaders.add((URIConfigLoader) spi);
@@ -54,18 +56,20 @@ final class ConfigServiceLoader {
     }
 
     this.log = spiLog == null ? new DefaultConfigurationLog() : spiLog;
-    this.resourceLoader = spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
+    this.resourceLoader =
+        spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
     this.eventRunner =
         spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
-    this.uriLoaders = new URILoaders(loaders);
+
     this.parsers = initParsers(otherParsers);
+    this.uriLoaders = loaders.stream().collect(toMap((Function<? super URIConfigLoader, ? extends String>) URIConfigLoader::supportedScheme, Function.identity()));
   }
 
   Map<String, ConfigParser> initParsers(List<ConfigParser> parsers) {
 
     var parserMap = new HashMap<String, ConfigParser>();
     parserMap.put("properties", new PropertiesParser());
-    if (!"true".equals(System.getProperty("skipYaml"))) {
+    if (!Boolean.getBoolean("skipYaml")) {
 
       YamlLoader yamlLoader;
       try {
@@ -90,7 +94,7 @@ final class ConfigServiceLoader {
     return parsers;
   }
 
-  public URILoaders uriLoaders() {
+  public Map<String, URIConfigLoader> uriLoaders() {
     return uriLoaders;
   }
 

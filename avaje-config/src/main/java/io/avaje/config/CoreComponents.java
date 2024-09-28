@@ -8,7 +8,7 @@ final class CoreComponents {
   private final ModificationEventRunner runner;
   private final ConfigurationLog log;
   private final Map<String, ConfigParser> parsers;
-  private final URILoaders uriLoaders;
+  private final Map<String, URIConfigLoader> uriLoaders;
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
 
@@ -16,7 +16,7 @@ final class CoreComponents {
       ModificationEventRunner runner,
       ConfigurationLog log,
       Map<String, ConfigParser> parsers,
-      URILoaders uriLoaders,
+      Map<String, URIConfigLoader> uriLoaders,
       List<ConfigurationSource> sources,
       List<ConfigurationPlugin> plugins) {
     this.runner = runner;
@@ -41,7 +41,7 @@ final class CoreComponents {
     return parsers;
   }
 
-  public URILoaders uriLoaders() {
+  public Map<String, URIConfigLoader> uriLoaders() {
     return uriLoaders;
   }
 
