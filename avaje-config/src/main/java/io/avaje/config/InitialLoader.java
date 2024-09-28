@@ -43,7 +43,7 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final ConfigParsers parsers;
+  private final Map<String, ConfigParser> parsers;
   private final URILoaders uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
@@ -156,7 +156,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parsers.supportsExtension(extension);
+    return "properties".equals(extension) || parsers.containsKey(extension);
   }
 
   /**
@@ -273,7 +273,7 @@ final class InitialLoader {
       if (parser == null) {
         throw new IllegalArgumentException(
           "Expecting only properties or "
-            + parsers.supportedExtensions()
+            + parsers.keySet()
             + " file extensions but got ["
             + fileName
             + "]");
