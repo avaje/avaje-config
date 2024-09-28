@@ -267,20 +267,20 @@ final class InitialLoader {
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
 
-      return loadProperties(fileName, RESOURCE) || loadProperties(fileName, FILE);
+      return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-            "Expecting only properties or "
-                + parsers.keySet()
-                + " file extensions but got ["
-                + fileName
-                + "]");
+          "Expecting only properties or "
+            + parsers.keySet()
+            + " file extensions but got ["
+            + fileName
+            + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-          || loadCustomExtension(fileName, parser, FILE);
+        | loadCustomExtension(fileName, parser, FILE);
     }
   }
 
