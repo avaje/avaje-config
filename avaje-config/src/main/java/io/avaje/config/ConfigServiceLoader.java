@@ -25,7 +25,7 @@ final class ConfigServiceLoader {
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
   private final URILoaders uriLoaders;
-  Map<String, ConfigParser> parsers;
+  private final Map<String, ConfigParser> parsers;
 
   ConfigServiceLoader() {
     ModificationEventRunner spiEventRunner = null;

@@ -31,8 +31,8 @@ final class CoreComponents {
   CoreComponents() {
     this.runner = new CoreConfiguration.ForegroundEventRunner();
     this.log = new DefaultConfigurationLog();
-    this.parsers = Map.of();
-    this.uriLoaders = new URILoaders(List.of());
+    this.parsers = ConfigServiceLoader.get().parsers();
+    this.uriLoaders = ConfigServiceLoader.get().uriLoaders();
     this.sources = List.of();
     this.plugins = List.of();
   }
