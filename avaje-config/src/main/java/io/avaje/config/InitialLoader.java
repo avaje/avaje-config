@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -257,12 +258,7 @@ final class InitialLoader {
 
   boolean loadWithExtensionCheck(String fileName) {
 
-    // no need to custom URL load regular cp and file schemes
-    fileName = fileName.replaceFirst("classpath:/", "").replaceFirst("file:/", "");
-    if (fileName.contains(":/")) {
-
-      return loadURI(fileName);
-    }
+    if (loadURI(fileName)) return true;
 
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
@@ -272,33 +268,42 @@ final class InitialLoader {
       var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-          "Expecting only properties or "
-            + parsers.keySet()
-            + " file extensions but got ["
-            + fileName
-            + "]");
+            "Expecting only properties or "
+                + parsers.keySet()
+                + " file extensions or "
+                + uriLoaders.keySet().stream().map(s -> s + ":/").collect(joining(","))
+                + "uri schemes but got ["
+                + fileName
+                + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+          | loadCustomExtension(fileName, parser, FILE);
     }
   }
 
-  private boolean loadURI(String uriPath) {
-    var uri = URI.create(uriPath);
-    final var scheme = uri.getScheme();
+  private boolean loadURI(String fileName) {
+    URI uri;
+    try {
+      uri = new URI(fileName);
+    } catch (URISyntaxException e) {
+      return false;
+    }
+
+    var scheme = uri.getScheme();
+
+    if (scheme == null || "classpath".equals(scheme) || "file".equals(scheme)) {
+
+      return false;
+    }
+
     var loader = uriLoaders.get(scheme);
+
     if (loader != null) {
       loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, "uri scheme " + scheme));
       return true;
     }
-
-    throw new IllegalArgumentException(
-        "Expecting only properties or "
-            + uriLoaders.keySet().stream().map(s -> s + ":/").collect(joining(","))
-            + " uris but got ["
-            + uriPath
-            + "]");
+    return false;
   }
 
   /**
