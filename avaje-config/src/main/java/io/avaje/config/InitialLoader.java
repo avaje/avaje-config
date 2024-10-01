@@ -190,7 +190,7 @@ final class InitialLoader {
   }
 
   /**
-   * Recursively Load configuration defined by a <em>load.properties</em> entry in properties file.
+   * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
