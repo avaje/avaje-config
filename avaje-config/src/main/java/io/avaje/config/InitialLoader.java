@@ -202,6 +202,7 @@ final class InitialLoader {
       while ((path = stack.poll()) != null) {
         loadWithExtensionCheck(loadContext.eval(path));
         var newPath = loadContext.indirectLocation();
+        if (newPath == null) throw new IllegalStateException("truly impossible");
         if (!paths.equals(newPath)) {
           paths = newPath;
           splitAndAddPaths(stack, paths);
