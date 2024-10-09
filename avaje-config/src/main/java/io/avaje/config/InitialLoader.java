@@ -3,11 +3,14 @@ package io.avaje.config;
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -41,10 +44,12 @@ final class InitialLoader {
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Parsers parsers;
+  private final Map<String, ConfigParser> parsers;
+  private final Map<String, URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
+    this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
   }
@@ -153,7 +158,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parsers.supportsExtension(extension);
+    return "properties".equals(extension) || parsers.containsKey(extension);
   }
 
   /**
@@ -252,23 +257,53 @@ final class InitialLoader {
   }
 
   boolean loadWithExtensionCheck(String fileName) {
+
+    if (loadURI(fileName)) return true;
+
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
+
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-          "Expecting only properties or "
-            + parsers.supportedExtensions()
-            + " file extensions but got ["
-            + fileName
-            + "]");
+            "Expecting only properties or "
+                + parsers.keySet()
+                + " file extensions or "
+                + uriLoaders.keySet().stream().map(s -> s + ":/").collect(joining(","))
+                + "uri schemes but got ["
+                + fileName
+                + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+          | loadCustomExtension(fileName, parser, FILE);
     }
+  }
+
+  private boolean loadURI(String fileName) {
+    URI uri;
+    try {
+      uri = new URI(fileName);
+    } catch (URISyntaxException e) {
+      return false;
+    }
+
+    var scheme = uri.getScheme();
+
+    if (scheme == null || "classpath".equals(scheme) || "file".equals(scheme)) {
+
+      return false;
+    }
+
+    var loader = uriLoaders.get(scheme);
+
+    if (loader != null) {
+      loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, "uri scheme " + scheme));
+      return true;
+    }
+    return false;
   }
 
   /**
