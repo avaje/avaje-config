@@ -188,7 +188,7 @@ final class CoreEntry implements Configuration.Entry {
       entryMap.put(key, value);
     }
 
-    void put(String key, String value, String source) {
+    void put(String key, @Nullable String value, String source) {
       entryMap.put(key, CoreEntry.of(value, source));
     }
 
