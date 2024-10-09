@@ -197,8 +197,7 @@ final class InitialLoader {
     }
   }
 
-  @Nullable
-  private String[] profiles() {
+  private String@Nullable[] profiles() {
     final String paths = loadContext.profiles();
     return paths == null ? null : splitPaths(paths);
   }
@@ -321,6 +320,7 @@ final class InitialLoader {
     return false;
   }
 
+  @Nullable
   private InputStream resource(String resourcePath, Source source) {
     return loadContext.resource(resourcePath, source);
   }
