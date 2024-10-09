@@ -111,6 +111,7 @@ final class InitialLoader {
    */
   void loadLocalFiles() {
     loadMain(RESOURCE);
+    loadViaProfiles(RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(FILE);
     // load additional profile RESOURCE(s) if added via loadMain()
