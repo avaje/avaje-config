@@ -6,6 +6,11 @@ import java.util.Map;
 /** Custom URI configuration loader. Used when a matching uri scheme is found in load.properties */
 public interface URIConfigLoader extends ConfigExtension {
 
+  /** redact any sensitive information in the URI when displayed by logging */
+  default String redact(URI uri) {
+    return uri.toString();
+  }
+
   /** URI Scheme Supported by this loader */
   String supportedScheme();
 

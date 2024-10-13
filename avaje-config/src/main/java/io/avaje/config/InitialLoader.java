@@ -301,7 +301,7 @@ final class InitialLoader {
     var loader = uriLoaders.get(scheme);
 
     if (loader != null) {
-      loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, "uri scheme " + scheme));
+      loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, loader.redact(uri)));
       return true;
     }
     return false;
