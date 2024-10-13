@@ -1,6 +1,7 @@
 package io.avaje.config;
 
 import io.avaje.config.CoreEntry.CoreMap;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.lang.System.Logger.Level;
@@ -81,6 +82,7 @@ final class InitialLoadContext {
   /**
    * Return the input stream (maybe null) for the given source.
    */
+  @Nullable
   InputStream resource(String resourcePath, InitialLoader.Source source) {
     InputStream is = null;
     if (source == InitialLoader.Source.RESOURCE) {
