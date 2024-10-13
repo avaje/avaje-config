@@ -27,7 +27,7 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
-  private final Map<String, URIConfigLoader> uriLoaders;
+  private final Map<String, URIConfigParser> uriLoaders;
   private final Map<String, ConfigParser> parsers;
 
   ConfigServiceLoader() {
@@ -35,7 +35,7 @@ final class ConfigServiceLoader {
     ConfigurationLog spiLog = null;
     ResourceLoader spiResourceLoader = null;
     List<ConfigParser> otherParsers = new ArrayList<>();
-    List<URIConfigLoader> loaders = new ArrayList<>();
+    List<URIConfigParser> loaders = new ArrayList<>();
 
     for (var spi : ServiceLoader.load(ConfigExtension.class)) {
       if (spi instanceof ConfigurationSource) {
@@ -44,8 +44,8 @@ final class ConfigServiceLoader {
         plugins.add((ConfigurationPlugin) spi);
       } else if (spi instanceof ConfigParser && !Boolean.getBoolean("skipCustomParsing")) {
         otherParsers.add((ConfigParser) spi);
-      } else if (spi instanceof URIConfigLoader) {
-        loaders.add((URIConfigLoader) spi);
+      } else if (spi instanceof URIConfigParser) {
+        loaders.add((URIConfigParser) spi);
       } else if (spi instanceof ConfigurationLog) {
         spiLog = (ConfigurationLog) spi;
       } else if (spi instanceof ResourceLoader) {
@@ -62,7 +62,7 @@ final class ConfigServiceLoader {
         spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
 
     this.parsers = initParsers(otherParsers);
-    this.uriLoaders = loaders.stream().collect(toMap((Function<? super URIConfigLoader, ? extends String>) URIConfigLoader::supportedScheme, Function.identity()));
+    this.uriLoaders = loaders.stream().collect(toMap((Function<? super URIConfigParser, ? extends String>) URIConfigParser::supportedScheme, Function.identity()));
   }
 
   Map<String, ConfigParser> initParsers(List<ConfigParser> parsers) {
@@ -94,7 +94,7 @@ final class ConfigServiceLoader {
     return parsers;
   }
 
-  public Map<String, URIConfigLoader> uriLoaders() {
+  public Map<String, URIConfigParser> uriLoaders() {
     return uriLoaders;
   }
 

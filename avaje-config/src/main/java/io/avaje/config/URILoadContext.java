@@ -6,7 +6,7 @@ import java.util.function.UnaryOperator;
 
 public interface URILoadContext {
 
-  Optional<ConfigParser> parser(String extension);
+  Optional<ConfigParser> configParser(String extension);
 
   Optional<String> getProperty(String key);
 }
@@ -23,7 +23,7 @@ class DURILoadContext implements URILoadContext {
   }
 
   @Override
-  public Optional<ConfigParser> parser(String extension) {
+  public Optional<ConfigParser> configParser(String extension) {
 
     return Optional.ofNullable(parsersMap.get(extension));
   }
