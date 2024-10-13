@@ -1,6 +1,8 @@
 package io.avaje.config;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -49,6 +51,7 @@ final class ConfigServiceLoader {
     this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
     this.eventRunner = _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
     this.parsers = new Parsers(otherParsers);
+    sources.sort(Comparator.comparingInt(ConfigurationSource::priority));
   }
 
   Parsers parsers() {
