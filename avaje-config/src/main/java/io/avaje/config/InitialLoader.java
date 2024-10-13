@@ -43,6 +43,7 @@ final class InitialLoader {
 
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
+  private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Map<String, ConfigParser> parsers;
   private final Map<String, URIConfigLoader> uriLoaders;
@@ -52,6 +53,7 @@ final class InitialLoader {
     this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
+    this.uriContext = new DURILoadContext(parsers, loadContext::get);
   }
 
   Set<String> loadedFrom() {
@@ -302,7 +304,7 @@ final class InitialLoader {
 
     if (loader != null) {
       final var source = loader.redact(uri);
-      loader.load(uri, parsers).forEach((k, v) -> loadContext.put(k, v, source));
+      loader.load(uri, uriContext).forEach((k, v) -> loadContext.put(k, v, source));
       return true;
     }
     return false;

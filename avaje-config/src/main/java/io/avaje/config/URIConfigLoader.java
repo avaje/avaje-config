@@ -8,6 +8,7 @@ public interface URIConfigLoader extends ConfigExtension {
 
   /** redact any sensitive information in the URI when displayed by logging */
   default String redact(URI uri) {
+
     return uri.toString();
   }
 
@@ -20,5 +21,5 @@ public interface URIConfigLoader extends ConfigExtension {
    *     ConfigParser#supportedExtensions()}
    * @return key/value map of loaded properties
    */
-  Map<String, String> load(URI uri, Map<String, ConfigParser> parsers);
+  Map<String, String> load(URI uri, URILoadContext ctx);
 }

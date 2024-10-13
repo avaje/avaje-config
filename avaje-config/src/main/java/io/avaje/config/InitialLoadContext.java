@@ -107,6 +107,13 @@ final class InitialLoadContext {
     return resourceLoader.getResourceAsStream(resourcePath);
   }
 
+  /** Get a property */
+  String get(String key) {
+
+    var entry = map.get(key);
+    return entry == null ? null : entry.value();
+  }
+
   /**
    * Add a property entry.
    */
