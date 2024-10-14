@@ -8,7 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
+import java.util.function.Function;
+
+import org.jspecify.annotations.Nullable;
 
 public interface URILoadContext {
 
@@ -38,9 +40,11 @@ class DURILoadContext implements URILoadContext {
 
   Map<String, ConfigParser> parsersMap;
 
-  UnaryOperator<String> getProperty;
+  Function<String, @Nullable String> getProperty;
 
-  DURILoadContext(Map<String, ConfigParser> parsersMap, UnaryOperator<String> getPropertyFunction) {
+  DURILoadContext(
+      Map<String, ConfigParser> parsersMap,
+      Function<String, @Nullable String> getPropertyFunction) {
     this.parsersMap = parsersMap;
     this.getProperty = getPropertyFunction;
   }
