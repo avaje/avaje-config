@@ -146,30 +146,38 @@ final class InitialLoadContext {
       indirectLocation = map.get("load.properties.override");
     }
     var result = indirectLocation == null ? null : indirectLocation.value();
-
-    if (result != null && AVAJE_PROFILES.matcher(result).find()) {
-      var join = new StringJoiner(",");
-
-      var profiles = profiles();
-      if (profiles.length == 0) {
-
-        throw new IllegalStateException("No avaje.profiles value detected");
-      }
-
-      for (var path : InitialLoader.splitPaths(result)) {
-        var matcher = AVAJE_PROFILES.matcher(path);
-        if (matcher.find()) {
-          for (var profile : profiles) {
-            join.add(matcher.replaceAll(profile));
-          }
-        } else {
-          join.add(path);
-        }
-        result = join.toString();
-        map.put("load.properties", result, "");
-      }
+    if (result != null && indirectLocation.needsEvaluation()) {
+      result = evalLoadProperties(result);
     }
     return result;
+  }
+
+  private String evalLoadProperties(String result) {
+
+    var join = new StringJoiner(",");
+
+    var profiles = profiles();
+    for (var path : InitialLoader.splitPaths(result)) {
+      var matcher = AVAJE_PROFILES.matcher(path);
+      if (matcher.find()) {
+        if (profiles.length == 0) {
+
+          throw new IllegalStateException("No avaje.profiles value detected");
+        }
+
+        for (var profile : profiles) {
+          join.add(matcher.replaceAll(profile));
+        }
+      } else if (path.contains("${")) {
+        join.add(eval(path));
+      } else {
+
+        join.add(path);
+      }
+    }
+    var expanded = join.toString();
+    map.put("load.properties", expanded, "");
+    return expanded;
   }
 
   String[] profiles() {
