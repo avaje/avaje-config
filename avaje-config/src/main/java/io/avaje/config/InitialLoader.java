@@ -190,7 +190,7 @@ final class InitialLoader {
   /**
    * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
-  private void loadViaIndirection() {
+  void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
