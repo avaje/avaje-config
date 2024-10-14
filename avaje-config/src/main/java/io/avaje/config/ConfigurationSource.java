@@ -5,9 +5,9 @@ package io.avaje.config;
  */
 public interface ConfigurationSource extends ConfigExtension {
 
-  /** The load priority of this data source. Smaller values are loaded first */
+  /** The load priority of this data source. Smaller values are loaded first (going first makes it more likely for values to be overridden) */
   default int priority() {
-    return 1000;
+    return 10;
   }
 
   /**
