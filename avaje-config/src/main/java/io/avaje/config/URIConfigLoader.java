@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Map;
 
 /** Custom URI configuration parser for reading load.properties properties that use a URI. */
-public interface URIConfigParser extends ConfigExtension {
+public interface URIConfigLoader extends ConfigExtension {
 
   /** redact any sensitive information in the URI when displayed by logging */
   default String redact(URI uri) {
