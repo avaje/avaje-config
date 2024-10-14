@@ -121,6 +121,18 @@ class InitialLoaderTest {
   }
 
   @Test
+  void loadViaIndirection_Profiles() {
+    InitialLoader loader = newInitialLoader();
+    loader.entryMap().put("avaje.profiles", "a,b,c", "test");
+    loader.entryMap().put("load.properties", "application-test-${avaje.profiles}.properties", "test");
+    loader.loadViaIndirection();
+
+    assertEquals(
+        loader.entryMap().get("load.properties").value(),
+        "application-test-a.properties,application-test-b.properties,application-test-c.properties");
+  }
+
+  @Test
   void load_withSuppressTestResource() {
     //application-test.yaml is loaded when suppressTestResource is not set to true
     try {

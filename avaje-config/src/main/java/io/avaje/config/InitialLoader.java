@@ -24,7 +24,7 @@ import io.avaje.config.CoreEntry.CoreMap;
 @NullMarked
 final class InitialLoader {
 
-  private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
+ private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
 
   /**
    * Return the Expression evaluator using the given properties.
@@ -190,23 +190,18 @@ final class InitialLoader {
   /**
    * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
-  private void loadViaIndirection() {
+  void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
     if (paths != null) {
       loadViaPaths(paths);
     }
   }
 
-  private String@Nullable[] profiles() {
-    final String paths = loadContext.profiles();
-    return paths == null ? null : splitPaths(paths);
-  }
-
   /**
    * Load configuration defined by a <em>config.profiles</em> property.
    */
   private void loadViaProfiles(Source source) {
-    final var profiles = profiles();
+    final var profiles = loadContext.profiles();
     if (profiles != null) {
       for (final String path : profiles) {
         final var profile = loadContext.eval(path);
@@ -227,7 +222,7 @@ final class InitialLoader {
     return loadContext.size();
   }
 
-  String[] splitPaths(String location) {
+  static String[] splitPaths(String location) {
     return SPLIT_PATHS.split(location);
   }
 

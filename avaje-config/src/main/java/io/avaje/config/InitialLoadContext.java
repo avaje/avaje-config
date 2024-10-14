@@ -6,15 +6,21 @@ import org.jspecify.annotations.Nullable;
 import java.io.*;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.regex.Pattern;
 
 /**
  * Manages the underlying map of properties we are gathering.
  */
 final class InitialLoadContext {
 
+  private static final Pattern AVAJE_PROFILES =
+      Pattern.compile(
+          "\\$\\{avaje\\.profiles\\}|\\$\\{AVAJE_PROFILES\\}", Pattern.CASE_INSENSITIVE);
   private final ConfigurationLog log;
   private final ResourceLoader resourceLoader;
   /**
@@ -139,10 +145,39 @@ final class InitialLoadContext {
     if (indirectLocation == null) {
       indirectLocation = map.get("load.properties.override");
     }
-    return indirectLocation == null ? null : indirectLocation.value();
+    var result = indirectLocation == null ? null : indirectLocation.value();
+
+    if (result != null && AVAJE_PROFILES.matcher(result).find()) {
+      var join = new StringJoiner(",");
+
+      var profiles = profiles();
+      if (profiles.length == 0) {
+
+        throw new IllegalStateException("No avaje.profiles value detected");
+      }
+
+      for (var path : InitialLoader.splitPaths(result)) {
+        var matcher = AVAJE_PROFILES.matcher(path);
+        if (matcher.find()) {
+          for (var profile : profiles) {
+            join.add(matcher.replaceAll(profile));
+          }
+        } else {
+          join.add(path);
+        }
+        result = join.toString();
+        map.put("load.properties", result, "");
+      }
+    }
+    return result;
   }
 
-  String profiles() {
+  String[] profiles() {
+    final String paths = getProfiles();
+    return paths == null ? new String[] {} : InitialLoader.splitPaths(paths);
+  }
+
+  String getProfiles() {
     final var configEntry = map.get("config.profiles");
     final var configProfile = configEntry == null ? System.getProperty("config.profiles") : configEntry.value();
     if (configProfile != null) {
