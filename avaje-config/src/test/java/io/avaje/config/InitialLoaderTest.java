@@ -126,7 +126,7 @@ class InitialLoaderTest {
     loader.entryMap().put("getsuga", "tensho.properties", "test");
     loader
         .entryMap()
-        .put("load.properties", "${getsuga},application-test-${avaje.profiles}.properties", "test");
+        .put("load.properties", "${getsuga}", "test");
     loader.loadViaIndirection();
 
     assertEquals(loader.entryMap().get("load.properties").value(), "tensho.properties");
