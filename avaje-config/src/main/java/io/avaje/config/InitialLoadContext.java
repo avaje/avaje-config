@@ -1,14 +1,20 @@
 package io.avaje.config;
 
-import io.avaje.config.CoreEntry.CoreMap;
-import org.jspecify.annotations.Nullable;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
+
+import io.avaje.config.CoreEntry.CoreMap;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -86,7 +92,7 @@ final class InitialLoadContext {
   InputStream resource(String resourcePath, InitialLoader.Source source) {
     InputStream is = null;
     if (source == InitialLoader.Source.RESOURCE) {
-      is = resourceStream(resourcePath);
+      is = resourceLoader.getResourceAsStream(resourcePath);
       if (is != null) {
         loadedResources.add("resource:" + resourcePath);
       }
@@ -107,6 +113,13 @@ final class InitialLoadContext {
 
   private InputStream resourceStream(String resourcePath) {
     return resourceLoader.getResourceAsStream(resourcePath);
+  }
+
+  /** Get a property */
+  Optional<String> get(String key) {
+
+    return Optional.ofNullable(map.get(key))
+        .map(e -> e.needsEvaluation() ? eval(e.value()) : e.value());
   }
 
   /**

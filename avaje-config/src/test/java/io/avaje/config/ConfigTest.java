@@ -126,7 +126,7 @@ class ConfigTest {
 
     var entry = Config.asConfiguration().entry("myapp.fooName");
     assertThat(entry).isPresent().get().satisfies(e -> {
-      assertThat(e.source()).isEqualTo("resource:application-test.yaml");
+      assertThat(e.source()).isEqualTo("classpath:/application-test.yaml");
       assertThat(e.value()).isEqualTo("Hello");
     });
 
