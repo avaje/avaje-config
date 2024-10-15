@@ -62,8 +62,9 @@ final class ConfigServiceLoader {
         spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
 
     this.parsers = initParsers(otherParsers);
-    this.uriLoaders = loaders.stream().collect(toMap((Function<? super URIConfigLoader, ? extends String>) URIConfigLoader::supportedScheme, Function.identity()));
+    this.uriLoaders = initloaders(loaders);
   }
+
 
   Map<String, ConfigParser> initParsers(List<ConfigParser> parsers) {
 
@@ -84,6 +85,17 @@ final class ConfigServiceLoader {
 
     for (ConfigParser parser : parsers) {
       for (var ext : parser.supportedExtensions()) {
+        parserMap.put(ext, parser);
+      }
+    }
+    return Collections.unmodifiableMap(parserMap);
+  }
+
+  Map<String, URIConfigLoader> initloaders(List<URIConfigLoader> parsers) {
+
+    var parserMap = new HashMap<String, URIConfigLoader>();
+    for (var parser : parsers) {
+      for (var ext : parser.supportedSchemes()) {
         parserMap.put(ext, parser);
       }
     }

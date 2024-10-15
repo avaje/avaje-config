@@ -13,7 +13,7 @@ public interface URIConfigLoader extends ConfigExtension {
   }
 
   /** URI Scheme Supported by this loader */
-  String supportedScheme();
+  String[] supportedSchemes();
 
   /**
    * @param uri uri from which to load data

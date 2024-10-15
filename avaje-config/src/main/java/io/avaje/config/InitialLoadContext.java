@@ -8,6 +8,7 @@ import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -110,10 +111,10 @@ final class InitialLoadContext {
   }
 
   /** Get a property */
-  String get(String key) {
+  Optional<String> get(String key) {
 
-    var entry = map.get(key);
-    return entry == null ? null : entry.value();
+    return Optional.ofNullable(map.get(key))
+        .map(e -> e.needsEvaluation() ? eval(e.value()) : e.value());
   }
 
   /**

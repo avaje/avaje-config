@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 
 public interface URILoadContext {
 
-  Optional<ConfigParser> configParser(String extension);
+  ConfigParser configParser(String extension);
 
   Optional<String> getProperty(String key);
 
@@ -40,24 +40,29 @@ class DURILoadContext implements URILoadContext {
 
   Map<String, ConfigParser> parsersMap;
 
-  Function<String, @Nullable String> getProperty;
+  Function<String, Optional<String>> getProperty;
 
   DURILoadContext(
       Map<String, ConfigParser> parsersMap,
-      Function<String, @Nullable String> getPropertyFunction) {
+      Function<String, Optional<String>> getPropertyFunction) {
     this.parsersMap = parsersMap;
     this.getProperty = getPropertyFunction;
   }
 
   @Override
-  public Optional<ConfigParser> configParser(String extension) {
+  public ConfigParser configParser(String extension) {
+    var parser = parsersMap.get(extension);
+    if (parser == null) {
 
-    return Optional.ofNullable(parsersMap.get(extension));
+      throw new IllegalArgumentException("No ConfigParser found for file extension" + extension);
+    }
+
+    return parser;
   }
 
   @Override
   public Optional<String> getProperty(String key) {
 
-    return Optional.ofNullable(getProperty.apply(key));
+    return getProperty.apply(key);
   }
 }
