@@ -266,7 +266,7 @@ final class InitialLoader {
 
   boolean loadWithExtensionCheck(String fileName) {
 
-    return loadURI("classpath:/" + fileName) | loadURI(fileName);
+    return loadURI(fileName) | loadURI("classpath:/" + fileName);
   }
 
   private boolean loadURI(String fileName) {
