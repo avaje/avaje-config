@@ -3,6 +3,7 @@ package io.avaje.config;
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,13 +41,17 @@ final class InitialLoader {
 
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
+  private final ConfigLoadCTX configContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Parsers parsers;
+  private final Map<String, ConfigParser> parsers;
+  private final Map<String, SuperConfigSource> superConfigSources;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
+    this.superConfigSources = components.superConfigSources();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
+    this.configContext = new DConfigLoadCTX(parsers, loadContext::get);
   }
 
   Set<String> loadedFrom() {
@@ -153,7 +158,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parsers.supportsExtension(extension);
+    return "properties".equals(extension) || parsers.containsKey(extension);
   }
 
   /**
@@ -252,22 +257,40 @@ final class InitialLoader {
   }
 
   boolean loadWithExtensionCheck(String fileName) {
+
+    var sourcesIdx = fileName.indexOf("config-source:");
+
+    if (sourcesIdx > -1) {
+
+      var sources = superConfigSources.get(fileName.substring(sourcesIdx + 1));
+
+      if (sources != null) {
+        sources.load(configContext).forEach((k, v) -> loadContext.put(k, v, fileName));
+        return true;
+      }
+    }
+
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
+
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-          "Expecting only properties or "
-            + parsers.supportedExtensions()
-            + " file extensions but got ["
-            + fileName
-            + "]");
+            "Expecting only properties or "
+                + parsers.keySet()
+                + " file extensions or "
+                + superConfigSources.keySet().stream()
+                    .map(s -> "config-source:" + s)
+                    .collect(joining(","))
+                + "config sources but got ["
+                + fileName
+                + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+          | loadCustomExtension(fileName, parser, FILE);
     }
   }
 

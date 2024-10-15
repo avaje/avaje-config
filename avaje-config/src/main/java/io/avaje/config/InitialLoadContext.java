@@ -8,6 +8,7 @@ import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -107,6 +108,13 @@ final class InitialLoadContext {
 
   private InputStream resourceStream(String resourcePath) {
     return resourceLoader.getResourceAsStream(resourcePath);
+  }
+
+  /** Get a property */
+  Optional<String> get(String key) {
+
+    return Optional.ofNullable(map.get(key))
+        .map(e -> e.needsEvaluation() ? eval(e.value()) : e.value());
   }
 
   /**
