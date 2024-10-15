@@ -254,7 +254,7 @@ final class InitialLoader {
   boolean loadWithExtensionCheck(String fileName) {
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
-      return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
+      return loadProperties(fileName, RESOURCE) || loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
@@ -267,7 +267,7 @@ final class InitialLoader {
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+        || loadCustomExtension(fileName, parser, FILE);
     }
   }
 
