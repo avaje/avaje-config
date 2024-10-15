@@ -70,7 +70,7 @@ class InitialLoaderTest {
     loader.loadProperties("test-properties/one.properties", RESOURCE);
     var properties = evalFor(loader.entryMap());
 
-    assertThat(properties.get("hello").source()).isEqualTo("resource:test-properties/one.properties");
+    assertThat(properties.get("hello").source()).isEqualTo("classpath:/test-properties/one.properties");
     assertThat(properties.get("hello").value()).isEqualTo("there");
     assertThat(properties.get("name").value()).isEqualTo("Rob");
     assertThat(properties.get("statusPageUrl").value()).isEqualTo("https://host1:9876/status");

@@ -3,11 +3,14 @@ package io.avaje.config;
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -40,13 +43,17 @@ final class InitialLoader {
 
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
+  private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Parsers parsers;
+  private final Map<String, ConfigParser> parsers;
+  private final Map<String, URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
+    this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
+    this.uriContext = new DURILoadContext(parsers, loadContext::get);
   }
 
   Set<String> loadedFrom() {
@@ -153,7 +160,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parsers.supportsExtension(extension);
+    return "properties".equals(extension) || parsers.containsKey(extension);
   }
 
   /**
@@ -251,24 +258,39 @@ final class InitialLoader {
     }
   }
 
-  boolean loadWithExtensionCheck(String fileName) {
-    var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-    if ("properties".equals(extension)) {
-      return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
-    } else {
-      var parser = parsers.get(extension);
-      if (parser == null) {
-        throw new IllegalArgumentException(
-          "Expecting only properties or "
-            + parsers.supportedExtensions()
-            + " file extensions but got ["
-            + fileName
-            + "]");
-      }
+  boolean loadProperties(String fileName) {
+    loadURI(fileName);
 
-      return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+    return loadURI("classpath:/" + fileName) | loadURI(fileName);
+  }
+
+  boolean loadWithExtensionCheck(String fileName) {
+
+    return loadURI("classpath:/" + fileName) | loadURI(fileName);
+  }
+
+  private boolean loadURI(String fileName) {
+    URI uri;
+    try {
+      uri = new URI(fileName);
+    } catch (URISyntaxException e) {
+      return false;
     }
+
+    var loader = uriLoaders.get(uri.getScheme());
+
+    if (loader != null) {
+      final var source = loader.redact(uri);
+      var kv = loader.load(uri, uriContext);
+      if (kv.isEmpty()) {
+        return false;
+      }
+      kv.forEach((k, v) -> loadContext.put(k, v, source));
+
+      loadContext.loadedFrom().add(uri.toString());
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -278,66 +300,25 @@ final class InitialLoader {
     return loadContext.entryMap();
   }
 
-  /**
-   * Attempt to load a properties and yaml/yml file. Return true if at least one was loaded.
-   */
+  /** Attempt to load a properties and yaml/yml file. Return true if at least one was loaded. */
   boolean load(String resourcePath, Source source) {
-    return loadProperties(resourcePath + ".properties", source) || loadCustom(resourcePath, source);
-  }
 
-  private boolean loadCustom(String resourcePath, Source source) {
-    for (var entry : parsers.entrySet()) {
-      var extension = entry.getKey();
-      if (loadCustomExtension(resourcePath + "." + extension, entry.getValue(), source)) {
-        return true;
-      }
-    }
-    return false;
-  }
+    var prefix = source == FILE ? "": "classpath:/";
 
-  boolean loadCustomExtension(String resourcePath, ConfigParser parser, Source source) {
-    try (InputStream is = resource(resourcePath, source)) {
-      if (is != null) {
-        var sourceName = (source == RESOURCE ? "resource:" : "file:") + resourcePath;
-        parser.load(is).forEach((k, v) -> loadContext.put(k, v, sourceName));
-        return true;
-      }
-    } catch (Exception e) {
-      throw new IllegalStateException("Error loading properties - " + resourcePath, e);
-    }
-    return false;
+    return loadCustom(prefix + resourcePath);
   }
 
   boolean loadProperties(String resourcePath, Source source) {
-    try (InputStream is = resource(resourcePath, source)) {
-      if (is != null) {
-        loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
+    var prefix = source == FILE ? "": "classpath:/";
+    return loadURI(prefix + resourcePath);
+  }
+
+  private boolean loadCustom(String resourcePath) {
+    for (var extension : parsers.keySet()) {
+      if (loadURI(resourcePath + "." + extension)) {
         return true;
       }
-    } catch (IOException e) {
-      throw new UncheckedIOException("Error loading properties - " + resourcePath, e);
     }
     return false;
   }
-
-  @Nullable
-  private InputStream resource(String resourcePath, Source source) {
-    return loadContext.resource(resourcePath, source);
-  }
-
-  private void loadProperties(InputStream is, String source) throws IOException {
-    Properties properties = new Properties();
-    properties.load(is);
-    put(properties, source);
-  }
-
-  private void put(Properties properties, String source) {
-    Enumeration<?> enumeration = properties.propertyNames();
-    while (enumeration.hasMoreElements()) {
-      String key = (String) enumeration.nextElement();
-      String val = properties.getProperty(key);
-      loadContext.put(key, val, source);
-    }
-  }
-
 }
