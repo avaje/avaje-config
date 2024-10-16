@@ -53,7 +53,7 @@ final class InitialLoader {
     this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
-    this.uriContext = new DURILoadContext(parsers, loadContext::get);
+    this.uriContext = new DURILoadContext(log, parsers, loadContext::get);
   }
 
   Set<String> loadedFrom() {

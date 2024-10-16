@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.jspecify.annotations.Nullable;
-
 public interface URILoadContext {
 
   ConfigParser configParser(String extension);
+
+  ConfigurationLog logger();
 
   Optional<String> getProperty(String key);
 
@@ -37,16 +37,22 @@ public interface URILoadContext {
 }
 
 class DURILoadContext implements URILoadContext {
-
+  ConfigurationLog logger;
   Map<String, ConfigParser> parsersMap;
 
   Function<String, Optional<String>> getProperty;
 
   DURILoadContext(
+      ConfigurationLog logger,
       Map<String, ConfigParser> parsersMap,
       Function<String, Optional<String>> getPropertyFunction) {
     this.parsersMap = parsersMap;
     this.getProperty = getPropertyFunction;
+  }
+
+  @Override
+  public ConfigurationLog logger() {
+    return logger;
   }
 
   @Override
