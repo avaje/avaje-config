@@ -120,12 +120,12 @@ final class InitialLoader {
     loadViaProfiles(RESOURCE);
     loadViaProfiles(FILE);
     loadViaSystemProperty();
-    loadViaIndirection();
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
       loadLocalDev();
     }
+    loadViaIndirection();
     loadViaCommandLineArgs();
   }
 
