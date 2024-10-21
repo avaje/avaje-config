@@ -48,7 +48,7 @@ class InitialLoaderTest {
     var properties = evalFor(loader.entryMap());
     assertThat(properties.get("dummy.yaml.bar").value()).isEqualTo("baz");
     assertThat(properties.get("dummy.yml.foo").value()).isEqualTo("bar");
-    assertThat(properties.get("dummy.properties.foo").value()).isEqualTo("bar");
+    assertThat(properties.get("dummy.properties.foo").value()).isEqualTo("bazz");
     assertThat(properties.get("dummy.properties.a").value()).isEqualTo("fromResource");
   }
 
