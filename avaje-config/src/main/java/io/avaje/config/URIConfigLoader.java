@@ -12,8 +12,8 @@ public interface URIConfigLoader extends ConfigExtension {
     return uri.toString();
   }
 
-  /** URI Scheme Supported by this loader */
-  String[] supportedSchemes();
+  /** Whether the URI is supported by this loader */
+  boolean supports(URI uri);
 
   /**
    * @param uri uri from which to load data

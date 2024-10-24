@@ -27,7 +27,7 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
-  private final Map<String, URIConfigLoader> uriLoaders;
+  private final List<URIConfigLoader> uriLoaders;
   private final Map<String, ConfigParser> parsers;
 
   ConfigServiceLoader() {
@@ -62,7 +62,7 @@ final class ConfigServiceLoader {
         spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
 
     this.parsers = initParsers(otherParsers);
-    this.uriLoaders = initloaders(loaders);
+    this.uriLoaders = loaders;
   }
 
 
@@ -91,22 +91,11 @@ final class ConfigServiceLoader {
     return Collections.unmodifiableMap(parserMap);
   }
 
-  Map<String, URIConfigLoader> initloaders(List<URIConfigLoader> parsers) {
-
-    var parserMap = new HashMap<String, URIConfigLoader>();
-    for (var parser : parsers) {
-      for (var ext : parser.supportedSchemes()) {
-        parserMap.put(ext, parser);
-      }
-    }
-    return Collections.unmodifiableMap(parserMap);
-  }
-
   Map<String, ConfigParser> parsers() {
     return parsers;
   }
 
-  public Map<String, URIConfigLoader> uriLoaders() {
+  public List<URIConfigLoader> uriLoaders() {
     return uriLoaders;
   }
 

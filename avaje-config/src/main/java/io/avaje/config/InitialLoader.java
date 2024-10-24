@@ -46,7 +46,7 @@ final class InitialLoader {
   private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Map<String, ConfigParser> parsers;
-  private final Map<String, URIConfigLoader> uriLoaders;
+  private final List<URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
@@ -273,8 +273,8 @@ final class InitialLoader {
             "Expecting only properties or "
                 + parsers.keySet()
                 + " file extensions or "
-                + uriLoaders.keySet().stream().map(s -> s + ":/").collect(joining(","))
-                + "uri schemes but got ["
+                + uriLoaders.stream().map(s -> s.getClass().getSimpleName()).collect(joining(","))
+                + " compatible uri schemes but got ["
                 + fileName
                 + "]");
       }
@@ -299,7 +299,7 @@ final class InitialLoader {
       return false;
     }
 
-    var loader = uriLoaders.get(scheme);
+    var loader = getLoader(uri);
 
     if (loader != null) {
       final var source = loader.redact(uri);
@@ -307,6 +307,19 @@ final class InitialLoader {
       return true;
     }
     return false;
+  }
+
+  @Nullable
+  private URIConfigLoader getLoader(URI uri) {
+
+    for (var loader : uriLoaders) {
+
+      if (loader.supports(uri)) {
+        return loader;
+      }
+    }
+
+    return null;
   }
 
   /**
