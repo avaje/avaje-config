@@ -18,7 +18,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
-  private final Parsers parsers = serviceLoader.parsers();
+  private final Map<String, ConfigParser> parsers = serviceLoader.parsers();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
