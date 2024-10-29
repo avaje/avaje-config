@@ -25,7 +25,6 @@ import io.avaje.config.CoreEntry.CoreMap;
 final class InitialLoader {
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
-  private static final boolean SINGLE_LOAD = Boolean.getBoolean("config.single.load");
 
   /**
    * Return the Expression evaluator using the given properties.
@@ -43,6 +42,7 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Parsers parsers;
+  private final boolean SINGLE_LOAD = Boolean.getBoolean("config.single.load");
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
