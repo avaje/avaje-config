@@ -6,7 +6,7 @@ final class CoreComponents {
 
   private final ModificationEventRunner runner;
   private final ConfigurationLog log;
-  private final ConfigParsers parsers;
+  private final Parsers parsers;
   private final List<URIConfigLoader> uriLoaders;
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
@@ -14,7 +14,7 @@ final class CoreComponents {
   CoreComponents(
       ModificationEventRunner runner,
       ConfigurationLog log,
-      ConfigParsers parsers,
+      Parsers parsers,
       List<URIConfigLoader> uriLoaders,
       List<ConfigurationSource> sources,
       List<ConfigurationPlugin> plugins) {
@@ -36,7 +36,7 @@ final class CoreComponents {
     this.plugins = List.of();
   }
 
-  ConfigParsers parsers() {
+  Parsers parsers() {
     return parsers;
   }
 

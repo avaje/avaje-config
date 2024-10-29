@@ -22,7 +22,7 @@ final class ConfigServiceLoader {
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
   private final List<URIConfigLoader> uriLoaders;
-  private final ConfigParsers parsers;
+  private final Parsers parsers;
 
   ConfigServiceLoader() {
     ModificationEventRunner spiEventRunner = null;
@@ -57,7 +57,7 @@ final class ConfigServiceLoader {
     this.uriLoaders = loaders;
   }
 
-  ConfigParsers parsers() {
+  Parsers parsers() {
     return parsers;
   }
 

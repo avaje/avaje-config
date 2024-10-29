@@ -45,7 +45,7 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final ConfigParsers parsers;
+  private final Parsers parsers;
   private final List<URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {

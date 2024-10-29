@@ -38,13 +38,13 @@ public interface URILoadContext {
 
 class DURILoadContext implements URILoadContext {
   ConfigurationLog logger;
-  ConfigParsers parsers;
+  Parsers parsers;
 
   Function<String, Optional<String>> getProperty;
 
   DURILoadContext(
       ConfigurationLog logger,
-      ConfigParsers parsers,
+      Parsers parsers,
       Function<String, Optional<String>> getPropertyFunction) {
     this.parsers = parsers;
     this.getProperty = getPropertyFunction;

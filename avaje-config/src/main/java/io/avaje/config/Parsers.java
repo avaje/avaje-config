@@ -3,26 +3,9 @@ package io.avaje.config;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-public interface ConfigParsers {
-
-  /** Return the ConfigParser for the given extension. */
-  ConfigParser get(String extension);
-
-  /** Return true if the extension has a matching parser. */
-  boolean supportsExtension(String extension);
-
-  /** Return the set of supported extensions. */
-  Set<String> supportedExtensions();
-
-  /** Return the extension ConfigParser pairs. */
-  Set<Entry<String, ConfigParser>> entrySet();
-}
-
-/** Holds the ConfigParsers for various extension types. */
-final class Parsers implements ConfigParsers {
+final class Parsers {
 
   private final Map<String, ConfigParser> parserMap = new HashMap<>();
 
@@ -56,22 +39,18 @@ final class Parsers implements ConfigParsers {
     }
   }
 
-  @Override
   public Set<Map.Entry<String, ConfigParser>> entrySet() {
     return parserMap.entrySet();
   }
 
-  @Override
   public ConfigParser get(String extension) {
     return parserMap.get(extension.toLowerCase());
   }
 
-  @Override
   public boolean supportsExtension(String extension) {
     return parserMap.containsKey(extension.toLowerCase());
   }
 
-  @Override
   public Set<String> supportedExtensions() {
     return parserMap.keySet();
   }

@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 final class CoreConfiguration implements Configuration {
 
-  private final ConfigParsers parsers;
+  private final Parsers parsers;
   private final ConfigurationLog log;
   private final ModifyAwareProperties properties;
   private final ReentrantLock lock = new ReentrantLock();
