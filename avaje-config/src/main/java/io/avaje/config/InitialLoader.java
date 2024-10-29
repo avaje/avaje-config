@@ -42,7 +42,7 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Parsers parsers;
-  private final boolean SINGLE_LOAD = Boolean.getBoolean("config.single.load");
+  private final boolean singleLoad = Boolean.getBoolean("config.single.load");
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
@@ -255,7 +255,8 @@ final class InitialLoader {
   boolean loadWithExtensionCheck(String fileName) {
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
-      return loadProperties(fileName, RESOURCE) | (SINGLE_LOAD || loadProperties(fileName, FILE));
+      var loadedProperties = loadProperties(fileName, RESOURCE);
+      return loadedProperties | (singleLoad && loadedProperties || loadProperties(fileName, FILE));
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
@@ -267,8 +268,10 @@ final class InitialLoader {
             + "]");
       }
 
-      return loadCustomExtension(fileName, parser, RESOURCE)
-          | (SINGLE_LOAD || loadCustomExtension(fileName, parser, FILE));
+      var loadedProperties = loadCustomExtension(fileName, parser, RESOURCE);
+
+      return loadedProperties
+          | (singleLoad && loadedProperties || loadCustomExtension(fileName, parser, FILE));
     }
   }
 

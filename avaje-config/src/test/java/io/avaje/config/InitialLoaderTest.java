@@ -53,6 +53,24 @@ class InitialLoaderTest {
   }
 
   @Test
+  void loadWithExtensionCheck_Single_Load() {
+    System.setProperty("config.single.load", "true");
+    InitialLoader loader = newInitialLoader();
+    loader.loadWithExtensionCheck("test-dummy.properties");
+    loader.loadWithExtensionCheck("test-dummy.yml");
+    loader.loadWithExtensionCheck("test-dummy2.yaml");
+
+    var properties = evalFor(loader.entryMap());
+    assertThat(properties.get("dummy.yaml.bar").value()).isEqualTo("baz");
+    assertThat(properties.get("dummy.yml.foo").value()).isEqualTo("bar");
+    assertThat(properties.get("dummy.properties.foo").value()).isEqualTo("bazz");
+    assertThat(properties.get("dummy.properties.a").value()).isEqualTo("fromResource");
+
+    System.setProperty("config.single.load", "false");
+  }
+
+
+  @Test
   void loadYaml() {
     InitialLoader loader = newInitialLoader();
     loader.loadWithExtensionCheck("test-properties/foo.yml");
