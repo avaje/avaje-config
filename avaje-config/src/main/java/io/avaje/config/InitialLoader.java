@@ -25,6 +25,7 @@ import io.avaje.config.CoreEntry.CoreMap;
 final class InitialLoader {
 
   private static final Pattern SPLIT_PATHS = Pattern.compile("[\\s,;]+");
+  private static final boolean SINGLE_LOAD = Boolean.getBoolean("config.single.load");
 
   /**
    * Return the Expression evaluator using the given properties.
@@ -254,7 +255,7 @@ final class InitialLoader {
   boolean loadWithExtensionCheck(String fileName) {
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
-      return loadProperties(fileName, RESOURCE) || loadProperties(fileName, FILE);
+      return loadProperties(fileName, RESOURCE) | (SINGLE_LOAD || loadProperties(fileName, FILE));
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
@@ -267,7 +268,7 @@ final class InitialLoader {
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        || loadCustomExtension(fileName, parser, FILE);
+          | (SINGLE_LOAD || loadCustomExtension(fileName, parser, FILE));
     }
   }
 
