@@ -38,15 +38,15 @@ public interface URILoadContext {
 
 class DURILoadContext implements URILoadContext {
   ConfigurationLog logger;
-  Map<String, ConfigParser> parsersMap;
+  ConfigParsers parsers;
 
   Function<String, Optional<String>> getProperty;
 
   DURILoadContext(
       ConfigurationLog logger,
-      Map<String, ConfigParser> parsersMap,
+      ConfigParsers parsers,
       Function<String, Optional<String>> getPropertyFunction) {
-    this.parsersMap = parsersMap;
+    this.parsers = parsers;
     this.getProperty = getPropertyFunction;
   }
 
@@ -57,7 +57,7 @@ class DURILoadContext implements URILoadContext {
 
   @Override
   public ConfigParser configParser(String extension) {
-    var parser = parsersMap.get(extension);
+    var parser = parsers.get(extension);
     if (parser == null) {
 
       throw new IllegalArgumentException("No ConfigParser found for file extension" + extension);

@@ -1,14 +1,8 @@
 package io.avaje.config;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.function.Function;
 
 /**
  * Load all the avaje-config extensions via ServiceLoader using the single common ConfigExtension
@@ -28,7 +22,7 @@ final class ConfigServiceLoader {
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
   private final List<URIConfigLoader> uriLoaders;
-  private final Map<String, ConfigParser> parsers;
+  private final ConfigParsers parsers;
 
   ConfigServiceLoader() {
     ModificationEventRunner spiEventRunner = null;
@@ -42,7 +36,7 @@ final class ConfigServiceLoader {
         sources.add((ConfigurationSource) spi);
       } else if (spi instanceof ConfigurationPlugin) {
         plugins.add((ConfigurationPlugin) spi);
-      } else if (spi instanceof ConfigParser && !Boolean.getBoolean("skipCustomParsing")) {
+      } else if (spi instanceof ConfigParser) {
         otherParsers.add((ConfigParser) spi);
       } else if (spi instanceof URIConfigLoader) {
         loaders.add((URIConfigLoader) spi);
@@ -56,42 +50,14 @@ final class ConfigServiceLoader {
     }
 
     this.log = spiLog == null ? new DefaultConfigurationLog() : spiLog;
-    this.resourceLoader =
-        spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
+    this.resourceLoader = spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
     this.eventRunner =
         spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
-
-    this.parsers = initParsers(otherParsers);
+    this.parsers = new Parsers(otherParsers);
     this.uriLoaders = loaders;
   }
 
-
-  Map<String, ConfigParser> initParsers(List<ConfigParser> parsers) {
-
-    var parserMap = new HashMap<String, ConfigParser>();
-    parserMap.put("properties", new PropertiesParser());
-    if (!Boolean.getBoolean("skipYaml")) {
-
-      YamlLoader yamlLoader;
-      try {
-        Class.forName("org.yaml.snakeyaml.Yaml");
-        yamlLoader = new YamlLoaderSnake();
-      } catch (ClassNotFoundException e) {
-        yamlLoader = new YamlLoaderSimple();
-      }
-      parserMap.put("yml", yamlLoader);
-      parserMap.put("yaml", yamlLoader);
-    }
-
-    for (ConfigParser parser : parsers) {
-      for (var ext : parser.supportedExtensions()) {
-        parserMap.put(ext, parser);
-      }
-    }
-    return Collections.unmodifiableMap(parserMap);
-  }
-
-  Map<String, ConfigParser> parsers() {
+  ConfigParsers parsers() {
     return parsers;
   }
 

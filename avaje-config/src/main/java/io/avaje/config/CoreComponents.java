@@ -1,13 +1,12 @@
 package io.avaje.config;
 
 import java.util.List;
-import java.util.Map;
 
 final class CoreComponents {
 
   private final ModificationEventRunner runner;
   private final ConfigurationLog log;
-  private final Map<String, ConfigParser> parsers;
+  private final ConfigParsers parsers;
   private final List<URIConfigLoader> uriLoaders;
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
@@ -15,7 +14,7 @@ final class CoreComponents {
   CoreComponents(
       ModificationEventRunner runner,
       ConfigurationLog log,
-      Map<String, ConfigParser> parsers,
+      ConfigParsers parsers,
       List<URIConfigLoader> uriLoaders,
       List<ConfigurationSource> sources,
       List<ConfigurationPlugin> plugins) {
@@ -37,7 +36,7 @@ final class CoreComponents {
     this.plugins = List.of();
   }
 
-  Map<String, ConfigParser> parsers() {
+  ConfigParsers parsers() {
     return parsers;
   }
 

@@ -19,7 +19,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
-  private final Map<String, ConfigParser> parsers = serviceLoader.parsers();
+  private final ConfigParsers parsers = serviceLoader.parsers();
   private final List<URIConfigLoader> uriLoaders = serviceLoader.uriLoaders();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();

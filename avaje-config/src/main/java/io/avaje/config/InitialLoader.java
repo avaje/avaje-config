@@ -45,7 +45,7 @@ final class InitialLoader {
   private final InitialLoadContext loadContext;
   private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
-  private final Map<String, ConfigParser> parsers;
+  private final ConfigParsers parsers;
   private final List<URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
@@ -160,7 +160,7 @@ final class InitialLoader {
 
   private boolean isValidExtension(String arg) {
     var extension = arg.substring(arg.lastIndexOf(".") + 1);
-    return "properties".equals(extension) || parsers.containsKey(extension);
+    return "properties".equals(extension) || parsers.supportsExtension(extension);
   }
 
   /**
@@ -271,7 +271,7 @@ final class InitialLoader {
       if (parser == null) {
         throw new IllegalArgumentException(
             "Expecting only properties or "
-                + parsers.keySet()
+                + parsers.supportedExtensions()
                 + " file extensions or "
                 + uriLoaders.stream().map(s -> s.getClass().getSimpleName()).collect(joining(","))
                 + " compatible uri schemes but got ["
