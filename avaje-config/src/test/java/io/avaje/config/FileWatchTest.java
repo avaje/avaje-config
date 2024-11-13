@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -137,7 +138,7 @@ class FileWatchTest {
   }
 
   private static FileWatch fileWatch(CoreConfiguration config, List<File> files) {
-    return new FileWatch(config, files, new Parsers(Collections.emptyList()));
+    return new FileWatch(config, files, ConfigServiceLoader.get().parsers());
   }
 
   private void writeContent(String content) throws IOException {
