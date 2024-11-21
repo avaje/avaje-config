@@ -1,14 +1,20 @@
 package io.avaje.config;
 
-import io.avaje.config.CoreEntry.CoreMap;
-import org.jspecify.annotations.Nullable;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
+
+import org.jspecify.annotations.Nullable;
+
+import io.avaje.config.CoreEntry.CoreMap;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -127,9 +133,7 @@ final class InitialLoadContext {
     return map;
   }
 
-  /**
-   * Read the special properties that can point to an external properties source.
-   */
+  /** Read the special properties that can point to an external properties source. */
   String indirectLocation() {
     String location = System.getProperty("load.properties");
     if (location != null) {
@@ -139,7 +143,12 @@ final class InitialLoadContext {
     if (indirectLocation == null) {
       indirectLocation = map.get("load.properties.override");
     }
-    return indirectLocation == null ? null : indirectLocation.value();
+    var result = indirectLocation == null ? null : indirectLocation.value();
+    if (result != null && indirectLocation.needsEvaluation()) {
+      result = eval(result);
+      map.put("load.properties", result, "");
+    }
+    return result;
   }
 
   String profiles() {
