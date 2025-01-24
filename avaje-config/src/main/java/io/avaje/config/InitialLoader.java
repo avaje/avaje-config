@@ -147,7 +147,9 @@ final class InitialLoader {
 
   private void loadCommandLineArg(String arg) {
     if (isValidExtension(arg)) {
-      loadViaPaths(arg);
+      for (String path : splitPaths(arg)) {
+        loadWithExtensionCheck(loadContext.eval(path));
+      }
     }
   }
 
@@ -193,7 +195,32 @@ final class InitialLoader {
   private void loadViaIndirection() {
     String paths = loadContext.indirectLocation();
     if (paths != null) {
-      loadViaPaths(paths);
+      var stack = new ArrayDeque<String>();
+      splitAndAddPaths(stack, paths);
+      String path;
+      var sentinel = 0;
+      while ((path = stack.poll()) != null) {
+        loadWithExtensionCheck(loadContext.eval(path));
+        var newPath = loadContext.indirectLocation();
+        if (newPath == null) throw new IllegalStateException("truly impossible");
+        if (!paths.equals(newPath)) {
+          paths = newPath;
+          splitAndAddPaths(stack, paths);
+        }
+
+        sentinel++;
+        if (sentinel == 69) {
+          throw new IllegalStateException(
+              "Failed to resolve load.properties after 69 iterations. Perhaps Circular load.properties reference?");
+        }
+      }
+    }
+  }
+
+  private void splitAndAddPaths(ArrayDeque<String> stack, String paths) {
+    var split = splitPaths(paths);
+    for (int i = split.length - 1; i >= 0; i--) {
+      stack.addFirst(split[i]);
     }
   }
 
@@ -214,12 +241,6 @@ final class InitialLoader {
           profileResourceLoaded.add(profile);
         }
       }
-    }
-  }
-
-  private void loadViaPaths(String paths) {
-    for (String path : splitPaths(paths)) {
-      loadWithExtensionCheck(loadContext.eval(path));
     }
   }
 
