@@ -19,7 +19,7 @@
   </scm>
 
   <properties>
-    <snakeyaml.version>2.3</snakeyaml.version>
+    <snakeyaml.version>2.4</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-spi-service</artifactId>
-      <version>2.7</version>
+      <version>2.10</version>
       <optional>true</optional>
     </dependency>
 
@@ -63,7 +63,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.12</version>
+      <version>1.5.17</version>
       <scope>test</scope>
     </dependency>
 
