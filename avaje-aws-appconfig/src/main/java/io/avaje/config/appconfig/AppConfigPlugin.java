@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.avaje.applog.AppLog;
+import io.avaje.config.ConfigExtension;
 import io.avaje.config.ConfigParser;
 import io.avaje.config.Configuration;
 import io.avaje.config.ConfigurationSource;
@@ -23,7 +24,7 @@ import io.avaje.spi.ServiceProvider;
  * <p>
  * By default, will periodically reload the configuration if it has changed.
  */
-@ServiceProvider
+@ServiceProvider(ConfigExtension.class)
 public final class AppConfigPlugin implements ConfigurationSource {
 
   private static final System.Logger log = AppLog.getLogger("io.avaje.config.AwsAppConfig");
