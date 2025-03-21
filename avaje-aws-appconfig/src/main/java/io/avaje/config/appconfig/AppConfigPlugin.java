@@ -110,7 +110,8 @@ public final class AppConfigPlugin implements ConfigurationSource {
         } else {
           String contentType = result.contentType();
           if (log.isLoggable(TRACE)) {
-            log.log(TRACE, "AwsAppConfig fetched version:{0} contentType:{1} body:{2}", result.version(), contentType, result.body());
+            int contentLength = result.body().length();
+            log.log(TRACE, "AwsAppConfig fetched version:{0} contentType:{1} contentLength:{2,number,#}", result.version(), contentType, contentLength);
           }
           Map<String, String> keyValues = parse(result);
           configuration.eventBuilder("AwsAppConfig")
