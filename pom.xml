@@ -9,9 +9,12 @@
   </parent>
 
   <groupId>io.avaje</groupId>
-  <artifactId>tests-config-reactor</artifactId>
-  <version>1</version>
+  <artifactId>avaje-config-parent</artifactId>
+  <version>4.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <properties>
+    <project.build.outputTimestamp>2024-10-25T04:21:12Z</project.build.outputTimestamp>
+  </properties>
 
   <modules>
     <module>avaje-config</module>
