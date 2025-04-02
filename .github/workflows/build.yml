@@ -31,4 +31,4 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: Build with Maven
-      run: mvn clean test
+      run: mvn clean install && mvn clean package -DskipTests artifact:compare
