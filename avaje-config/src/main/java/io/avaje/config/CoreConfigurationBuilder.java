@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,6 +20,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
   private final Parsers parsers = serviceLoader.parsers();
+  private final List<URIConfigLoader> uriLoaders = serviceLoader.uriLoaders();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
@@ -130,7 +132,14 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration build() {
-    var components = new CoreComponents(eventRunner, log, parsers, serviceLoader.sources(), serviceLoader.plugins());
+    var components =
+        new CoreComponents(
+            eventRunner,
+            log,
+            parsers,
+            uriLoaders,
+            serviceLoader.sources(),
+            serviceLoader.plugins());
     if (includeResourceLoading) {
       log.preInitialisation();
       initialLoader = new InitialLoader(components, resourceLoader);
