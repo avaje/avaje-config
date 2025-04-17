@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>4.5</version>
+    <version>5.1</version>
     <relativePath/>
   </parent>
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>1.2</version>
+  <version>1.3</version>
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>4.1-SNAPSHOT</version>
+      <version>4.0</version>
       <scope>provided</scope>
     </dependency>
 
