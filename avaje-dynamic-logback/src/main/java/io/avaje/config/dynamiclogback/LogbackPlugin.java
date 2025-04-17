@@ -20,6 +20,12 @@ import io.avaje.spi.ServiceProvider;
 @ServiceProvider
 public final class LogbackPlugin implements ConfigurationPlugin {
 
+  static {
+    // see #204. Without this called statically, the same call in the constructor
+    // may return SubstituteLoggerFactory and fail to cast.
+    LoggerFactory.getILoggerFactory();
+  }
+
   private static final System.Logger log = AppLog.getLogger(LogbackPlugin.class);
 
   @Override

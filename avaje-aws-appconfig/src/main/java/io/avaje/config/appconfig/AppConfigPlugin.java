@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.avaje.applog.AppLog;
@@ -37,7 +38,10 @@ public final class AppConfigPlugin implements ConfigurationSource {
       return;
     }
     loader = new Loader(configuration);
-    loader.reload();
+    int attempts = loader.initialLoad();
+    if (attempts > 1){
+      log.log(INFO, "AwsAppConfig loaded after {} attempts", attempts + 1);
+    }
   }
 
   @Override
@@ -88,6 +92,31 @@ public final class AppConfigPlugin implements ConfigurationSource {
       }
     }
 
+    /**
+     * Potential race conditional with AWS AppConfig sidecar so use simple retry loop.
+     */
+    int initialLoad() {
+      lock.lock();
+      try {
+        AppConfigFetcher.FetchException lastAttempt = null;
+        for (int i = 1; i < 11; i++) {
+          try {
+            loadAndPublish();
+            return i;
+          } catch (AppConfigFetcher.FetchException e) {
+            lastAttempt = e;
+            log.log(INFO, "retrying, load attempt {} got {}", i, e.getMessage());
+            LockSupport.parkNanos(250_000_000); // 250 millis
+          }
+        }
+        log.log(ERROR, "Failed initial AwsAppConfig load", lastAttempt);
+        return -1;
+
+      } finally{
+        lock.unlock();
+      }
+    }
+
     void reload() {
       if (reloadRequired()) {
         performReload();
@@ -104,30 +133,37 @@ public final class AppConfigPlugin implements ConfigurationSource {
         if (!reloadRequired()) {
           return;
         }
-        AppConfigFetcher.Result result = fetcher.fetch();
-        if (currentVersion.equals(result.version())) {
-          log.log(TRACE, "AwsAppConfig unchanged, version {0}", currentVersion);
-        } else {
-          String contentType = result.contentType();
-          if (log.isLoggable(TRACE)) {
-            int contentLength = result.body().length();
-            log.log(TRACE, "AwsAppConfig fetched version:{0} contentType:{1} contentLength:{2,number,#}", result.version(), contentType, contentLength);
-          }
-          Map<String, String> keyValues = parse(result);
-          configuration.eventBuilder("AwsAppConfig")
-            .putAll(keyValues)
-            .publish();
-          currentVersion = result.version();
-          debugLog(result, keyValues.size());
-        }
-        // move the next valid until time
-        validUntil.set(Instant.now().plusSeconds(nextRefreshSeconds));
+        loadAndPublish();
 
       } catch (Exception e) {
         log.log(ERROR, "Error fetching or processing AwsAppConfig", e);
       } finally {
         lock.unlock();
       }
+    }
+
+    /**
+     * Load and publish the configuration from AWS AppConfig.
+     */
+    private void loadAndPublish() throws AppConfigFetcher.FetchException {
+      AppConfigFetcher.Result result = fetcher.fetch();
+      if (currentVersion.equals(result.version())) {
+        log.log(TRACE, "AwsAppConfig unchanged, version {0}", currentVersion);
+      } else {
+        String contentType = result.contentType();
+        if (log.isLoggable(TRACE)) {
+          int contentLength = result.body().length();
+          log.log(TRACE, "AwsAppConfig fetched version:{0} contentType:{1} contentLength:{2,number,#}", result.version(), contentType, contentLength);
+        }
+        Map<String, String> keyValues = parse(result);
+        configuration.eventBuilder("AwsAppConfig")
+          .putAll(keyValues)
+          .publish();
+        currentVersion = result.version();
+        debugLog(result, keyValues.size());
+      }
+      // move the next valid until time
+      validUntil.set(Instant.now().plusSeconds(nextRefreshSeconds));
     }
 
     private Map<String, String> parse(AppConfigFetcher.Result result) {
