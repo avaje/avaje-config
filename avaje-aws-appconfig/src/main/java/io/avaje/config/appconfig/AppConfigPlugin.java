@@ -40,7 +40,7 @@ public final class AppConfigPlugin implements ConfigurationSource {
     loader = new Loader(configuration);
     int attempts = loader.initialLoad();
     if (attempts > 1){
-      log.log(INFO, "AwsAppConfig loaded after {} attempts", attempts + 1);
+      log.log(INFO, "AwsAppConfig loaded after {0} attempts", attempts + 1);
     }
   }
 
@@ -105,7 +105,7 @@ public final class AppConfigPlugin implements ConfigurationSource {
             return i;
           } catch (AppConfigFetcher.FetchException e) {
             lastAttempt = e;
-            log.log(INFO, "retrying, load attempt {} got {}", i, e.getMessage());
+            log.log(INFO, "retrying, load attempt {0} got {1}", i, e.getMessage());
             LockSupport.parkNanos(250_000_000); // 250 millis
           }
         }
