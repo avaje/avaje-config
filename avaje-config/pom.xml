@@ -22,6 +22,7 @@
     <snakeyaml.version>2.4</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
+    <project.build.outputTimestamp>2024-10-25T04:21:12Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
