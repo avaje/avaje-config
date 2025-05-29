@@ -10,7 +10,7 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config-toml</artifactId>
-  <version>4.1</version>
+  <version>4.2-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
@@ -20,7 +20,7 @@
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <project.build.outputTimestamp>2025-05-29T03:31:49Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-05-29T03:36:48Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
