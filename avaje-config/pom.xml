@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-applog</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
 
     <!-- If snakeyaml detected it will be used rather than built in simple parser -->
