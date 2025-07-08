@@ -1,7 +1,7 @@
 package io.avaje.config;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.URI;
 import java.time.Duration;
@@ -11,8 +11,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 class ConfigTest {
 
@@ -146,7 +146,7 @@ class ConfigTest {
     assertThat(System.getProperty("myapp.bar.barDouble")).isEqualTo("33.3");
 
     assertThat(properties).containsKeys("config.load.systemProperties", "config.watch.enabled", "myExternalLoader", "myapp.activateFoo", "myapp.bar.barDouble", "myapp.bar.barRules", "myapp.fooHome", "myapp.fooName", "system.excluded.properties");
-    assertThat(properties).hasSize(12);
+    assertThat(properties).hasSize(13);
   }
 
   @Test

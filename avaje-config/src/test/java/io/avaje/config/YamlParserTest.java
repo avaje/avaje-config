@@ -17,7 +17,7 @@ class YamlParserTest {
     YamlLoaderSimple parser = new YamlLoaderSimple();
     Map<String, String> load1 = parser.load(res("/yaml/basic.yaml"));
     assertThat(load1).hasSize(6);
-    basic(load1, true);
+    basic(load1);
 
     Map<String, String> load2 = parser.load(res("/yaml/key-comment.yaml"));
     assertThat(load2).hasSize(4);
@@ -26,11 +26,11 @@ class YamlParserTest {
 
   @Test
   void basic() {
-    basic(parseYaml2("/yaml/basic.yaml"), false);
-    basic(parseYaml("/yaml/basic.yaml"), true);
+    basic(parseYaml2("/yaml/basic.yaml"));
+    basic(parseYaml("/yaml/basic.yaml"));
   }
 
-  void basic(final Map<String, String> map, boolean simple) {
+  void basic(final Map<String, String> map) {
     assertThat(map)
         .containsOnlyKeys(
             "name",
