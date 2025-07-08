@@ -8,11 +8,13 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.StringJoiner;
 
 import org.jspecify.annotations.NullMarked;
@@ -50,7 +52,7 @@ final class YamlLoaderSimple implements YamlLoader {
     }
 
     private final Map<String, String> keyValues = new LinkedHashMap<>();
-    private final Stack<Key> keyStack = new Stack<>();
+    private final Deque<Key> keyStack = new ArrayDeque<>();
     private final List<String> multiLines = new ArrayList<>();
 
     private State state = State.RequireKey;
@@ -313,8 +315,9 @@ final class YamlLoaderSimple implements YamlLoader {
 
     private String fullKey() {
       StringJoiner fullKey = new StringJoiner(".");
-      for (Key next : keyStack) {
-        fullKey.add(next.key());
+      Iterator<Key> it = keyStack.descendingIterator();
+      while (it.hasNext()) {
+        fullKey.add(it.next().key());
       }
       return fullKey.toString();
     }
