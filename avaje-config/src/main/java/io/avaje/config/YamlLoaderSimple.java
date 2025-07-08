@@ -1,5 +1,7 @@
 package io.avaje.config;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +44,7 @@ final class YamlLoaderSimple implements YamlLoader {
     enum State {
       RequireKey,
       MultiLine,
+      List,
       KeyOrValue,
       RequireTopKey
     }
@@ -80,7 +83,7 @@ final class YamlLoaderSimple implements YamlLoader {
       } else {
         currentLine++;
         readIndent(line);
-        if (state == State.MultiLine) {
+        if (state == State.MultiLine || state == State.List) {
           processMultiLine(line);
         } else {
           processNext(line);
@@ -91,6 +94,9 @@ final class YamlLoaderSimple implements YamlLoader {
     private void checkFinalMultiLine() {
       if (state == State.MultiLine) {
         addKeyVal(multiLineValue());
+      }
+      if (state == State.List) {
+        addKeyVal(listValue());
       }
     }
 
@@ -112,8 +118,22 @@ final class YamlLoaderSimple implements YamlLoader {
     }
 
     private void multiLineEnd(String line) {
-      addKeyVal(multiLineValue());
+      if (state == State.MultiLine) addKeyVal(multiLineValue());
+      else {
+        addKeyVal(listValue());
+      }
       processNext(line);
+    }
+
+    private String listValue() {
+      if (multiLines.isEmpty()) {
+        return "";
+      }
+      multiLineTrimTrailing();
+      var result =
+          multiLines.stream().map(s -> s.trim().substring(1).stripLeading()).collect(joining(","));
+      multiLineEnd();
+      return result;
     }
 
     private String multiLineValue() {
@@ -123,7 +143,7 @@ final class YamlLoaderSimple implements YamlLoader {
       if (multiLineTrim != MultiLineTrim.Keep) {
         multiLineTrimTrailing();
       }
-      String join = (multiLineTrim == MultiLineTrim.Implicit) ? " " : "\n";
+      String join = multiLineTrim == MultiLineTrim.Implicit ? " " : "\n";
       StringBuilder sb = new StringBuilder();
       int lastIndex = multiLines.size() - 1;
       for (int i = 0; i <= lastIndex; i++) {
@@ -184,6 +204,8 @@ final class YamlLoaderSimple implements YamlLoader {
       if (trimmedValue.startsWith("|")) {
         multilineStart(multiLineTrimMode(trimmedValue));
 
+      } else if (trimmedValue.startsWith("-")) {
+        listStart(multiLineTrimMode(trimmedValue));
       } else if (trimmedValue.isEmpty() || trimmedValue.startsWith("#")) {
         // empty or comment
         state = State.KeyOrValue;
@@ -230,13 +252,23 @@ final class YamlLoaderSimple implements YamlLoader {
       if (currentIndent <= keyIndent) {
         throw new IllegalStateException("Value not indented enough for key " + fullKey() + " at line: " + currentLine + " line[" + line + "]");
       }
-      multilineStart(MultiLineTrim.Implicit);
+      if (line.stripLeading().charAt(0) == '-') {
+        listStart(MultiLineTrim.Implicit);
+      } else {
+        multilineStart(MultiLineTrim.Implicit);
+      }
       multiLineIndent = currentIndent;
       multiLines.add(line);
     }
 
     private void multilineStart(MultiLineTrim trim) {
       state = State.MultiLine;
+      multiLineIndent = 0;
+      multiLineTrim = trim;
+    }
+
+    private void listStart(MultiLineTrim trim) {
+      state = State.List;
       multiLineIndent = 0;
       multiLineTrim = trim;
     }
@@ -302,10 +334,7 @@ final class YamlLoaderSimple implements YamlLoader {
     }
 
     private String unquoteKey(String value) {
-      if (value.startsWith("'") && value.endsWith("'")) {
-        return value.substring(1, value.length() - 1);
-      }
-      if (value.startsWith("\"") && value.endsWith("\"")) {
+      if (value.startsWith("'") && value.endsWith("'") || value.startsWith("\"") && value.endsWith("\"")) {
         return value.substring(1, value.length() - 1);
       }
       return value;

@@ -49,6 +49,11 @@ class ConfigTest {
   }
 
   @Test
+  void getSnakeList() {
+    assertThat(Config.list().of("metal.gear")).contains("snake?", "Snake!?", "SNAAAAKE!!");
+  }
+
+  @Test
   void getNullableExists() {
     assertThat(Config.getNullable("IDoNotExist1", "SomeVal")).isEqualTo("SomeVal");
     System.setProperty("MyRareSystemProp", "hello");
@@ -104,7 +109,7 @@ class ConfigTest {
   void onChangeEventListener() {
     assertThat(Config.getOptional("MySystemProp5")).isEmpty();
     AtomicReference<ModificationEvent> capturedEvent = new AtomicReference<>();
-    Config.onChange((capturedEvent::set));
+    Config.onChange(capturedEvent::set);
     Config.setProperty("MySystemProp5", "hi5");
 
     ModificationEvent event = capturedEvent.get();

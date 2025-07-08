@@ -10,3 +10,8 @@ myapp:
 config.load.systemProperties: true
 system.excluded.properties: myapp.bar.barRules,myapp.fooName
 
+metal:
+  gear:
+    - snake?
+    - Snake!?
+    - SNAAAAKE!!
