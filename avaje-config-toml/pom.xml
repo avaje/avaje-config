@@ -4,14 +4,15 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>4.5</version>
+    <version>5.1</version>
     <relativePath/>
   </parent>
 
+  <name>Avaje Config Toml</name>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config-toml</artifactId>
-  <version>4.1-SNAPSHOT</version>
-
+  <version>4.2-RC1</version>
+ 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
     <developerConnection>scm:git:git@github.com:avaje/avaje-config.git</developerConnection>
@@ -20,6 +21,7 @@
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
+    <project.build.outputTimestamp>2025-07-08T20:22:48Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
@@ -37,7 +39,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
       <scope>test</scope>
     </dependency>
 

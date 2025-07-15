@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -70,6 +71,8 @@ final class YamlLoaderSnake implements YamlLoader {
         add(key, (String) val);
       } else if (val instanceof Number || val instanceof Boolean) {
         add(key, val.toString());
+      } else if (val instanceof Collection<?>) {
+        add(key, String.join(",", (Iterable<String>) val));
       }
     }
 

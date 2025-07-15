@@ -5,3 +5,7 @@ properties:
 sorted:
   '1': one
   '2': two
+root:
+  directories:
+    - /one/two/three
+    - /four/five/six
