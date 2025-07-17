@@ -14,5 +14,6 @@ class ReloadTest {
     Config.reload();
     assertThat(Config.get("Rock")).isEqualTo("Lee");
     System.clearProperty("Rock");
+    Config.reload();
   }
 }
