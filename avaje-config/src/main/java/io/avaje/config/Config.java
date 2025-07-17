@@ -81,7 +81,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class Config {
 
-  private static final Configuration data = CoreConfiguration.initialise();
+  private static Configuration data = CoreConfiguration.initialise();
 
   /**
    * Hide constructor.
@@ -623,5 +623,10 @@ public class Config {
    */
   public static void onChangeBool(String key, Consumer<Boolean> singlePropertyChangeListener) {
     data.onChangeBool(key, singlePropertyChangeListener);
+  }
+
+  /** Manually reload all configurations and config sources */
+  public static void reload() {
+    data = CoreConfiguration.initialise();
   }
 }
