@@ -16,14 +16,14 @@
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <project.build.outputTimestamp>2024-10-25T04:21:12Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-07-08T20:22:48Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-applog</artifactId>
-      <version>1.0</version>
+      <version>1.2</version>
     </dependency>
 
     <dependency>
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
