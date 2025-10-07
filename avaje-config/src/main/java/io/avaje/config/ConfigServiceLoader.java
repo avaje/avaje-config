@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * Load all the avaje-config extensions via ServiceLoader using the single
- * common ConfigExtension interface.
+ * Load all the avaje-config extensions via ServiceLoader using the single common ConfigExtension
+ * interface.
  */
 final class ConfigServiceLoader {
 
@@ -21,13 +21,15 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
+  private final List<URIConfigLoader> uriLoaders;
   private final Parsers parsers;
 
   ConfigServiceLoader() {
-    ModificationEventRunner _eventRunner = null;
-    ConfigurationLog _log = null;
-    ResourceLoader _resourceLoader = null;
+    ModificationEventRunner spiEventRunner = null;
+    ConfigurationLog spiLog = null;
+    ResourceLoader spiResourceLoader = null;
     List<ConfigParser> otherParsers = new ArrayList<>();
+    List<URIConfigLoader> loaders = new ArrayList<>();
 
     for (var spi : ServiceLoader.load(ConfigExtension.class)) {
       if (spi instanceof ConfigurationSource) {
@@ -36,23 +38,31 @@ final class ConfigServiceLoader {
         plugins.add((ConfigurationPlugin) spi);
       } else if (spi instanceof ConfigParser) {
         otherParsers.add((ConfigParser) spi);
+      } else if (spi instanceof URIConfigLoader) {
+        loaders.add((URIConfigLoader) spi);
       } else if (spi instanceof ConfigurationLog) {
-        _log = (ConfigurationLog) spi;
+        spiLog = (ConfigurationLog) spi;
       } else if (spi instanceof ResourceLoader) {
-        _resourceLoader = (ResourceLoader) spi;
+        spiResourceLoader = (ResourceLoader) spi;
       } else if (spi instanceof ModificationEventRunner) {
-        _eventRunner = (ModificationEventRunner) spi;
+        spiEventRunner = (ModificationEventRunner) spi;
       }
     }
 
-    this.log = _log == null ? new DefaultConfigurationLog() : _log;
-    this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
-    this.eventRunner = _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
+    this.log = spiLog == null ? new DefaultConfigurationLog() : spiLog;
+    this.resourceLoader = spiResourceLoader == null ? new DefaultResourceLoader() : spiResourceLoader;
+    this.eventRunner =
+        spiEventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : spiEventRunner;
     this.parsers = new Parsers(otherParsers);
+    this.uriLoaders = loaders;
   }
 
   Parsers parsers() {
     return parsers;
+  }
+
+  public List<URIConfigLoader> uriLoaders() {
+    return uriLoaders;
   }
 
   ConfigurationLog log() {

@@ -1,6 +1,5 @@
 package io.avaje.config;
 
-import java.util.Collections;
 import java.util.List;
 
 final class CoreComponents {
@@ -8,13 +7,21 @@ final class CoreComponents {
   private final ModificationEventRunner runner;
   private final ConfigurationLog log;
   private final Parsers parsers;
+  private final List<URIConfigLoader> uriLoaders;
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
 
-  CoreComponents(ModificationEventRunner runner, ConfigurationLog log, Parsers parsers, List<ConfigurationSource> sources, List<ConfigurationPlugin> plugins) {
+  CoreComponents(
+      ModificationEventRunner runner,
+      ConfigurationLog log,
+      Parsers parsers,
+      List<URIConfigLoader> uriLoaders,
+      List<ConfigurationSource> sources,
+      List<ConfigurationPlugin> plugins) {
     this.runner = runner;
     this.log = log;
     this.parsers = parsers;
+    this.uriLoaders = uriLoaders;
     this.sources = sources;
     this.plugins = plugins;
   }
@@ -23,13 +30,18 @@ final class CoreComponents {
   CoreComponents() {
     this.runner = new CoreConfiguration.ForegroundEventRunner();
     this.log = new DefaultConfigurationLog();
-    this.parsers = new Parsers(Collections.emptyList());
-    this.sources = Collections.emptyList();
-    this.plugins = Collections.emptyList();
+    this.parsers = ConfigServiceLoader.get().parsers();
+    this.uriLoaders = ConfigServiceLoader.get().uriLoaders();
+    this.sources = List.of();
+    this.plugins = List.of();
   }
 
   Parsers parsers() {
     return parsers;
+  }
+
+  public List<URIConfigLoader> uriLoaders() {
+    return uriLoaders;
   }
 
   ConfigurationLog log() {

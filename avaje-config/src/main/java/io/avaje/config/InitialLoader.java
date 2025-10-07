@@ -3,11 +3,14 @@ package io.avaje.config;
 import static io.avaje.config.InitialLoader.Source.FILE;
 import static io.avaje.config.InitialLoader.Source.RESOURCE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -40,13 +43,17 @@ final class InitialLoader {
 
   private final ConfigurationLog log;
   private final InitialLoadContext loadContext;
+  private final DURILoadContext uriContext;
   private final Set<String> profileResourceLoaded = new HashSet<>();
   private final Parsers parsers;
+  private final List<URIConfigLoader> uriLoaders;
 
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
+    this.uriLoaders = components.uriLoaders();
     this.log = components.log();
     this.loadContext = new InitialLoadContext(log, resourceLoader);
+    this.uriContext = new DURILoadContext(log, parsers, loadContext::get);
   }
 
   Set<String> loadedFrom() {
@@ -113,12 +120,12 @@ final class InitialLoader {
     loadViaProfiles(RESOURCE);
     loadViaProfiles(FILE);
     loadViaSystemProperty();
-    loadViaIndirection();
     // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
     if (!loadTest()) {
       loadLocalDev();
     }
+    loadViaIndirection();
     loadViaCommandLineArgs();
   }
 
@@ -252,23 +259,67 @@ final class InitialLoader {
   }
 
   boolean loadWithExtensionCheck(String fileName) {
+
+    if (loadURI(fileName)) return true;
+
     var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
     if ("properties".equals(extension)) {
+
       return loadProperties(fileName, RESOURCE) | loadProperties(fileName, FILE);
     } else {
       var parser = parsers.get(extension);
       if (parser == null) {
         throw new IllegalArgumentException(
-          "Expecting only properties or "
-            + parsers.supportedExtensions()
-            + " file extensions but got ["
-            + fileName
-            + "]");
+            "Expecting only properties or "
+                + parsers.supportedExtensions()
+                + " file extensions or "
+                + uriLoaders.stream().map(s -> s.getClass().getSimpleName()).collect(joining(","))
+                + " compatible uri schemes but got ["
+                + fileName
+                + "]");
       }
 
       return loadCustomExtension(fileName, parser, RESOURCE)
-        | loadCustomExtension(fileName, parser, FILE);
+          | loadCustomExtension(fileName, parser, FILE);
     }
+  }
+
+  private boolean loadURI(String fileName) {
+    URI uri;
+    try {
+      uri = new URI(fileName);
+    } catch (URISyntaxException e) {
+      return false;
+    }
+
+    var scheme = uri.getScheme();
+
+    if (scheme == null || "classpath".equals(scheme) || "file".equals(scheme)) {
+
+      return false;
+    }
+
+    var loader = getLoader(uri);
+
+    if (loader != null) {
+      final var source = loader.redact(uri);
+      loader.load(uri, uriContext).forEach((k, v) -> loadContext.put(k, v, source));
+      return true;
+    }
+    return false;
+  }
+
+  @Nullable
+  private URIConfigLoader getLoader(URI uri) {
+
+    for (var loader : uriLoaders) {
+
+      if (loader.supports(uri)) {
+        return loader;
+      }
+    }
+
+    return null;
   }
 
   /**
