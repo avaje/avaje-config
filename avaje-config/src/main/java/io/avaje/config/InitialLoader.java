@@ -35,7 +35,10 @@ final class InitialLoader {
 
   enum Source {
     RESOURCE,
-    FILE
+    FILE;
+    String key(String path) {
+      return name().toLowerCase() + ':' + path;
+    }
   }
 
   private final ConfigurationLog log;
@@ -319,7 +322,7 @@ final class InitialLoader {
   boolean loadCustomExtension(String resourcePath, ConfigParser parser, Source source) {
     try (InputStream is = resource(resourcePath, source)) {
       if (is != null) {
-        var sourceName = (source == RESOURCE ? "resource:" : "file:") + resourcePath;
+        var sourceName = source.key(resourcePath);
         parser.load(is).forEach((k, v) -> loadContext.put(k, v, sourceName));
         return true;
       }
@@ -332,7 +335,7 @@ final class InitialLoader {
   boolean loadProperties(String resourcePath, Source source) {
     try (InputStream is = resource(resourcePath, source)) {
       if (is != null) {
-        loadProperties(is, (source == RESOURCE ? "resource:" : "file") + resourcePath);
+        loadProperties(is, source.key(resourcePath));
         return true;
       }
     } catch (IOException e) {
