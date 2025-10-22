@@ -16,7 +16,7 @@ class YamlParserTest {
   void simpleYamlParserMultiLoad() {
     YamlLoaderSimple parser = new YamlLoaderSimple();
     Map<String, String> load1 = parser.load(res("/yaml/basic.yaml"));
-    assertThat(load1).hasSize(5);
+    assertThat(load1).hasSize(6);
     basic(load1);
 
     Map<String, String> load2 = parser.load(res("/yaml/key-comment.yaml"));
@@ -31,11 +31,19 @@ class YamlParserTest {
   }
 
   void basic(final Map<String, String> map) {
-    assertThat(map).containsOnlyKeys("name", "properties.key1", "properties.key2", "sorted.1", "sorted.2");
+    assertThat(map)
+        .containsOnlyKeys(
+            "name",
+            "properties.key1",
+            "properties.key2",
+            "sorted.1",
+            "sorted.2",
+            "root.directories");
     assertThat(map.get("name")).isEqualTo("Name123");
     assertThat(map.get("properties.key1")).isEqualTo("value1");
     assertThat(map.get("properties.key2")).isEqualTo("value2");
     assertThat(map.get("sorted.1")).isEqualTo("one");
+    assertThat(map.get("root.directories")).isEqualTo("/one/two/three,/four/five/six");
   }
 
   @Test

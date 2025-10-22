@@ -4,13 +4,14 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>4.5</version>
+    <version>5.1</version>
     <relativePath/>
   </parent>
 
+  <name>Avaje Config</name>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>4.1-SNAPSHOT</version>
+  <version>4.2-RC1</version>
 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
@@ -19,9 +20,10 @@
   </scm>
 
   <properties>
-    <snakeyaml.version>2.3</snakeyaml.version>
+    <snakeyaml.version>2.5</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
+    <project.build.outputTimestamp>2025-07-08T20:22:48Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
@@ -35,14 +37,14 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-spi-service</artifactId>
-      <version>2.6</version>
+      <version>2.13</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-applog</artifactId>
-      <version>1.0</version>
+      <version>1.2</version>
     </dependency>
 
     <!-- If snakeyaml detected it will be used rather than built in simple parser -->
@@ -56,14 +58,14 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.8</version>
+      <version>1.5.20</version>
       <scope>test</scope>
     </dependency>
 
