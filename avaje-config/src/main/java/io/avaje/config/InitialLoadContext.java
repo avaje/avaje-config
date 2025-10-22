@@ -94,14 +94,14 @@ final class InitialLoadContext {
     if (source == InitialLoader.Source.RESOURCE) {
       is = resourceStream(resourcePath);
       if (is != null) {
-        loadedResources.add("resource:" + resourcePath);
+        loadedResources.add(source.key(resourcePath));
       }
     } else {
       File file = new File(resourcePath);
       if (file.exists()) {
         try {
           is = new FileInputStream(file);
-          loadedResources.add("file:" + resourcePath);
+          loadedResources.add(source.key(resourcePath));
           loadedFiles.add(file);
         } catch (FileNotFoundException e) {
           throw new UncheckedIOException(e);
