@@ -221,8 +221,14 @@ final class InitialLoader {
   }
 
   private void loadViaPaths(String paths) {
-    for (String path : splitPaths(paths)) {
-      loadWithExtensionCheck(loadContext.eval(path));
+    for (String rawPath : splitPaths(paths)) {
+      String path = loadContext.eval(rawPath);
+      if (!loadContext.alreadyLoaded(path)) {
+        if (loadWithExtensionCheck(path) && loadContext.allowRecursiveLoad()) {
+          // depth first recursively load via load.properties entry
+          loadViaIndirection();
+        }
+      }
     }
   }
 

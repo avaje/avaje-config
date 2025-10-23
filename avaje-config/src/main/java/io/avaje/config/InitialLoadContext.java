@@ -5,10 +5,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.lang.System.Logger.Level;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages the underlying map of properties we are gathering.
@@ -28,6 +25,8 @@ final class InitialLoadContext {
   private final Set<String> loadedResources = new LinkedHashSet<>();
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
+  private final Set<String> loadCheck = new HashSet<>();
+  private int recursiveLoadCount;
 
   InitialLoadContext(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
@@ -89,6 +88,7 @@ final class InitialLoadContext {
       is = resourceStream(resourcePath);
       if (is != null) {
         loadedResources.add(source.key(resourcePath));
+        loadCheck.add(resourcePath);
       }
     } else {
       File file = new File(resourcePath);
@@ -96,6 +96,7 @@ final class InitialLoadContext {
         try {
           is = new FileInputStream(file);
           loadedResources.add(source.key(resourcePath));
+          loadCheck.add(resourcePath);
           loadedFiles.add(file);
         } catch (FileNotFoundException e) {
           throw new UncheckedIOException(e);
@@ -163,5 +164,16 @@ final class InitialLoadContext {
   String getAppName() {
     final var appName = map.get("app.name");
     return (appName != null) ? appName.value() : System.getProperty("app.name");
+  }
+
+  boolean alreadyLoaded(String fileName) {
+    return !loadCheck.add(fileName);
+  }
+
+  boolean allowRecursiveLoad() {
+    if (recursiveLoadCount++ > 100) {
+      throw new IllegalStateException("Recursive loading exceeded 100. Check your load.properties entries");
+    }
+    return true;
   }
 }
