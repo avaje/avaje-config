@@ -1,6 +1,6 @@
 package io.avaje.config.appconfig;
 
-import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,7 +23,7 @@ final class DAppConfigFetcher implements AppConfigFetcher {
   }
 
   @Override
-  public AppConfigFetcher.Result fetch() throws FetchException {
+  public AppConfigFetcher.Result fetch() throws ConnectException, FetchException {
     HttpRequest request = HttpRequest.newBuilder()
       .uri(uri)
       .GET()
@@ -36,7 +36,9 @@ final class DAppConfigFetcher implements AppConfigFetcher {
       String body = res.body();
       return new DResult(version, contentType, body);
 
-    } catch (IOException | InterruptedException e) {
+    } catch (ConnectException e) {
+      throw e; // expected on shutdown
+    } catch (Exception e) {
       throw new FetchException(e);
     }
   }
