@@ -12,7 +12,9 @@
 
   <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>1.4</version>
+  <name>avaje-aws-appconfig</name>
+  <version>1.5</version>
+  <description>AWS AppConfig plugin for avaje-config</description>
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
@@ -29,7 +31,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>4.0</version>
+      <version>4.2</version>
       <scope>provided</scope>
     </dependency>
 
