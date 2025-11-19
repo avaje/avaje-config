@@ -7,8 +7,11 @@ import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.StringReader;
+import java.lang.System.Logger.Level;
+import java.net.ConnectException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,6 +60,7 @@ public final class AppConfigPlugin implements ConfigurationSource {
     private final AppConfigFetcher fetcher;
     private final ConfigParser yamlParser;
     private final ConfigParser propertiesParser;
+    private final AtomicInteger connectErrorCount = new AtomicInteger();
     private final ReentrantLock lock = new ReentrantLock();
     private final AtomicReference<Instant> validUntil;
     private final long nextRefreshSeconds;
@@ -98,14 +102,15 @@ public final class AppConfigPlugin implements ConfigurationSource {
     int initialLoad() {
       lock.lock();
       try {
-        AppConfigFetcher.FetchException lastAttempt = null;
+        Exception lastAttempt = null;
         for (int i = 1; i < 11; i++) {
           try {
             loadAndPublish();
             return i;
-          } catch (AppConfigFetcher.FetchException e) {
+          } catch (Exception e) {
+            // often seeing this with apps that start quickly (and AppConfig sidecar not up yet)
             lastAttempt = e;
-            log.log(INFO, "retrying, load attempt {0} got {1}", i, e.getMessage());
+            log.log(DEBUG, "retrying, load attempt {0} got {1}", i, e.getMessage());
             LockSupport.parkNanos(250_000_000); // 250 millis
           }
         }
@@ -135,6 +140,11 @@ public final class AppConfigPlugin implements ConfigurationSource {
         }
         loadAndPublish();
 
+      } catch (ConnectException e) {
+        // expected during shutdown when AppConfig sidecar shuts down before the app
+        int errCount = connectErrorCount.incrementAndGet();
+        Level level = errCount > 1 ? WARNING : INFO;
+        log.log(level, "Failed to fetch from AwsAppConfig - likely shutdown in progress");
       } catch (Exception e) {
         log.log(ERROR, "Error fetching or processing AwsAppConfig", e);
       } finally {
@@ -145,7 +155,7 @@ public final class AppConfigPlugin implements ConfigurationSource {
     /**
      * Load and publish the configuration from AWS AppConfig.
      */
-    private void loadAndPublish() throws AppConfigFetcher.FetchException {
+    private void loadAndPublish() throws AppConfigFetcher.FetchException, ConnectException {
       AppConfigFetcher.Result result = fetcher.fetch();
       if (currentVersion.equals(result.version())) {
         log.log(TRACE, "AwsAppConfig unchanged, version {0}", currentVersion);
