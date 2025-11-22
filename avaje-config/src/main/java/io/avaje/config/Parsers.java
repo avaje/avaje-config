@@ -24,6 +24,12 @@ final class Parsers {
 
   private void initYamlParser() {
     YamlLoader yamlLoader;
+    if (ModuleLayer.boot().findModule("org.yaml.snakeyaml").isPresent()) {
+      yamlLoader = new YamlLoaderSnake();
+      parserMap.put("yml", yamlLoader);
+      parserMap.put("yaml", yamlLoader);
+      return;
+    }
     try {
       yamlLoader = new YamlLoaderSnake();
     } catch (NoClassDefFoundError e) {
