@@ -1,5 +1,6 @@
 package io.avaje.config.appconfig;
 
+import java.net.ConnectException;
 import java.net.URI;
 
 interface AppConfigFetcher {
@@ -8,7 +9,7 @@ interface AppConfigFetcher {
     return new DAppConfigFetcher.Builder();
   }
 
-  Result fetch() throws FetchException;
+  Result fetch() throws ConnectException, FetchException;
 
   URI uri();
 
