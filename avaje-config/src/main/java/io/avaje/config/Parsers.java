@@ -23,18 +23,21 @@ final class Parsers {
   }
 
   private void initYamlParser() {
-    YamlLoader yamlLoader;
-    if (ModuleLayer.boot().findModule("org.yaml.snakeyaml").isPresent()) {
-      yamlLoader = new YamlLoaderSnake();
-      parserMap.put("yml", yamlLoader);
-      parserMap.put("yaml", yamlLoader);
-      return;
-    }
-    try {
-      yamlLoader = new YamlLoaderSnake();
-    } catch (NoClassDefFoundError e) {
-      yamlLoader = new YamlLoaderSimple();
-    }
+    var modules = ModuleLayer.boot();
+    YamlLoader yamlLoader =
+        modules
+            .findModule("io.avaje.config")
+            .map(m -> modules.findModule("org.yaml.snakeyaml").isPresent())
+            .map(m -> (YamlLoader) new YamlLoaderSnake())
+            .orElseGet(
+                () -> {
+                  try {
+                    return new YamlLoaderSnake();
+                  } catch (NoClassDefFoundError e) {
+                    return new YamlLoaderSimple();
+                  }
+                });
+
     parserMap.put("yml", yamlLoader);
     parserMap.put("yaml", yamlLoader);
   }
