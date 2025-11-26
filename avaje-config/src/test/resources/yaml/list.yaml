@@ -1,0 +1,5 @@
+keyValueList: apple:10,pear:15,cheese:10
+keyValueList1:
+  - apple:10
+  - pear:15
+  - cheese:10
