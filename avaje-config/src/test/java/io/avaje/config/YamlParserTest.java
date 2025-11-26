@@ -1,12 +1,12 @@
 package io.avaje.config;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class YamlParserTest {
 
@@ -196,6 +196,17 @@ class YamlParserTest {
       .hasMessageContaining("line:5");
   }
 
+  @Test
+  void parse_list() {
+    var list =
+        Map.of(
+            "keyValueList",
+            "apple:10,pear:15,cheese:10",
+            "keyValueList1",
+            "apple:10,pear:15,cheese:10");
+    assertThat(parseYaml2("/yaml/list.yaml")).isEqualTo(list);
+    assertThat(parseYaml("/yaml/list.yaml")).isEqualTo(list);
+  }
 
   private Map<String, String> parseYaml2(String s) {
     return load.load(res(s));

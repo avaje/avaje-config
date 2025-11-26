@@ -120,8 +120,9 @@ final class YamlLoaderSimple implements YamlLoader {
     }
 
     private void multiLineEnd(String line) {
-      if (state == State.MultiLine) addKeyVal(multiLineValue());
-      else {
+      if (state == State.MultiLine) {
+        addKeyVal(multiLineValue());
+      } else {
         addKeyVal(listValue());
       }
       processNext(line);
@@ -170,9 +171,8 @@ final class YamlLoaderSimple implements YamlLoader {
       for (int i = multiLines.size(); i-- > 0; ) {
         if (!multiLines.get(i).trim().isEmpty()) {
           break;
-        } else {
-          multiLines.remove(i);
         }
+        multiLines.remove(i);
       }
     }
 
@@ -186,9 +186,10 @@ final class YamlLoaderSimple implements YamlLoader {
       }
 
       final int pos = line.indexOf(':');
-      if (pos == -1) {
+      var list = line.stripLeading().charAt(0) == '-';
+      if (pos == -1 || list) {
         // value on another line
-        processNonKey(line);
+        processNonKey(line, list);
         return;
       }
       if (state == State.RequireTopKey && currentIndent > 0) {
@@ -241,7 +242,7 @@ final class YamlLoaderSimple implements YamlLoader {
       state = State.RequireKey;
     }
 
-    private void processNonKey(String line) {
+    private void processNonKey(String line, boolean list) {
       if (state == State.RequireKey) {
         state = State.RequireTopKey;
         // drop this value line
@@ -254,7 +255,7 @@ final class YamlLoaderSimple implements YamlLoader {
       if (currentIndent <= keyIndent) {
         throw new IllegalStateException("Value not indented enough for key " + fullKey() + " at line: " + currentLine + " line[" + line + "]");
       }
-      if (line.stripLeading().charAt(0) == '-') {
+      if (list) {
         listStart(MultiLineTrim.Implicit);
       } else {
         multilineStart(MultiLineTrim.Implicit);
@@ -326,9 +327,8 @@ final class YamlLoaderSimple implements YamlLoader {
       while (!keyStack.isEmpty()) {
         if (keyStack.peek().indent() < indent) {
           break;
-        } else {
-          keyStack.pop();
         }
+        keyStack.pop();
       }
     }
 
