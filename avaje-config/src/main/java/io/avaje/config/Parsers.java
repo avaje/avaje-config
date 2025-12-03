@@ -33,7 +33,7 @@ final class Parsers {
                 () -> {
                   try {
                     return new YamlLoaderSnake();
-                  } catch (NoClassDefFoundError e) {
+                  } catch (Throwable e) {
                     return new YamlLoaderSimple();
                   }
                 });
