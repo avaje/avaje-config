@@ -357,8 +357,8 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public <T> T getAs(String key, Function<String, T> mappingFunction) {
-    requireNonNull("key is required");
-    requireNonNull("mappingFunction is required");
+    requireNonNull(key, "key is required");
+    requireNonNull(mappingFunction,"mappingFunction is required");
     final var entry = required(key);
     try {
       return mappingFunction.apply(entry);
@@ -369,8 +369,8 @@ final class CoreConfiguration implements Configuration {
 
   @Override
   public <T> Optional<T> getAsOptional(String key, Function<String, T> mappingFunction) {
-    requireNonNull("key is required");
-    requireNonNull("mappingFunction is required");
+    requireNonNull(key, "key is required");
+    requireNonNull(mappingFunction, "mappingFunction is required");
     try {
       return Optional.ofNullable(value(key)).map(mappingFunction);
     } catch (final Exception e) {
