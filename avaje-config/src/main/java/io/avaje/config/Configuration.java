@@ -802,6 +802,13 @@ public interface Configuration {
     Builder includeResourceLoading();
 
     /**
+     * Defines the means by which the configuration is able to maybe fallback to a value if there is no configured value
+     * for a given key.
+     */
+
+    Builder withFallbacks(List<ConfigurationFallbacks> defaults);
+
+    /**
      * Build and return the Configuration.
      * <p>
      * Performs evaluation of property values that contain expressions (e.g. {@code ${user.home}})

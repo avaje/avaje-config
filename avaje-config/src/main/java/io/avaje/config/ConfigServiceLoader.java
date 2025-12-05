@@ -21,6 +21,7 @@ final class ConfigServiceLoader {
   private final ModificationEventRunner eventRunner;
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
+  private final List<ConfigurationFallbacks> fallbacks = new ArrayList<>();
   private final Parsers parsers;
 
   ConfigServiceLoader() {
@@ -42,6 +43,8 @@ final class ConfigServiceLoader {
         _resourceLoader = (ResourceLoader) spi;
       } else if (spi instanceof ModificationEventRunner) {
         _eventRunner = (ModificationEventRunner) spi;
+      } else if (spi instanceof ConfigurationFallbacks) {
+        fallbacks.add((ConfigurationFallbacks) spi);
       }
     }
 
@@ -74,4 +77,9 @@ final class ConfigServiceLoader {
   List<ConfigurationPlugin> plugins() {
     return plugins;
   }
+
+  List<ConfigurationFallbacks> fallbacks() {
+    return fallbacks;
+  }
+
 }

@@ -1,0 +1,21 @@
+package io.avaje.config;
+
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Provides a default means of maybe obtaining a fallback value for a configuration key in the
+ * case that there is no value explicitly configured.
+ */
+
+public class DefaultFallbacks implements ConfigurationFallbacks {
+
+  @Override
+  public @Nullable String get(String key) {
+    final String val = System.getProperty(key, System.getenv(key));
+    return val != null ? val : System.getenv(toEnvKey(key));
+  }
+
+  static String toEnvKey(String key) {
+    return key.replace('.', '_').toUpperCase();
+  }
+}

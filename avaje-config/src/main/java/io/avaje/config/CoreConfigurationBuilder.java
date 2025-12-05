@@ -1,17 +1,18 @@
 package io.avaje.config;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
-import static java.util.Objects.requireNonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.jspecify.annotations.NullMarked;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+import static java.util.Objects.requireNonNull;
 
 @NullMarked
 final class CoreConfigurationBuilder implements Configuration.Builder {
@@ -19,6 +20,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
   private final Parsers parsers = serviceLoader.parsers();
+  private List<ConfigurationFallbacks> fallbacks = serviceLoader.fallbacks();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
@@ -129,8 +131,22 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   @Override
+  public Configuration.Builder withFallbacks(List<ConfigurationFallbacks> defaults) {
+    this.fallbacks = defaults;
+    return this;
+  }
+
+
+  @Override
   public Configuration build() {
-    var components = new CoreComponents(eventRunner, log, parsers, serviceLoader.sources(), serviceLoader.plugins());
+    var components = new CoreComponents(
+      eventRunner,
+      log,
+      parsers,
+      serviceLoader.sources(),
+      serviceLoader.plugins(),
+      fallbacks.isEmpty() ? List.of(new DefaultFallbacks()) : fallbacks
+    );
     if (includeResourceLoading) {
       log.preInitialisation();
       initialLoader = new InitialLoader(components, resourceLoader);

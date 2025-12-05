@@ -156,14 +156,6 @@ class CoreConfigurationTest {
   }
 
   @Test
-  void toEnvKey() {
-    assertThat(CoreConfiguration.toEnvKey("My")).isEqualTo("MY");
-    assertThat(CoreConfiguration.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
-    assertThat(CoreConfiguration.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
-    assertThat(CoreConfiguration.toEnvKey("BAR")).isEqualTo("BAR");
-  }
-
-  @Test
   void builder() {
     var fileSource = new File("./src/test/resources/yaml/minimal.yaml");
     var conf = Configuration.builder()
@@ -583,4 +575,24 @@ class CoreConfigurationTest {
     String afterYeahNahValue = props.getProperty("yeahNah");
     assertThat(beforeYeahNahValue).isSameAs(afterYeahNahValue);
   }
+
+  /**
+   * Tests the behavior when a specific supplier of defaults is supplied instead of relying on the
+   * fallback behaviour of using the system properties + env-vars.
+   */
+
+  @Test
+  void fallbacksAreApplied() {
+    var conf = Configuration.builder()
+      .putAll(properties())
+      .withFallbacks(List.of((key) -> key + ":octopus"))
+      .build();
+
+    String oceanValue = conf.get("ocean"); // no actual value so the fallbacks are used
+    String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
+
+    assertThat(oceanValue).isEqualTo("ocean:octopus");
+    assertThat(fooBarValue).isEqualTo("42");
+  }
+
 }

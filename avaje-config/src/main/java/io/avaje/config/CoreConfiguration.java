@@ -50,7 +50,7 @@ final class CoreConfiguration implements Configuration {
     this.log = components.log();
     this.sources = components.sources();
     this.plugins = components.plugins();
-    this.properties = new ModifyAwareProperties(entries);
+    this.properties = new ModifyAwareProperties(entries, components.fallbacks());
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = "";
@@ -62,7 +62,7 @@ final class CoreConfiguration implements Configuration {
     this.log = parent.log;
     this.sources = parent.sources;
     this.plugins = parent.plugins;
-    this.properties = new ModifyAwareProperties(entries);
+    this.properties = new ModifyAwareProperties(entries, parent.properties.fallbacks);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = prefix;
@@ -486,18 +486,16 @@ final class CoreConfiguration implements Configuration {
     }
   }
 
-  static String toEnvKey(String key) {
-    return key.replace('.', '_').toUpperCase();
-  }
-
   private static class ModifyAwareProperties {
 
     private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
+    private final List<ConfigurationFallbacks> fallbacks;
 
-    ModifyAwareProperties(CoreEntry.CoreMap entries) {
+    ModifyAwareProperties(CoreEntry.CoreMap entries, List<ConfigurationFallbacks> fallbacks) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
+      this.fallbacks = fallbacks;
     }
 
     int size() {
@@ -547,8 +545,7 @@ final class CoreConfiguration implements Configuration {
     private CoreEntry _entry(String key, @Nullable String defaultValue) {
       CoreEntry value = entries.get(key);
       if (value == null) {
-        // defining property at runtime with System property/ENV backing
-        value = defaultEntry(defaultValue, systemValue(key));
+        value = defaultEntry(defaultValue, fallbackValue(key));
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
         value = CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
@@ -557,9 +554,9 @@ final class CoreConfiguration implements Configuration {
       return value;
     }
 
-    private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String systemValue) {
-      if (systemValue != null) {
-        return CoreEntry.of(systemValue, SYSTEM_PROPS);
+    private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String fallbackValue) {
+      if (fallbackValue != null) {
+        return CoreEntry.of(fallbackValue, SYSTEM_PROPS); // the source here is historical.
       } else if (defaultValue != null) {
         return CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
       } else {
@@ -567,10 +564,19 @@ final class CoreConfiguration implements Configuration {
       }
     }
 
+    /**
+     * Creates a fallback value for the supplied key. If no fallback is possible, this method
+     * will return {@code null}.
+     */
+
     @Nullable
-    private static String systemValue(String key) {
-      final String val = System.getProperty(key, System.getenv(key));
-      return val != null ? val : System.getenv(toEnvKey(key));
+    private String fallbackValue(String key) {
+      return this.fallbacks
+        .stream()
+        .map(d -> d.get(key))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
