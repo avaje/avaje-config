@@ -806,7 +806,7 @@ public interface Configuration {
      * for a given key.
      */
 
-    Builder withFallbacks(List<ConfigurationFallbacks> defaults);
+    Builder fallback(ConfigurationFallback fallback);
 
     /**
      * Build and return the Configuration.

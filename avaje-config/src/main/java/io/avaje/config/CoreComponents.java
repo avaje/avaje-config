@@ -8,23 +8,23 @@ final class CoreComponents {
   private final ModificationEventRunner runner;
   private final ConfigurationLog log;
   private final Parsers parsers;
+  private final ConfigurationFallback fallback;
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
-  private final List<ConfigurationFallbacks> fallbacks;
 
   CoreComponents(
-    ModificationEventRunner runner,
-    ConfigurationLog log,
-    Parsers parsers,
-    List<ConfigurationSource> sources,
-    List<ConfigurationPlugin> plugins,
-    List<ConfigurationFallbacks> fallbacks) {
+          ModificationEventRunner runner,
+          ConfigurationLog log,
+          Parsers parsers,
+          ConfigurationFallback fallback,
+          List<ConfigurationSource> sources,
+          List<ConfigurationPlugin> plugins) {
     this.runner = runner;
     this.log = log;
     this.parsers = parsers;
     this.sources = sources;
     this.plugins = plugins;
-    this.fallbacks = fallbacks;
+    this.fallback = fallback;
   }
 
   /** For testing only */
@@ -34,7 +34,7 @@ final class CoreComponents {
     this.parsers = new Parsers(Collections.emptyList());
     this.sources = Collections.emptyList();
     this.plugins = Collections.emptyList();
-    this.fallbacks = List.of(new DefaultFallbacks());
+    this.fallback = new DefaultFallback();
   }
 
   Parsers parsers() {
@@ -49,6 +49,10 @@ final class CoreComponents {
     return runner;
   }
 
+  ConfigurationFallback fallbacks() {
+    return fallback;
+  }
+
   List<ConfigurationSource> sources() {
     return sources;
   }
@@ -56,9 +60,4 @@ final class CoreComponents {
   List<ConfigurationPlugin> plugins() {
     return plugins;
   }
-
-  List<ConfigurationFallbacks> fallbacks() {
-    return fallbacks;
-  }
-
 }

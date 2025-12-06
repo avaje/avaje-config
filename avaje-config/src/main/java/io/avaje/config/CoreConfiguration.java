@@ -62,7 +62,7 @@ final class CoreConfiguration implements Configuration {
     this.log = parent.log;
     this.sources = parent.sources;
     this.plugins = parent.plugins;
-    this.properties = new ModifyAwareProperties(entries, parent.properties.fallbacks);
+    this.properties = new ModifyAwareProperties(entries, parent.properties.fallback);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = prefix;
@@ -490,12 +490,12 @@ final class CoreConfiguration implements Configuration {
 
     private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
-    private final List<ConfigurationFallbacks> fallbacks;
+    private final ConfigurationFallback fallback;
 
-    ModifyAwareProperties(CoreEntry.CoreMap entries, List<ConfigurationFallbacks> fallbacks) {
+    ModifyAwareProperties(CoreEntry.CoreMap entries, ConfigurationFallback fallback) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
-      this.fallbacks = fallbacks;
+      this.fallback = fallback;
     }
 
     int size() {
@@ -571,12 +571,7 @@ final class CoreConfiguration implements Configuration {
 
     @Nullable
     private String fallbackValue(String key) {
-      return this.fallbacks
-        .stream()
-        .map(d -> d.get(key))
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElse(null);
+      return fallback.get(key);
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {

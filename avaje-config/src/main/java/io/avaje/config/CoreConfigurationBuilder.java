@@ -20,7 +20,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
   private final Parsers parsers = serviceLoader.parsers();
-  private List<ConfigurationFallbacks> fallbacks = serviceLoader.fallbacks();
+  private ConfigurationFallback fallback = serviceLoader.fallback();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
@@ -131,8 +131,8 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   @Override
-  public Configuration.Builder withFallbacks(List<ConfigurationFallbacks> defaults) {
-    this.fallbacks = defaults;
+  public Configuration.Builder fallback(ConfigurationFallback fallback) {
+    this.fallback = requireNonNull(fallback);
     return this;
   }
 
@@ -143,9 +143,9 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
       eventRunner,
       log,
       parsers,
+      fallback,
       serviceLoader.sources(),
-      serviceLoader.plugins(),
-      fallbacks.isEmpty() ? List.of(new DefaultFallbacks()) : fallbacks
+      serviceLoader.plugins()
     );
     if (includeResourceLoading) {
       log.preInitialisation();

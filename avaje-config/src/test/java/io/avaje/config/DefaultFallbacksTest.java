@@ -8,10 +8,10 @@ public class DefaultFallbacksTest {
 
   @Test
   void toEnvKey() {
-    assertThat(DefaultFallbacks.toEnvKey("My")).isEqualTo("MY");
-    assertThat(DefaultFallbacks.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
-    assertThat(DefaultFallbacks.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
-    assertThat(DefaultFallbacks.toEnvKey("BAR")).isEqualTo("BAR");
+    assertThat(DefaultFallback.toEnvKey("My")).isEqualTo("MY");
+    assertThat(DefaultFallback.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
+    assertThat(DefaultFallback.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
+    assertThat(DefaultFallback.toEnvKey("BAR")).isEqualTo("BAR");
   }
 
 }
