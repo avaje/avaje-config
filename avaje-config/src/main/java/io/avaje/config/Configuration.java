@@ -823,6 +823,13 @@ public interface Configuration {
   interface Entry {
 
     /**
+     * Return an entry given the value and source.
+     */
+    static Entry of(@Nullable String val, String source) {
+      return CoreEntry.of(val, source);
+    }
+
+    /**
      * Return the source of the entry.
      */
     String source();
@@ -831,5 +838,20 @@ public interface Configuration {
      * Return the String value of the entry.
      */
     String value();
+
+    /**
+     * Return true if the entry needs evaluation.
+     */
+    boolean needsEvaluation();
+
+    /**
+     * Return true if the entry represents a null.
+     */
+    boolean isNull();
+
+    /**
+     * Return the boolean value for the entry.
+     */
+    boolean boolValue();
   }
 }

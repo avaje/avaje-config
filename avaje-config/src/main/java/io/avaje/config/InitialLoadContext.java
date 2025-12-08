@@ -116,8 +116,7 @@ final class InitialLoadContext {
     if (val != null) {
       val = val.trim();
     }
-    val = fallback.overrideValue(key, val, source);
-    map.put(key, val, source);
+    map.put(key, fallback.overrideValue(key, val, source));
   }
 
   /**

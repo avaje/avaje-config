@@ -508,7 +508,7 @@ final class CoreConfiguration implements Configuration {
 
     @Nullable
     String valueOrNull(String key) {
-      CoreEntry entry = entries.get(key);
+      Entry entry = entries.get(key);
       return entry == null ? null : entry.value();
     }
 
@@ -521,11 +521,11 @@ final class CoreConfiguration implements Configuration {
       return entry(key, String.valueOf(defaultValue)).boolValue();
     }
 
-    CoreEntry entry(String key) {
+    Entry entry(String key) {
       return _entry(key, null);
     }
 
-    CoreEntry entry(String key, String defaultValue) {
+    Entry entry(String key, String defaultValue) {
       return _entry(key, defaultValue);
     }
 
@@ -542,8 +542,8 @@ final class CoreConfiguration implements Configuration {
     /**
      * Get property with caching taking into account defaultValue and "null".
      */
-    private CoreEntry _entry(String key, @Nullable String defaultValue) {
-      CoreEntry value = entries.get(key);
+    private Entry _entry(String key, @Nullable String defaultValue) {
+      Entry value = entries.get(key);
       if (value == null) {
         value = defaultEntry(defaultValue, fallbackValue(key));
         entries.put(key, value);

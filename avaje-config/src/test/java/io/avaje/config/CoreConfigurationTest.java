@@ -611,11 +611,11 @@ class CoreConfigurationTest {
       .putAll(properties())
       .build();
 
+    String someOther = conf.get("some.other.system.property"); // fallback to system property
     String oceanValue = conf.getNullable("ocean"); // no actual value so the fallbacks are used
     String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
     System.clearProperty("foo.bar");
-
-    String someOther = conf.get("some.other.system.property"); // there is an actual value for this
+    System.clearProperty("some.other.system.property");
 
     assertThat(oceanValue).isNull();
     assertThat(fooBarValue).isEqualTo("HelloThere");
@@ -625,27 +625,13 @@ class CoreConfigurationTest {
   static class MyFallback implements ConfigurationFallback {
 
     @Override
-    public String overrideValue(String key, String value, String source) {
-      String val = System.getenv(toEnvKey(key));
-      if (val != null) {
-        return val;
-      }
-      val = System.getProperty(key);
-      if (val != null) {
-        return val;
-      }
-      return value;
+    public Configuration.Entry overrideValue(String key, String value, String source) {
+      return DefaultFallback.toEnvOverrideValue(key, value, source);
     }
 
     @Override
     public @Nullable String fallbackValue(String key) {
       return System.getProperty(key);
-    }
-
-    private static String toEnvKey(String key) {
-      key = key.replace(".", "_");
-      key = key.replace("-", "");
-      return key.toUpperCase();
     }
   }
 }

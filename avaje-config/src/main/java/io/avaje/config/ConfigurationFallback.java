@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import io.avaje.config.Configuration.Entry;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -20,8 +21,8 @@ public interface ConfigurationFallback extends ConfigExtension {
    * @param value  The value that can be overridden by the returned value
    * @param source The source of the key value pair
    */
-  default String overrideValue(String key, String value, String source) {
-    return value;
+  default Entry overrideValue(String key, String value, String source) {
+    return Entry.of(value, source);
   }
 
   /**

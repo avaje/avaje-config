@@ -112,8 +112,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   private void put(String key, String value, String source) {
-    value = fallback.overrideValue(key, value, source);
-    sourceMap.put(key, value, source);
+    sourceMap.put(key, fallback.overrideValue(key, value, source));
   }
 
   private ConfigParser parser(String name) {

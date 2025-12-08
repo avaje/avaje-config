@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import io.avaje.config.Configuration.Entry;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -13,7 +14,7 @@ import org.jspecify.annotations.Nullable;
  * Configuration entry.
  */
 @NullMarked
-final class CoreEntry implements Configuration.Entry {
+final class CoreEntry implements Entry {
 
   /**
    * Entry used to represent no entry / null.
@@ -75,7 +76,8 @@ final class CoreEntry implements Configuration.Entry {
     return '{' + value + " source:" + source + '}';
   }
 
-  boolean needsEvaluation() {
+  @Override
+  public boolean needsEvaluation() {
     return value != null && value.contains("${");
   }
 
@@ -84,7 +86,8 @@ final class CoreEntry implements Configuration.Entry {
     return value;
   }
 
-  boolean boolValue() {
+  @Override
+  public boolean boolValue() {
     return boolValue;
   }
 
@@ -93,7 +96,8 @@ final class CoreEntry implements Configuration.Entry {
     return source;
   }
 
-  boolean isNull() {
+  @Override
+  public boolean isNull() {
     return value == null;
   }
 
@@ -102,7 +106,7 @@ final class CoreEntry implements Configuration.Entry {
    */
   static class CoreMap {
 
-    private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
+    private final Map<String, Entry> entryMap = new ConcurrentHashMap<>();
 
     CoreMap() {
     }
@@ -131,7 +135,7 @@ final class CoreEntry implements Configuration.Entry {
     }
 
     @Nullable
-    CoreEntry get(String key) {
+    Entry get(String key) {
       return entryMap.get(key);
     }
 
@@ -157,20 +161,20 @@ final class CoreEntry implements Configuration.Entry {
      * Return true if this is a change in value.
      */
     boolean isChanged(String key, String value) {
-      final CoreEntry entry = entryMap.get(key);
-      return entry == null || !Objects.equals(entry.value, value);
+      final Entry entry = entryMap.get(key);
+      return entry == null || !Objects.equals(entry.value(), value);
     }
 
     /**
      * Return true if this put resulted in a modification.
      */
     private boolean putIfChanged(String key, String value, String source) {
-      final CoreEntry entry = entryMap.get(key);
+      final Entry entry = entryMap.get(key);
       if (entry == null) {
         entryMap.put(key, CoreEntry.of(value, source));
         return true;
-      } else if (!Objects.equals(entry.value, value)) {
-        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source));
+      } else if (!Objects.equals(entry.value(), value)) {
+        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source()));
         return true;
       }
       return false;
@@ -184,7 +188,7 @@ final class CoreEntry implements Configuration.Entry {
       return entryMap.containsKey(key);
     }
 
-    void put(String key, CoreEntry value) {
+    void put(String key, Entry value) {
       entryMap.put(key, value);
     }
 
@@ -198,7 +202,7 @@ final class CoreEntry implements Configuration.Entry {
       return entry == null ? null : entry.value();
     }
 
-    void forEach(BiConsumer<String, CoreEntry> consumer) {
+    void forEach(BiConsumer<String, Entry> consumer) {
       entryMap.forEach(consumer);
     }
   }
