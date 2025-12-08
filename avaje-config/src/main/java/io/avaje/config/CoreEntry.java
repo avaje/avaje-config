@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-import io.avaje.config.Configuration.Entry;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -14,7 +13,7 @@ import org.jspecify.annotations.Nullable;
  * Configuration entry.
  */
 @NullMarked
-final class CoreEntry implements Entry {
+final class CoreEntry implements Configuration.Entry {
 
   /**
    * Entry used to represent no entry / null.
@@ -160,20 +159,20 @@ final class CoreEntry implements Entry {
      * Return true if this is a change in value.
      */
     boolean isChanged(String key, String value) {
-      final Entry entry = entryMap.get(key);
-      return entry == null || !Objects.equals(entry.value(), value);
+      final CoreEntry entry = entryMap.get(key);
+      return entry == null || !Objects.equals(entry.value, value);
     }
 
     /**
      * Return true if this put resulted in a modification.
      */
     private boolean putIfChanged(String key, String value, String source) {
-      final Entry entry = entryMap.get(key);
+      final CoreEntry entry = entryMap.get(key);
       if (entry == null) {
         entryMap.put(key, CoreEntry.of(value, source));
         return true;
-      } else if (!Objects.equals(entry.value(), value)) {
-        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source()));
+      } else if (!Objects.equals(entry.value, value)) {
+        entryMap.put(key, CoreEntry.of(value, source + " <- " + entry.source));
         return true;
       }
       return false;

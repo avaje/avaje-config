@@ -827,6 +827,5 @@ public interface Configuration {
      */
     @Nullable
     String value();
-
   }
 }

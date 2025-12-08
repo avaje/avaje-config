@@ -507,7 +507,7 @@ final class CoreConfiguration implements Configuration {
 
     @Nullable
     String valueOrNull(String key) {
-      Entry entry = entries.get(key);
+      CoreEntry entry = entries.get(key);
       return entry == null ? null : entry.value();
     }
 
