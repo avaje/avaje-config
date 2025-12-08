@@ -76,8 +76,7 @@ final class CoreEntry implements Entry {
     return '{' + value + " source:" + source + '}';
   }
 
-  @Override
-  public boolean needsEvaluation() {
+  boolean needsEvaluation() {
     return value != null && value.contains("${");
   }
 
@@ -87,8 +86,7 @@ final class CoreEntry implements Entry {
     return value;
   }
 
-  @Override
-  public boolean boolValue() {
+  boolean boolValue() {
     return boolValue;
   }
 
@@ -98,8 +96,7 @@ final class CoreEntry implements Entry {
     return source;
   }
 
-  @Override
-  public boolean isNull() {
+  boolean isNull() {
     return value == null;
   }
 
@@ -108,7 +105,7 @@ final class CoreEntry implements Entry {
    */
   static class CoreMap {
 
-    private final Map<String, Entry> entryMap = new ConcurrentHashMap<>();
+    private final Map<String, CoreEntry> entryMap = new ConcurrentHashMap<>();
 
     CoreMap() {
     }
@@ -137,7 +134,7 @@ final class CoreEntry implements Entry {
     }
 
     @Nullable
-    Entry get(String key) {
+    CoreEntry get(String key) {
       return entryMap.get(key);
     }
 
@@ -190,7 +187,7 @@ final class CoreEntry implements Entry {
       return entryMap.containsKey(key);
     }
 
-    void put(String key, Entry value) {
+    void put(String key, CoreEntry value) {
       entryMap.put(key, value);
     }
 
@@ -204,7 +201,7 @@ final class CoreEntry implements Entry {
       return entry == null ? null : entry.value();
     }
 
-    void forEach(BiConsumer<String, Entry> consumer) {
+    void forEach(BiConsumer<String, CoreEntry> consumer) {
       entryMap.forEach(consumer);
     }
   }

@@ -520,11 +520,11 @@ final class CoreConfiguration implements Configuration {
       return entry(key, String.valueOf(defaultValue)).boolValue();
     }
 
-    Entry entry(String key) {
+    CoreEntry entry(String key) {
       return _entry(key, null);
     }
 
-    Entry entry(String key, @Nullable String defaultValue) {
+    CoreEntry entry(String key, @Nullable String defaultValue) {
       return _entry(key, defaultValue);
     }
 
@@ -534,14 +534,15 @@ final class CoreConfiguration implements Configuration {
      */
     Optional<Entry> optionalEntry(String key) {
       return Optional.ofNullable(entries.get(key))
-        .filter(entry -> !entry.isNull());
+        .filter(entry -> !entry.isNull())
+        .map(entry -> entry);
     }
 
     /**
      * Get property with caching taking into account defaultValue and "null".
      */
-    private Entry _entry(String key, @Nullable String defaultValue) {
-      Entry value = entries.get(key);
+    private CoreEntry _entry(String key, @Nullable String defaultValue) {
+      CoreEntry value = entries.get(key);
       if (value == null) {
         value = DefaultValues.fallbackValue(key)
           .or(() -> asDefault(defaultValue))
@@ -554,7 +555,7 @@ final class CoreConfiguration implements Configuration {
       return value;
     }
 
-    private Optional<Entry> asDefault(@Nullable String defaultValue) {
+    private Optional<CoreEntry> asDefault(@Nullable String defaultValue) {
       return defaultValue == null ? Optional.empty() : Optional.of(CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT));
     }
 
