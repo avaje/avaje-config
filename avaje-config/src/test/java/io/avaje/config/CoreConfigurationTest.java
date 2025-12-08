@@ -2,6 +2,7 @@ package io.avaje.config;
 
 import io.avaje.config.CoreEntry.CoreMap;
 import org.example.MyExternalLoader;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -600,4 +601,51 @@ class CoreConfigurationTest {
     assertThat(fooBarValue).isEqualTo("42");
   }
 
+  @Test
+  void fallbacksAreApplied_withOverride() {
+    System.setProperty("foo.bar","HelloThere");
+    System.setProperty("some.other.system.property","HelloSome");
+
+    var conf = Configuration.builder()
+      .fallback(new MyFallback())
+      .putAll(properties())
+      .build();
+
+    String oceanValue = conf.getNullable("ocean"); // no actual value so the fallbacks are used
+    String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
+    System.clearProperty("foo.bar");
+
+    String someOther = conf.get("some.other.system.property"); // there is an actual value for this
+
+    assertThat(oceanValue).isNull();
+    assertThat(fooBarValue).isEqualTo("HelloThere");
+    assertThat(someOther).isEqualTo("HelloSome");
+  }
+
+  static class MyFallback implements ConfigurationFallback {
+
+    @Override
+    public String overrideValue(String key, String value, String source) {
+      String val = System.getenv(toEnvKey(key));
+      if (val != null) {
+        return val;
+      }
+      val = System.getProperty(key);
+      if (val != null) {
+        return val;
+      }
+      return value;
+    }
+
+    @Override
+    public @Nullable String fallbackValue(String key) {
+      return System.getProperty(key);
+    }
+
+    private static String toEnvKey(String key) {
+      key = key.replace(".", "_");
+      key = key.replace("-", "");
+      return key.toUpperCase();
+    }
+  }
 }
