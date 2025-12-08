@@ -1,5 +1,6 @@
 package io.avaje.config;
 
+import io.avaje.config.Configuration.Entry;
 import io.avaje.config.CoreEntry.CoreMap;
 import org.example.MyExternalLoader;
 import org.jspecify.annotations.Nullable;
@@ -87,7 +88,7 @@ class CoreConfigurationTest {
     assertThat(loaded.get("a")).isEqualTo("1");
     assertThat(loaded.get("SetViaSystemProperty")).isNull();
 
-    Optional<Configuration.Entry> entry = configuration.entry("SetViaSystemProperty");
+    Optional<Entry> entry = configuration.entry("SetViaSystemProperty");
     assertThat(entry).isEmpty();
 
     System.clearProperty("SetViaSystemProperty");
@@ -588,8 +589,8 @@ class CoreConfigurationTest {
       .putAll(properties())
       .fallback(new ConfigurationFallback() {
         @Override
-        public String fallbackValue(String key) {
-          return key + ":octopus";
+        public Optional<Entry> fallbackValue(String key) {
+          return Optional.of(Entry.of(key + ":octopus", "SourceTest"));
         }
       })
       .build();
@@ -597,8 +598,13 @@ class CoreConfigurationTest {
     String oceanValue = conf.get("ocean"); // no actual value so the fallbacks are used
     String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
 
+    Optional<Entry> entryOcean = conf.entry("ocean");
+    Optional<Entry> entryFooBar = conf.entry("foo.bar");
+
     assertThat(oceanValue).isEqualTo("ocean:octopus");
     assertThat(fooBarValue).isEqualTo("42");
+    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("initial");
+    assertThat(entryOcean).isPresent().get().extracting(Entry::source).isEqualTo("SourceTest");
   }
 
   @Test
@@ -617,21 +623,31 @@ class CoreConfigurationTest {
     System.clearProperty("foo.bar");
     System.clearProperty("some.other.system.property");
 
+    Optional<Entry> entryOther = conf.entry("some.other.system.property");
+    Optional<Entry> entryFooBar = conf.entry("foo.bar");
+
     assertThat(oceanValue).isNull();
     assertThat(fooBarValue).isEqualTo("HelloThere");
     assertThat(someOther).isEqualTo("HelloSome");
+    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+    assertThat(entryOther).isPresent().get().extracting(Entry::source).isEqualTo("FallbackSystemProperty");
   }
 
   static class MyFallback implements ConfigurationFallback {
 
     @Override
-    public Configuration.Entry overrideValue(String key, String value, String source) {
+    public Entry overrideValue(String key, String value, String source) {
       return DefaultFallback.toEnvOverrideValue(key, value, source);
     }
 
     @Override
-    public @Nullable String fallbackValue(String key) {
-      return System.getProperty(key);
+    @Nullable
+    public Optional<Entry> fallbackValue(String key) {
+      String val = System.getProperty(key);
+      if (val != null) {
+        return Optional.of(Entry.of(val, "FallbackSystemProperty"));
+      }
+      return Optional.empty();
     }
   }
 }

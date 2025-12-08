@@ -1,6 +1,8 @@
 package io.avaje.config;
 
-import org.jspecify.annotations.Nullable;
+import io.avaje.config.Configuration.Entry;
+
+import java.util.Optional;
 
 /**
  * Provides a default means of maybe obtaining a fallback value for a configuration key in the
@@ -36,24 +38,31 @@ public final class DefaultFallback implements ConfigurationFallback {
    * @param source The source of the entry that can be overridden
    * @return The entry to be added (that might have been its value and source overridden).
    */
-  public static Configuration.Entry toEnvOverrideValue(String key, String value, String source) {
+  public static Entry toEnvOverrideValue(String key, String value, String source) {
     String envValue = System.getenv(toEnvKey(key));
     if (envValue != null) {
       // overridden by an environment variable
-      return Configuration.Entry.of(envValue, Constants.ENV_VARIABLES);
+      return Entry.of(envValue, Constants.ENV_VARIABLES);
     }
     String propertyValue = System.getProperty(key);
     if (propertyValue != null) {
       // overridden by a system property
-      return Configuration.Entry.of(propertyValue, Constants.SYSTEM_PROPS);
+      return Entry.of(propertyValue, Constants.SYSTEM_PROPS);
     }
     // not overridden, return as given
-    return Configuration.Entry.of(value, source);
+    return Entry.of(value, source);
   }
 
   @Override
-  public @Nullable String fallbackValue(String key) {
+  public Optional<Entry> fallbackValue(String key) {
     final String val = System.getProperty(key, System.getenv(key));
-    return val != null ? val : System.getenv(oldEnvKey(key));
+    if (val != null) {
+      return Optional.of(Entry.of(val, Constants.SYSTEM_PROPS));
+    }
+    String envVal = System.getenv(oldEnvKey(key));
+    if (envVal != null) {
+      return Optional.of(Entry.of(val, Constants.ENV_VARIABLES));
+    }
+    return Optional.empty();
   }
 }

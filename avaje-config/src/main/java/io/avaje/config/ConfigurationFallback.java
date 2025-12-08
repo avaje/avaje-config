@@ -1,7 +1,8 @@
 package io.avaje.config;
 
 import io.avaje.config.Configuration.Entry;
-import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * Implementations of this class are able to define a fallback value when there is no
@@ -30,9 +31,8 @@ public interface ConfigurationFallback extends ConfigExtension {
    *
    * @param key The configuration key to get a fallback value for.
    */
-  @Nullable
-  default String fallbackValue(String key) {
-    return null;
+  default Optional<Entry> fallbackValue(String key) {
+    return Optional.empty();
   }
 
 }

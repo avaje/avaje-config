@@ -1,6 +1,5 @@
 package io.avaje.config;
 
-import static io.avaje.config.Constants.SYSTEM_PROPS;
 import static io.avaje.config.Constants.USER_PROVIDED_DEFAULT;
 import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Objects.requireNonNull;
@@ -535,8 +534,7 @@ final class CoreConfiguration implements Configuration {
      */
     Optional<Entry> optionalEntry(String key) {
       return Optional.ofNullable(entries.get(key))
-        .filter(entry -> !entry.isNull())
-        .map(entry -> entry);
+        .filter(entry -> !entry.isNull());
     }
 
     /**
@@ -545,7 +543,9 @@ final class CoreConfiguration implements Configuration {
     private Entry _entry(String key, @Nullable String defaultValue) {
       Entry value = entries.get(key);
       if (value == null) {
-        value = defaultEntry(defaultValue, fallbackValue(key));
+        value = fallback.fallbackValue(key)
+          .or(() -> asDefault(defaultValue))
+          .orElse(CoreEntry.NULL_ENTRY);
         entries.put(key, value);
       } else if (value.isNull() && defaultValue != null) {
         value = CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
@@ -554,19 +554,8 @@ final class CoreConfiguration implements Configuration {
       return value;
     }
 
-    private static CoreEntry defaultEntry(@Nullable String defaultValue, @Nullable String fallbackValue) {
-      if (fallbackValue != null) {
-        return CoreEntry.of(fallbackValue, SYSTEM_PROPS); // the source here is historical.
-      } else if (defaultValue != null) {
-        return CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT);
-      } else {
-        return CoreEntry.NULL_ENTRY;
-      }
-    }
-
-    @Nullable
-    private String fallbackValue(String key) {
-      return fallback.fallbackValue(key);
+    private Optional<Entry> asDefault(@Nullable String defaultValue) {
+      return defaultValue == null ? Optional.empty() : Optional.of(CoreEntry.of(defaultValue, USER_PROVIDED_DEFAULT));
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {
