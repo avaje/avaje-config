@@ -23,13 +23,21 @@ final class Parsers {
   }
 
   private void initYamlParser() {
-    YamlLoader yamlLoader;
-    try {
-      Class.forName("org.yaml.snakeyaml.Yaml");
-      yamlLoader = new YamlLoaderSnake();
-    } catch (ClassNotFoundException e) {
-      yamlLoader = new YamlLoaderSimple();
-    }
+    var modules = ModuleLayer.boot();
+    YamlLoader yamlLoader =
+        modules
+            .findModule("io.avaje.config")
+            .map(m -> modules.findModule("org.yaml.snakeyaml").isPresent())
+            .map(m -> (YamlLoader) new YamlLoaderSnake())
+            .orElseGet(
+                () -> {
+                  try {
+                    return new YamlLoaderSnake();
+                  } catch (Throwable e) {
+                    return new YamlLoaderSimple();
+                  }
+                });
+
     parserMap.put("yml", yamlLoader);
     parserMap.put("yaml", yamlLoader);
   }
