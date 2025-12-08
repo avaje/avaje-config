@@ -20,9 +20,9 @@ final class CoreEntry implements Configuration.Entry {
    */
   static final CoreEntry NULL_ENTRY = new CoreEntry();
 
-  private final String value;
+  private @Nullable final String value;
   private final boolean boolValue;
-  private final String source;
+  private @Nullable final String source;
 
   /**
    * Return a new empty entryMap for entries.
@@ -80,6 +80,7 @@ final class CoreEntry implements Configuration.Entry {
   }
 
   @Override
+  @Nullable
   public String value() {
     return value;
   }
@@ -89,6 +90,7 @@ final class CoreEntry implements Configuration.Entry {
   }
 
   @Override
+  @Nullable
   public String source() {
     return source;
   }
