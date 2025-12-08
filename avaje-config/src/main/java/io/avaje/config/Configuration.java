@@ -569,7 +569,8 @@ public interface Configuration {
     /**
      * Evaluate a configuration expression.
      */
-    String eval(String expression);
+    @Nullable
+    String eval(@Nullable String expression);
   }
 
   /**
@@ -832,11 +833,13 @@ public interface Configuration {
     /**
      * Return the source of the entry.
      */
+    @Nullable
     String source();
 
     /**
      * Return the String value of the entry.
      */
+    @Nullable
     String value();
 
     /**

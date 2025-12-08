@@ -1,6 +1,10 @@
 package io.avaje.config;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Properties;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Helper used to evaluate expressions such as ${CATALINA_HOME}.
@@ -51,14 +55,15 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
   private CoreEntry.CoreMap evalAll() {
     sourceMap.forEach((key, entry) -> {
       if (entry.needsEvaluation()) {
-        sourceMap.put(key, eval(entry.value()), entry.source());
+        sourceMap.put(key, eval(entry.value()), requireNonNull(entry.source()));
       }
     });
     return sourceMap;
   }
 
   @Override
-  public String eval(String val) {
+  @Nullable
+  public String eval(@Nullable String val) {
     return val == null ? null : evalRecurse(val);
   }
 
