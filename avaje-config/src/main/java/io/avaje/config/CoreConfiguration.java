@@ -49,7 +49,7 @@ final class CoreConfiguration implements Configuration {
     this.log = components.log();
     this.sources = components.sources();
     this.plugins = components.plugins();
-    this.properties = new ModifyAwareProperties(entries, components.fallback());
+    this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = "";
@@ -61,7 +61,7 @@ final class CoreConfiguration implements Configuration {
     this.log = parent.log;
     this.sources = parent.sources;
     this.plugins = parent.plugins;
-    this.properties = new ModifyAwareProperties(entries, parent.properties.fallback);
+    this.properties = new ModifyAwareProperties(entries);
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = prefix;
@@ -490,12 +490,10 @@ final class CoreConfiguration implements Configuration {
 
     private final CoreEntry.CoreMap entries;
     private final Configuration.ExpressionEval eval;
-    private final ConfigurationFallback fallback;
 
-    ModifyAwareProperties(CoreEntry.CoreMap entries, ConfigurationFallback fallback) {
+    ModifyAwareProperties(CoreEntry.CoreMap entries) {
       this.entries = entries;
       this.eval = new CoreExpressionEval(entries);
-      this.fallback = fallback;
     }
 
     int size() {
@@ -545,7 +543,7 @@ final class CoreConfiguration implements Configuration {
     private Entry _entry(String key, @Nullable String defaultValue) {
       Entry value = entries.get(key);
       if (value == null) {
-        value = fallback.fallbackValue(key)
+        value = DefaultValues.fallbackValue(key)
           .or(() -> asDefault(defaultValue))
           .orElse(CoreEntry.NULL_ENTRY);
         entries.put(key, value);

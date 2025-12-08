@@ -25,14 +25,12 @@ final class InitialLoadContext {
   private final Set<String> loadedResources = new LinkedHashSet<>();
   private final List<File> loadedFiles = new ArrayList<>();
   private final CoreExpressionEval exprEval;
-  private final ConfigurationFallback fallback;
   private final Set<String> loadCheck = new HashSet<>();
   private int recursiveLoadCount;
 
-  InitialLoadContext(ConfigurationLog log, ResourceLoader resourceLoader, ConfigurationFallback fallback) {
+  InitialLoadContext(ConfigurationLog log, ResourceLoader resourceLoader) {
     this.log = log;
     this.resourceLoader = resourceLoader;
-    this.fallback = fallback;
     this.exprEval = new CoreExpressionEval(map);
   }
 
@@ -116,7 +114,7 @@ final class InitialLoadContext {
     if (val != null) {
       val = val.trim();
     }
-    map.put(key, fallback.overrideValue(key, val, source));
+    map.put(key, DefaultValues.overrideValue(key, val, source));
   }
 
   /**

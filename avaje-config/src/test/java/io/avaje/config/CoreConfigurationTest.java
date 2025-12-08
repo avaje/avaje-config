@@ -587,24 +587,20 @@ class CoreConfigurationTest {
   void fallbacksAreApplied() {
     var conf = Configuration.builder()
       .putAll(properties())
-      .fallback(new ConfigurationFallback() {
-        @Override
-        public Optional<Entry> fallbackValue(String key) {
-          return Optional.of(Entry.of(key + ":octopus", "SourceTest"));
-        }
-      })
       .build();
 
+    System.setProperty("ocean", "ocean:octopus");
     String oceanValue = conf.get("ocean"); // no actual value so the fallbacks are used
     String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
 
+    System.clearProperty("ocean");
     Optional<Entry> entryOcean = conf.entry("ocean");
     Optional<Entry> entryFooBar = conf.entry("foo.bar");
 
     assertThat(oceanValue).isEqualTo("ocean:octopus");
     assertThat(fooBarValue).isEqualTo("42");
-    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("initial");
-    assertThat(entryOcean).isPresent().get().extracting(Entry::source).isEqualTo("SourceTest");
+    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+    assertThat(entryOcean).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
   }
 
   @Test
@@ -613,7 +609,6 @@ class CoreConfigurationTest {
     System.setProperty("some.other.system.property","HelloSome");
 
     var conf = Configuration.builder()
-      .fallback(new MyFallback())
       .putAll(properties())
       .build();
 
@@ -630,24 +625,7 @@ class CoreConfigurationTest {
     assertThat(fooBarValue).isEqualTo("HelloThere");
     assertThat(someOther).isEqualTo("HelloSome");
     assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
-    assertThat(entryOther).isPresent().get().extracting(Entry::source).isEqualTo("FallbackSystemProperty");
+    assertThat(entryOther).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
   }
 
-  static class MyFallback implements ConfigurationFallback {
-
-    @Override
-    public Entry overrideValue(String key, String value, String source) {
-      return DefaultFallback.toEnvOverrideValue(key, value, source);
-    }
-
-    @Override
-    @Nullable
-    public Optional<Entry> fallbackValue(String key) {
-      String val = System.getProperty(key);
-      if (val != null) {
-        return Optional.of(Entry.of(val, "FallbackSystemProperty"));
-      }
-      return Optional.empty();
-    }
-  }
 }

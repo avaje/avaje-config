@@ -22,13 +22,11 @@ final class ConfigServiceLoader {
   private final List<ConfigurationSource> sources = new ArrayList<>();
   private final List<ConfigurationPlugin> plugins = new ArrayList<>();
   private final Parsers parsers;
-  private final ConfigurationFallback fallback;
 
   ConfigServiceLoader() {
     ModificationEventRunner _eventRunner = null;
     ConfigurationLog _log = null;
     ResourceLoader _resourceLoader = null;
-    ConfigurationFallback _fallback = null;
     List<ConfigParser> otherParsers = new ArrayList<>();
 
     for (var spi : ServiceLoader.load(ConfigExtension.class)) {
@@ -44,8 +42,6 @@ final class ConfigServiceLoader {
         _resourceLoader = (ResourceLoader) spi;
       } else if (spi instanceof ModificationEventRunner) {
         _eventRunner = (ModificationEventRunner) spi;
-      } else if (spi instanceof ConfigurationFallback) {
-        _fallback = (ConfigurationFallback) spi;
       }
     }
 
@@ -53,7 +49,6 @@ final class ConfigServiceLoader {
     this.resourceLoader = _resourceLoader == null ? new DefaultResourceLoader() : _resourceLoader;
     this.eventRunner = _eventRunner == null ? new CoreConfiguration.ForegroundEventRunner() : _eventRunner;
     this.parsers = new Parsers(otherParsers);
-    this.fallback = _fallback == null ? new DefaultFallback() : _fallback;
   }
 
   Parsers parsers() {
@@ -70,10 +65,6 @@ final class ConfigServiceLoader {
 
   ModificationEventRunner eventRunner() {
     return eventRunner;
-  }
-
-  ConfigurationFallback fallback() {
-    return fallback;
   }
 
   List<ConfigurationSource> sources() {

@@ -20,7 +20,6 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private final CoreEntry.CoreMap sourceMap = CoreEntry.newMap();
   private final ConfigServiceLoader serviceLoader = ConfigServiceLoader.get();
   private final Parsers parsers = serviceLoader.parsers();
-  private ConfigurationFallback fallback = serviceLoader.fallback();
   private ConfigurationLog log = serviceLoader.log();
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
@@ -112,7 +111,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   private void put(String key, String value, String source) {
-    sourceMap.put(key, fallback.overrideValue(key, value, source));
+    sourceMap.put(key, DefaultValues.overrideValue(key, value, source));
   }
 
   private ConfigParser parser(String name) {
@@ -135,19 +134,11 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   }
 
   @Override
-  public Configuration.Builder fallback(ConfigurationFallback fallback) {
-    this.fallback = requireNonNull(fallback);
-    return this;
-  }
-
-
-  @Override
   public Configuration build() {
     var components = new CoreComponents(
       eventRunner,
       log,
       parsers,
-      fallback,
       serviceLoader.sources(),
       serviceLoader.plugins()
     );
