@@ -585,7 +585,12 @@ class CoreConfigurationTest {
   void fallbacksAreApplied() {
     var conf = Configuration.builder()
       .putAll(properties())
-      .fallback(((key) -> key + ":octopus"))
+      .fallback(new ConfigurationFallback() {
+        @Override
+        public String fallbackValue(String key) {
+          return key + ":octopus";
+        }
+      })
       .build();
 
     String oceanValue = conf.get("ocean"); // no actual value so the fallbacks are used

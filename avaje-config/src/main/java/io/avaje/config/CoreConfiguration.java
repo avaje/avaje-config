@@ -50,7 +50,7 @@ final class CoreConfiguration implements Configuration {
     this.log = components.log();
     this.sources = components.sources();
     this.plugins = components.plugins();
-    this.properties = new ModifyAwareProperties(entries, components.fallbacks());
+    this.properties = new ModifyAwareProperties(entries, components.fallback());
     this.listValue = new CoreListValue(this);
     this.setValue = new CoreSetValue(this);
     this.pathPrefix = "";
@@ -564,14 +564,9 @@ final class CoreConfiguration implements Configuration {
       }
     }
 
-    /**
-     * Creates a fallback value for the supplied key. If no fallback is possible, this method
-     * will return {@code null}.
-     */
-
     @Nullable
     private String fallbackValue(String key) {
-      return fallback.get(key);
+      return fallback.fallbackValue(key);
     }
 
     void loadIntoSystemProperties(Set<String> excludedSet) {

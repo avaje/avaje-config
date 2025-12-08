@@ -49,7 +49,7 @@ final class InitialLoader {
   InitialLoader(CoreComponents components, ResourceLoader resourceLoader) {
     this.parsers = components.parsers();
     this.log = components.log();
-    this.loadContext = new InitialLoadContext(log, resourceLoader);
+    this.loadContext = new InitialLoadContext(log, resourceLoader, components.fallback());
   }
 
   Set<String> loadedFrom() {

@@ -49,7 +49,7 @@ final class CoreComponents {
     return runner;
   }
 
-  ConfigurationFallback fallbacks() {
+  ConfigurationFallback fallback() {
     return fallback;
   }
 

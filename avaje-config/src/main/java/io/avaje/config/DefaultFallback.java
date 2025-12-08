@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 public final class DefaultFallback implements ConfigurationFallback {
 
   @Override
-  public @Nullable String get(String key) {
+  public @Nullable String fallbackValue(String key) {
     final String val = System.getProperty(key, System.getenv(key));
     return val != null ? val : System.getenv(toEnvKey(key));
   }

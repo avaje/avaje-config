@@ -1,12 +1,12 @@
 package io.avaje.config;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -25,7 +25,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
   private ResourceLoader resourceLoader = serviceLoader.resourceLoader();
   private ModificationEventRunner eventRunner = serviceLoader.eventRunner();
   private boolean includeResourceLoading;
-  private InitialLoader initialLoader;
+  private @Nullable InitialLoader initialLoader;
 
   @Override
   public Configuration.Builder eventRunner(ModificationEventRunner eventRunner) {
@@ -47,7 +47,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
 
   @Override
   public Configuration.Builder put(String key, String value) {
-    sourceMap.put(requireNonNull(key), requireNonNull(value), "initial");
+    put(requireNonNull(key), requireNonNull(value), "initial");
     return this;
   }
 
@@ -56,7 +56,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     requireNonNull(source);
     source.forEach((key, value) -> {
       if (key != null && value != null) {
-        sourceMap.put(key, value.toString(), "initial");
+        put(key, value.toString(), "initial");
       }
     });
     return this;
@@ -67,7 +67,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     requireNonNull(source);
     source.forEach((key, value) -> {
       if (key != null && value != null) {
-        sourceMap.put(key.toString(), value.toString(), "initial");
+        put(key.toString(), value.toString(), "initial");
       }
     });
     return this;
@@ -82,7 +82,7 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
           log.log(INFO, "Configuration resource:{0} not found", resource);
         } else {
           var source = "resource:" + resource;
-          configParser.load(inputStream).forEach((k, v) -> sourceMap.put(k, v, source));
+          configParser.load(inputStream).forEach((k, v) -> put(k, v, source));
           log.log(DEBUG, "loaded {0}", source);
         }
         return this;
@@ -102,13 +102,18 @@ final class CoreConfigurationBuilder implements Configuration.Builder {
     try {
       try (var reader = new FileReader(file)) {
         var source = "file:" + file.getName();
-        configParser.load(reader).forEach((k, v) -> sourceMap.put(k, v, source));
+        configParser.load(reader).forEach((k, v) -> put(k, v, source));
         log.log(DEBUG, "loaded {0}", source);
         return this;
       }
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  private void put(String key, String value, String source) {
+    value = fallback.overrideValue(key, value, source);
+    sourceMap.put(key, value, source);
   }
 
   private ConfigParser parser(String name) {
