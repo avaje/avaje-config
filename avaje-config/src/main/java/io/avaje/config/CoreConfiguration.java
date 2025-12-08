@@ -40,8 +40,8 @@ final class CoreConfiguration implements Configuration {
   private final List<ConfigurationPlugin> plugins;
 
   private boolean loadedSystemProperties;
-  private FileWatch watcher;
-  private Timer timer;
+  private @Nullable FileWatch watcher;
+  private @Nullable Timer timer;
   private final String pathPrefix;
 
   CoreConfiguration(CoreComponents components, CoreEntry.CoreMap entries) {
@@ -259,7 +259,8 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public String getNullable(String key, String defaultValue) {
+  @Nullable
+  public String getNullable(String key, @Nullable String defaultValue) {
     requireNonNull(key, "key is required");
     return properties.entry(key, defaultValue).value();
   }
@@ -268,7 +269,7 @@ final class CoreConfiguration implements Configuration {
   public String get(String key, String defaultValue) {
     requireNonNull(key, "key is required");
     requireNonNull(defaultValue, "defaultValue is required, use getOptional() instead");
-    return properties.entry(key, defaultValue).value();
+    return requireNonNull(properties.entry(key, defaultValue).value());
   }
 
   @Override
@@ -277,7 +278,7 @@ final class CoreConfiguration implements Configuration {
   }
 
   @Override
-  public Optional<String> getOptional(String key, String defaultValue) {
+  public Optional<String> getOptional(String key, @Nullable String defaultValue) {
     return Optional.ofNullable(getNullable(key, defaultValue));
   }
 
@@ -504,6 +505,7 @@ final class CoreConfiguration implements Configuration {
       return entries.size();
     }
 
+    @Nullable
     String eval(String value) {
       return eval.eval(value);
     }
@@ -527,7 +529,7 @@ final class CoreConfiguration implements Configuration {
       return _entry(key, null);
     }
 
-    CoreEntry entry(String key, String defaultValue) {
+    CoreEntry entry(String key, @Nullable String defaultValue) {
       return _entry(key, defaultValue);
     }
 
@@ -576,7 +578,7 @@ final class CoreConfiguration implements Configuration {
     void loadIntoSystemProperties(Set<String> excludedSet) {
       entries.forEach((key, entry) -> {
         if (!excludedSet.contains(key) && !entry.isNull()) {
-          System.setProperty(key, entry.value());
+          System.setProperty(key, requireNonNull(entry.value()));
         }
       });
     }
