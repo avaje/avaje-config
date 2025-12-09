@@ -27,7 +27,7 @@ final class Parsers {
     YamlLoader yamlLoader =
         modules
             .findModule("io.avaje.config")
-            .map(m -> modules.findModule("org.yaml.snakeyaml").isPresent())
+            .filter(m -> modules.findModule("org.yaml.snakeyaml").isPresent())
             .map(m -> (YamlLoader) new YamlLoaderSnake())
             .orElseGet(
                 () -> {
