@@ -11,7 +11,7 @@
   <name>Avaje Config</name>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>4.3</version>
+  <version>4.4</version>
 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
