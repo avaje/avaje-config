@@ -11,7 +11,12 @@ final class CoreComponents {
   private final List<ConfigurationSource> sources;
   private final List<ConfigurationPlugin> plugins;
 
-  CoreComponents(ModificationEventRunner runner, ConfigurationLog log, Parsers parsers, List<ConfigurationSource> sources, List<ConfigurationPlugin> plugins) {
+  CoreComponents(
+          ModificationEventRunner runner,
+          ConfigurationLog log,
+          Parsers parsers,
+          List<ConfigurationSource> sources,
+          List<ConfigurationPlugin> plugins) {
     this.runner = runner;
     this.log = log;
     this.parsers = parsers;

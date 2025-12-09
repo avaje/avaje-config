@@ -110,14 +110,11 @@ final class InitialLoadContext {
     return resourceLoader.getResourceAsStream(resourcePath);
   }
 
-  /**
-   * Add a property entry.
-   */
   void put(String key, String val, String source) {
     if (val != null) {
       val = val.trim();
     }
-    map.put(key, val, source);
+    map.put(key, DefaultValues.overrideValue(key, val, source));
   }
 
   /**

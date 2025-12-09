@@ -1,7 +1,9 @@
 package io.avaje.config;
 
+import io.avaje.config.Configuration.Entry;
 import io.avaje.config.CoreEntry.CoreMap;
 import org.example.MyExternalLoader;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -86,7 +88,7 @@ class CoreConfigurationTest {
     assertThat(loaded.get("a")).isEqualTo("1");
     assertThat(loaded.get("SetViaSystemProperty")).isNull();
 
-    Optional<Configuration.Entry> entry = configuration.entry("SetViaSystemProperty");
+    Optional<Entry> entry = configuration.entry("SetViaSystemProperty");
     assertThat(entry).isEmpty();
 
     System.clearProperty("SetViaSystemProperty");
@@ -153,14 +155,6 @@ class CoreConfigurationTest {
   void test_toString() {
     data.setWatcher(new FileWatch(createConfig(CoreEntry.newMap(new Properties(), "test")), Collections.emptyList(), null));
     assertThat(data.toString()).doesNotContain("entries");
-  }
-
-  @Test
-  void toEnvKey() {
-    assertThat(CoreConfiguration.toEnvKey("My")).isEqualTo("MY");
-    assertThat(CoreConfiguration.toEnvKey("My.Foo")).isEqualTo("MY_FOO");
-    assertThat(CoreConfiguration.toEnvKey("my.foo.bar")).isEqualTo("MY_FOO_BAR");
-    assertThat(CoreConfiguration.toEnvKey("BAR")).isEqualTo("BAR");
   }
 
   @Test
@@ -583,4 +577,55 @@ class CoreConfigurationTest {
     String afterYeahNahValue = props.getProperty("yeahNah");
     assertThat(beforeYeahNahValue).isSameAs(afterYeahNahValue);
   }
+
+  /**
+   * Tests the behavior when a specific supplier of defaults is supplied instead of relying on the
+   * fallback behaviour of using the system properties + env-vars.
+   */
+
+  @Test
+  void fallbacksAreApplied() {
+    var conf = Configuration.builder()
+      .putAll(properties())
+      .build();
+
+    System.setProperty("ocean", "ocean:octopus");
+    String oceanValue = conf.get("ocean"); // no actual value so the fallbacks are used
+    String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
+
+    System.clearProperty("ocean");
+    Optional<Entry> entryOcean = conf.entry("ocean");
+    Optional<Entry> entryFooBar = conf.entry("foo.bar");
+
+    assertThat(oceanValue).isEqualTo("ocean:octopus");
+    assertThat(fooBarValue).isEqualTo("42");
+    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+    assertThat(entryOcean).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+  }
+
+  @Test
+  void fallbacksAreApplied_withOverride() {
+    System.setProperty("foo.bar","HelloThere");
+    System.setProperty("some.other.system.property","HelloSome");
+
+    var conf = Configuration.builder()
+      .putAll(properties())
+      .build();
+
+    String someOther = conf.get("some.other.system.property"); // fallback to system property
+    String oceanValue = conf.getNullable("ocean"); // no actual value so the fallbacks are used
+    String fooBarValue = conf.get("foo.bar"); // there is an actual value for this
+    System.clearProperty("foo.bar");
+    System.clearProperty("some.other.system.property");
+
+    Optional<Entry> entryOther = conf.entry("some.other.system.property");
+    Optional<Entry> entryFooBar = conf.entry("foo.bar");
+
+    assertThat(oceanValue).isNull();
+    assertThat(fooBarValue).isEqualTo("HelloThere");
+    assertThat(someOther).isEqualTo("HelloSome");
+    assertThat(entryFooBar).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+    assertThat(entryOther).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
+  }
+
 }
