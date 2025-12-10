@@ -1,0 +1,44 @@
+# Trigger the workflow when a release is published
+name: Close Milestone on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  close_milestone:
+    # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
+    # We only want to proceed if the release tag matches the milestone title
+    steps:
+      - name: Extract Milestone Title
+        id: extract
+        run: |
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          MILESTONE_TITLE="${RELEASE_TAG#v}"
+          echo "MILESTONE_TITLE=$MILESTONE_TITLE" >> $GITHUB_OUTPUT
+
+      - name: Close Corresponding Milestone
+        uses: cli/cli-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          args: |
+            # Search for an open milestone with a title matching the release tag
+            MILESTONE_ID=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              /repos/${{ github.repository }}/milestones \
+              -f state='open' \
+              -f sort='due_on' \
+              -f direction='asc' \
+              -f per_page='100' \
+              --jq '.[] | select(.title=="${{ steps.extract.outputs.MILESTONE_TITLE }}") | .number' \
+              | head -n 1)
+            if [ -z "$MILESTONE_ID" ]; then
+              echo "No open milestone found"
+            else
+              gh api \
+                --method PATCH \
+                -H "Accept: application/vnd.github+json" \
+                /repos/${{ github.repository }}/milestones/$MILESTONE_ID \
+                -f state='closed'
+            fi
