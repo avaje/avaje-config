@@ -11,7 +11,7 @@
   <name>Avaje Config</name>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>5.0-RC2</version>
+  <version>5.0</version>
 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
@@ -23,7 +23,7 @@
     <snakeyaml.version>2.5</snakeyaml.version>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <project.build.outputTimestamp>2025-12-09T10:04:37Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-12-16T08:12:58Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
