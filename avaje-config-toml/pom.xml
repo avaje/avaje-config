@@ -46,14 +46,14 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.23</version>
+      <version>1.5.24</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-applog-slf4j</artifactId>
-      <version>1.0</version>
+      <version>1.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
