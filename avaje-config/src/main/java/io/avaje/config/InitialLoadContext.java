@@ -91,7 +91,7 @@ final class InitialLoadContext {
         loadCheck.add(resourcePath);
       }
     } else {
-      File file = new File(resourcePath);
+      File file = toFile(resourcePath);
       if (file.exists()) {
         try {
           is = new FileInputStream(file);
@@ -104,6 +104,17 @@ final class InitialLoadContext {
       }
     }
     return is;
+  }
+
+  static File toFile(String path) {
+    var file = new File(path);
+    return file.exists() || !path.startsWith("~/")
+      ? file
+      : new File(userHomeFileName(path));
+  }
+
+  private static String userHomeFileName(String fileName) {
+    return System.getProperty("user.home") + fileName.substring(1);
   }
 
   private InputStream resourceStream(String resourcePath) {
