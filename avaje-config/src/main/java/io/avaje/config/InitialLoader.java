@@ -251,12 +251,9 @@ final class InitialLoader {
   }
 
   private void loadViaSystemProperty() {
-    String fileName = System.getenv("PROPS_FILE");
-    if (fileName == null) {
-      fileName = System.getProperty("props.file");
-      if (fileName != null && !loadWithExtensionCheck(fileName)) {
-        log.log(WARNING, "Unable to find file {0} to load properties", fileName);
-      }
+    String fileName = System.getProperty("props.file");
+    if (fileName != null && !loadWithExtensionCheck(fileName)) {
+      log.log(WARNING, "Unable to find file {0} to load properties", fileName);
     }
   }
 
