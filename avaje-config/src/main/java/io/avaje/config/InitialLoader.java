@@ -251,10 +251,20 @@ final class InitialLoader {
   }
 
   private void loadViaSystemProperty() {
-    String fileName = System.getProperty("props.file");
+    String fileName = configFile();
     if (fileName != null && !loadWithExtensionCheck(fileName)) {
       log.log(WARNING, "Unable to find file {0} to load properties", fileName);
     }
+  }
+
+  @Nullable
+  private static String configFile() {
+    String propsFile = System.getProperty("props.file");
+    if (propsFile != null) {
+      System.err.println("WARNING: avaje-config has deprecated use of props.file, use config.file instead. Refer https://avaje.io/warn#props");
+      return propsFile;
+    }
+    return System.getProperty("config.file", System.getenv("CONFIG_FILE"));
   }
 
   boolean loadWithExtensionCheck(String fileName) {
