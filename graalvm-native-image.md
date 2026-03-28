@@ -97,8 +97,3 @@ src/main/resources/META-INF/native-image/<groupId>/<artifactId>/resource-config.
 
 The standard `application.*` patterns are already covered by avaje-config itself.
 
-## Verification
-
-The avaje-config CI runs a native image build test on every scheduled build:
-
-[![native image build](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml)
