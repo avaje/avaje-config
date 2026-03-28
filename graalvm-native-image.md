@@ -1,7 +1,7 @@
 # GraalVM Native Image
 
-avaje-config has built-in support for GraalVM native image. No additional dependencies
-or configuration files are required — everything is bundled in the jar.
+Avaje config has built-in support for GraalVM native image. No additional dependencies
+or configuration files should be required.
 
 ## How it works
 
