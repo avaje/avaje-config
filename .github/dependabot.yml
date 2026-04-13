@@ -11,7 +11,7 @@ updates:
         - "*"
     labels:
       - "dependencies"
-    target-branch: "master"
+    target-branch: "main"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -22,4 +22,4 @@ updates:
       prefix: "[workflow]"
     labels:
       - "dependencies"
-    target-branch: "master"
+    target-branch: "main"
