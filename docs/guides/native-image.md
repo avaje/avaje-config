@@ -1,95 +1,9 @@
 # Building GraalVM Native Images
 
-How to use avaje-config with GraalVM native image compilation.
+avaje-config supports GraalVM native image compilation. 
 
-## Configuration
+We don't need to do anything extra. 
 
-Add GraalVM Maven plugin to `pom.xml`:
-
-```xml
-<plugin>
-  <groupId>org.graalvm.buildtools</groupId>
-  <artifactId>native-maven-plugin</artifactId>
-  <version>0.10.0</version>
-  <configuration>
-    <buildArgs>
-      <buildArg>--enable-url-protocols=https</buildArg>
-    </buildArgs>
-  </configuration>
-</plugin>
-```
-
-## Native Image Hints
-
-Avaje Config provides native image metadata automatically via GraalVM tracing agent.
-
-To generate hints:
-
-```bash
-# Build with instrumentation
-mvn -DskipTests -Pnative-image clean package
-
-# Or use the native-image agent
-java -agentlib:native-image=config-output-dir=native-image-config -jar target/myapp.jar
-```
-
-## Static Initialization
-
-For best performance, enable static initialization:
-
-```java
-import io.avaje.config.Config;
-
-public class Application {
-  static {
-    // Configuration is loaded at build time
-    Config.setLogLevel("INFO");
-  }
-}
-```
-
-## Property Resolution in Native Image
-
-All configuration files must be on the classpath:
-
-```
-src/main/resources/
-├── application.yaml          # Always included
-├── application-prod.yaml     # Include via classpath
-└── META-INF/native-image/
-    └── reflect-config.json   # Reflection metadata
-```
-
-For dynamic profiles, use environment variables:
-
-```yaml
-logging:
-  level: ${LOGGING_LEVEL:INFO}
-```
-
-Then set at runtime:
-
-```bash
-LOGGING_LEVEL=DEBUG ./myapp
-```
-
-## Classpath Resources
-
-Ensure all configuration files are included in the native image:
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-shade-plugin</artifactId>
-  <configuration>
-    <transformers>
-      <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-        <mainClass>com.example.Application</mainClass>
-      </transformer>
-    </transformers>
-  </configuration>
-</plugin>
-```
 
 ## Building the Native Image
 
@@ -112,7 +26,6 @@ Native images with avaje-config offer:
 
 ## Limitations
 
-- Configuration must be known at build time or provided via environment variables
 - Dynamic class loading not supported
 - Reflection on configuration classes must be hinted
 
@@ -129,25 +42,6 @@ mvn -Pnative clean package
 
 # Test
 ./target/myapp
-```
-
-## Troubleshooting
-
-### "Configuration class not found"
-
-Ensure all `@Config` classes are on the classpath:
-
-```
-mvn native:compile
-```
-
-### "Property not resolved at runtime"
-
-Use environment variables for dynamic values:
-
-```yaml
-database:
-  host: ${DATABASE_HOST:localhost}
 ```
 
 ## Next Steps
