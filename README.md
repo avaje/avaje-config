@@ -5,6 +5,10 @@
 [![Build](https://github.com/avaje/avaje-config/actions/workflows/build.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/build.yml)
 [![native image build](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml/badge.svg)](https://github.com/avaje/avaje-config/actions/workflows/native-image.yml)
 
+> **Note:** As of April 2026, the default branch has been changed from `master` to `main`.
+> All new development should target the `main` branch. The `master` branch is maintained
+> for backward compatibility but is no longer the active development branch.
+
 # [Avaje Config](https://avaje.io/config/)
 
 This library loads properties files that can be used to configure
