@@ -185,15 +185,15 @@ app:
 
 | Task | Difficulty | Guide |
 |------|-----------|-------|
-| Load properties | Beginner | [guides/getting-started.md](../guides/getting-started.md) |
-| Use default values | Beginner | [guides/default-values.md](../guides/default-values.md) |
-| Load profile-specific config | Beginner | [guides/profiles.md](../guides/profiles.md) |
-| Use environment variables | Beginner | [guides/environment-variables.md](../guides/environment-variables.md) |
-| React to configuration changes | Intermediate | [guides/change-listeners.md](../guides/change-listeners.md) |
-| Integrate with cloud platforms | Advanced | [guides/cloud-integration.md](../guides/cloud-integration.md) |
-| Build native images | Advanced | [guides/native-image.md](../guides/native-image.md) |
+| Load properties | Beginner | [guides/getting-started.md](guides/getting-started.md) |
+| Use default values | Beginner | [guides/default-values.md](guides/default-values.md) |
+| Load profile-specific config | Beginner | [guides/profiles.md](guides/profiles.md) |
+| Use environment variables | Beginner | [guides/environment-variables.md](guides/environment-variables.md) |
+| React to configuration changes | Intermediate | [guides/change-listeners.md](guides/change-listeners.md) |
+| Integrate with cloud platforms | Advanced | [guides/cloud-integration.md](guides/cloud-integration.md) |
+| Build native images | Advanced | [guides/native-image.md](guides/native-image.md) |
 
-**Full Guides Index**: See [guides/README.md](../guides/README.md)
+**Full Guides Index**: See [guides/README.md](guides/README.md)
 
 ## API Quick Reference
 
@@ -337,7 +337,7 @@ void testConfigIntegration() {
 }
 ```
 
-**See**: [guides/testing.md](../guides/testing.md)
+**See**: [guides/testing.md](guides/testing.md)
 
 ## Performance Characteristics
 
@@ -378,7 +378,7 @@ java MyApp
 
 **Solution**: Ensure property exists in configuration files. Use default values: `Config.get("key", "defaultValue")`.
 
-**See**: [guides/troubleshooting.md](../guides/troubleshooting.md#property-not-found)
+**See**: [guides/troubleshooting.md](guides/troubleshooting.md#property-not-found)
 
 ### Issue: Profile Not Loading
 
@@ -391,7 +391,7 @@ export CONFIG_PROFILES=dev,docker
 java MyApp
 ```
 
-**See**: [guides/troubleshooting.md](../guides/troubleshooting.md#profile-not-loading)
+**See**: [guides/troubleshooting.md](guides/troubleshooting.md#profile-not-loading)
 
 ### Issue: Change Listener Not Called
 
@@ -399,7 +399,7 @@ java MyApp
 
 **Solution**: Properties loaded at startup. Changes must come from system property updates or external config reload mechanism.
 
-**See**: [guides/troubleshooting.md](../guides/troubleshooting.md#listener-not-called)
+**See**: [guides/troubleshooting.md](guides/troubleshooting.md#listener-not-called)
 
 ## GraalVM Native Image
 
@@ -415,7 +415,7 @@ java MyApp
 mvn clean package -Pnative
 ```
 
-**See**: [guides/native-image.md](../guides/native-image.md)
+**See**: [guides/native-image.md](guides/native-image.md)
 
 ## Design Philosophy
 
