@@ -25,7 +25,7 @@ Avaje Config loads application properties from multiple sources (YAML, propertie
 
 ### Runtime
 - **No external dependencies** — Zero runtime dependencies!
-- **SnakeYAML** — Optional for YAML parsing (included automatically if needed)
+- **SnakeYAML** — Optional for YAML parsing (avaje-config includes its own lightweight yaml parser)
 
 ### Test
 - **JUnit 5** — Testing framework
@@ -34,7 +34,6 @@ Avaje Config loads application properties from multiple sources (YAML, propertie
 - **avaje-simple-logger** — For logging (optional, works with any SLF4J impl)
 - **avaje-config-toml** — TOML file support
 - **avaje-aws-appconfig** — AWS AppConfig integration
-- **avaje-dynamic-logback** — Dynamic Logback configuration updates
 
 ## Core APIs
 
@@ -191,7 +190,6 @@ app:
 | Load profile-specific config | Beginner | [docs/guides/profiles.md](../guides/profiles.md) |
 | Use environment variables | Beginner | [docs/guides/environment-variables.md](../guides/environment-variables.md) |
 | React to configuration changes | Intermediate | [docs/guides/change-listeners.md](../guides/change-listeners.md) |
-| Chain configuration files | Intermediate | [docs/guides/file-chaining.md](../guides/file-chaining.md) |
 | Integrate with cloud platforms | Advanced | [docs/guides/cloud-integration.md](../guides/cloud-integration.md) |
 | Build native images | Advanced | [docs/guides/native-image.md](../guides/native-image.md) |
 
