@@ -17,50 +17,24 @@ Integrate with AWS Systems Manager Parameter Store:
 Configure in `application.yaml`:
 
 ```yaml
-avaje:
-  config:
-    appconfig:
-      enabled: true
-      application: myapp
-      environment: prod
-      profile: default
+aws.appconfig:
+    enabled: true
+    application: ${ENVIRONMENT_NAME:dev}-my-application
+    environment: ${ENVIRONMENT_NAME:dev}
+    configuration: default
 ```
 
 This automatically loads configuration from AWS AppConfig.
 
-## Spring Cloud Config
 
-For Spring Cloud Config compatibility:
-
-```yaml
-spring:
-  cloud:
-    config:
-      uri: http://localhost:8888
-      name: myapp
-      profile: prod
-```
-
-Avaje Config can read from Spring Cloud Config servers.
-
-## Environment Variables (Recommended for Cloud-Native)
-
-The simplest cloud-native approach is using environment variables:
+Configure in `application-test.yaml`:
 
 ```yaml
-database:
-  host: ${DATABASE_HOST}
-  port: ${DATABASE_PORT}
-  username: ${DATABASE_USER}
-  password: ${DATABASE_PASSWORD}
+aws.appconfig.enabled: false
 ```
 
-Set these in your deployment:
+To disable loading the AWS AppConfig when running tests.
 
-- Docker Compose
-- Kubernetes ConfigMaps and Secrets
-- CI/CD platform secrets
-- Cloud provider parameter stores
 
 ## Docker Compose Example
 
@@ -139,40 +113,6 @@ spec:
         name: myapp-secrets
 ```
 
-## Multi-Tenancy Configuration
-
-For multi-tenant applications, scope configuration by tenant:
-
-```yaml
-tenants:
-  acme:
-    database:
-      host: acme-db.example.com
-      port: 5432
-  widgetcorp:
-    database:
-      host: widgetcorp-db.example.com
-      port: 5432
-```
-
-Access in code:
-
-```java
-String tenant = getTenantFromRequest();
-String host = Config.get("tenants." + tenant + ".database.host");
-```
-
-## Configuration Precedence for Cloud
-
-When using cloud configuration services:
-
-1. Command-line system properties (highest)
-2. Environment variables
-3. Cloud service (AppConfig, Spring Cloud Config)
-4. Local application.yaml
-5. Application defaults (lowest)
-
-This allows local development while respecting cloud-provided values in production.
 
 ## Next Steps
 
