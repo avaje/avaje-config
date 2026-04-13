@@ -171,6 +171,86 @@ public class AppConfig {
 }
 ```
 
+## Step 3b: Alternative - Using Configuration Object
+
+As an alternative to using static `Config` methods, you can obtain the underlying `Configuration` object and use it directly. This approach is useful when you want to pass configuration as a parameter, store it as an instance variable, or access it from multiple methods.
+
+### Obtaining the Configuration Object
+
+```java
+import io.avaje.config.Config;
+import io.avaje.config.Configuration;
+
+Configuration configuration = Config.asConfiguration();
+```
+
+### Using Configuration for Property Access
+
+The `Configuration` object provides the same methods as the static `Config` class:
+
+```java
+public class AppService {
+  
+  private final Configuration configuration;
+  
+  public AppService() {
+    this.configuration = Config.asConfiguration();
+  }
+  
+  public void initialize() {
+    // Get string values
+    String appName = configuration.get("app.name");
+    String appName = configuration.get("app.name", "DefaultApp");
+    
+    // Get integer values
+    int port = configuration.getInt("app.port");
+    int port = configuration.getInt("app.port", 8080);
+    
+    // Get long values
+    long timeout = configuration.getLong("app.timeout-millis", 30000L);
+    
+    // Get boolean values
+    boolean debug = configuration.getBool("app.debug");
+    boolean debug = configuration.getBool("app.debug", false);
+  }
+}
+```
+
+### Complete Example with Configuration Object
+
+```java
+public class DatabaseService {
+  
+  private final Configuration config;
+  
+  public DatabaseService() {
+    this.config = Config.asConfiguration();
+  }
+  
+  public void setupConnection() {
+    String url = config.get("database.url");
+    String user = config.get("database.username");
+    int poolSize = config.getInt("database.max-pool-size", 10);
+    
+    System.out.println("Connecting to: " + url);
+    System.out.println("User: " + user);
+    System.out.println("Pool size: " + poolSize);
+  }
+}
+```
+
+### When to Use Configuration Object vs Static Methods
+
+| Scenario | Approach |
+|----------|----------|
+| Quick property access in a method | Use static `Config` methods |
+| Storing configuration as instance variable | Use `Configuration` object |
+| Passing configuration to methods/constructors | Use `Configuration` object |
+| Dependency injection scenarios | Use `Configuration` object |
+| One-off property lookups | Use static `Config` methods |
+
+**Both approaches access the same underlying configuration**, so choose based on your code structure and preferences.
+
 ## Step 4: Access Configuration in Your Application
 
 ### In a Main Application Class
