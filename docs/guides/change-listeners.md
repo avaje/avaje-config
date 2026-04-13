@@ -108,7 +108,7 @@ public class AppConfigListener implements ConfigChangeListener {
 With Avaje Inject, register the listener in your application setup:
 
 ```java
-@Config
+@Singleton
 public class ApplicationStartup {
   public ApplicationStartup(ConfigChangeListener listener) {
     Config.addChangeListener(listener);
