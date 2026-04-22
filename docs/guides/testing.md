@@ -29,8 +29,7 @@ cache:
 ## Test Resource Auto-Loading
 
 avaje-config automatically loads `src/test/resources/application-test.yaml` (or
-`.properties`) when it is present on the classpath. This happens unconditionally —
-no profile activation (`config.profiles`, `avaje.profiles`, etc.) is needed.
+`.properties`) when it is present on the classpath. This happens unconditionally, no profile activation (`config.profiles`, `avaje.profiles`, etc.) is needed.
 
 The loading order during tests is:
 
