@@ -13,7 +13,7 @@
   <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
   <name>avaje-aws-appconfig</name>
-  <version>1.6</version>
+  <version>1.7</version>
   <description>AWS AppConfig plugin for avaje-config</description>
 
   <properties>
@@ -31,8 +31,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>4.4</version>
-      <scope>provided</scope>
+      <version>5.1</version>
     </dependency>
 
     <dependency>
