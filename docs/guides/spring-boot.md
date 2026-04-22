@@ -47,7 +47,7 @@ private String url;
 avaje-config loads `application.yaml` from the classpath independently of Spring Boot.
 Both libraries load the same file, but from their own parsing context.
 
-**`src/main/resources/application.yaml`** — use `${ENV_VAR:default}` for env-injected values:
+In the following example, we use `${ENV_VAR:default}` for env-injected values:
 
 ```yaml
 db:
