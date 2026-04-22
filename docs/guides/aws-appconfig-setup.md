@@ -130,7 +130,7 @@ startup trying to connect.
 
 Additionally, because AppConfig is an additional configuration source loaded
 _after_ file-based resources, it would override your `application-test.yaml`
-values if left enabled — defeating the purpose of test configuration.
+values if left enabled. (Defeating the purpose of test configuration)
 
 ### Alternative with Properties Format
 
