@@ -33,7 +33,7 @@ Avaje Config loads application properties from multiple sources (YAML, propertie
 ### Optional
 - **avaje-simple-logger** — For logging (optional, works with any SLF4J impl)
 - **avaje-config-toml** — TOML file support
-- **avaje-aws-appconfig** — AWS AppConfig integration
+- **avaje-aws-appconfig** — AWS AppConfig integration *(note: declares `avaje-config` as `provided` — add `avaje-config` explicitly when using this)*
 
 ## Core APIs
 
@@ -189,7 +189,10 @@ app:
 | Use default values | Beginner | [guides/default-values.md](guides/default-values.md) |
 | Load profile-specific config | Beginner | [guides/profiles.md](guides/profiles.md) |
 | Use environment variables | Beginner | [guides/environment-variables.md](guides/environment-variables.md) |
+| Test with avaje-config | Beginner | [guides/testing.md](guides/testing.md) |
+| Integrate with AWS AppConfig | Intermediate | [guides/aws-appconfig-setup.md](guides/aws-appconfig-setup.md) |
 | React to configuration changes | Intermediate | [guides/change-listeners.md](guides/change-listeners.md) |
+| Use with Spring Boot | Intermediate | [guides/spring-boot.md](guides/spring-boot.md) |
 | Integrate with cloud platforms | Advanced | [guides/cloud-integration.md](guides/cloud-integration.md) |
 | Build native images | Advanced | [guides/native-image.md](guides/native-image.md) |
 
