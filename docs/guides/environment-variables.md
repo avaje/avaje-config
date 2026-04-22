@@ -65,11 +65,70 @@ Environment variable names follow this convention:
 
 | YAML Property | Environment Variable |
 |---------------|----------------------|
-| server.port | SERVER_PORT |
-| database.host | DATABASE_HOST |
-| app.name | APP_NAME |
+| `server.port` | `SERVER_PORT` |
+| `database.host` | `DATABASE_HOST` |
+| `app.name` | `APP_NAME` |
+| `my.foo-bar` | `MY_FOOBAR` |
 
-The convention is: `UPPERCASE_WITH_UNDERSCORES`
+The translation rule is: **dots → underscores, hyphens removed, uppercase**.
+
+> **Hyphen note:** hyphens are dropped entirely, not converted to underscores.
+> `my.foo-bar` → `MY_FOOBAR`, not `MY_FOO_BAR`.
+> This differs from Spring Boot's relaxed binding where hyphens become underscores.
+> To avoid ambiguity, prefer dot-only property names (e.g., `database.maxPoolSize`).
+
+## Two Mechanisms: Explicit vs Automatic
+
+avaje-config supports two distinct ways to use environment variables.
+
+### 1. Explicit `${ENV_VAR:default}` in YAML (expression evaluation)
+
+Use the `${VAR:default}` syntax inside YAML values. The expression is evaluated at
+load time using the exact variable name you specify:
+
+```yaml
+database:
+  host: ${DATABASE_HOST:localhost}
+  port: ${DATABASE_PORT:5432}
+  password: ${DATABASE_PASSWORD}      # No default — env var required
+```
+
+This form:
+- Uses the **exact env var name** you specify
+- Supports **default values** after the colon
+- Supports **compound values** where the env var is part of a larger string:
+
+```yaml
+aws.appconfig:
+  application: ${ENVIRONMENT_NAME:dev}-my-service   # e.g. "prod-my-service"
+```
+
+### 2. Automatic property override (no YAML changes needed)
+
+For **every** property key avaje-config knows about, it automatically checks whether
+a matching environment variable exists (using the `toEnvKey` translation rule above).
+If one is set, it overrides the file-based value. No `${...}` in the YAML is needed.
+
+```yaml
+# application.yaml - no ${...} needed
+database:
+  host: localhost
+  port: 5432
+```
+
+```bash
+# This env var automatically overrides database.host → DATABASE_HOST
+export DATABASE_HOST=prod-db.example.com
+java myapp.jar
+```
+
+```java
+// Still returns "prod-db.example.com" from env var
+String host = Config.get("database.host");
+```
+
+The automatic check also acts as a **fallback for missing keys**: if a key is not
+found in any configuration file, avaje-config will check the translated env var name.
 
 ## Accessing in Code
 

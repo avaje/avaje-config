@@ -2,126 +2,100 @@
 
 How to listen for and respond to configuration changes at runtime.
 
-## Adding a Configuration Listener
+## Listening to a Specific Property
 
-Implement `ConfigChangeListener` to be notified of configuration changes:
+Use `Config.onChange()` to register a lambda that fires when a named property changes:
 
 ```java
 import io.avaje.config.Config;
-import io.avaje.config.ConfigChangeListener;
 
-public class MyConfigListener implements ConfigChangeListener {
-  @Override
-  public void onConfigChange(ConfigChangeEvent event) {
-    System.out.println("Configuration changed: " + event.getProperty());
-  }
-}
+// String value listener
+Config.onChange("database.host", newHost -> {
+  System.out.println("Database host changed to: " + newHost);
+  reconnectDatabase(newHost);
+});
+
+// Typed listeners
+Config.onChangeInt("server.port", newPort -> {
+  System.out.println("Port changed to: " + newPort);
+});
+
+Config.onChangeLong("upload.max.bytes", newSize -> {
+  fileService.setMaxSize(newSize);
+});
+
+Config.onChangeBool("features.enabled", isEnabled -> {
+  featureManager.setEnabled(isEnabled);
+});
 ```
 
-Register the listener:
+## Listening to Multiple Properties
+
+Use the bulk `Config.onChange(Consumer<ModificationEvent>, String... keys)` form
+to watch several properties with a single listener:
 
 ```java
-Config.addChangeListener(new MyConfigListener());
+import io.avaje.config.Config;
+import io.avaje.config.ModificationEvent;
+
+Config.onChange(event -> {
+  Set<String> changed = event.modifiedKeys();
+  System.out.println("Config changed. Modified keys: " + changed);
+
+  if (changed.contains("database.host")) {
+    reconnectDatabase(Config.get("database.host"));
+  }
+  if (changed.contains("cache.ttl")) {
+    cacheService.setTtl(Config.getInt("cache.ttl", 300));
+  }
+}, "database.host", "cache.ttl");
 ```
 
-## Listening to Specific Properties
-
-Listen to changes on specific properties:
+Omit the key arguments to listen for **any** configuration change:
 
 ```java
-public class DatabaseConfigListener implements ConfigChangeListener {
-  @Override
-  public void onConfigChange(ConfigChangeEvent event) {
-    String property = event.getProperty();
-    String newValue = event.getNewValue();
-    
-    if (property.equals("database.host")) {
-      System.out.println("Database host changed to: " + newValue);
-      reconnectDatabase(newValue);
-    }
-  }
-  
-  private void reconnectDatabase(String newHost) {
-    // Close existing connection and reconnect
-  }
-}
+Config.onChange(event -> {
+  System.out.println("Any config changed: " + event.modifiedKeys());
+});
 ```
 
-## Practical Examples
-
-### Reload Cache on Configuration Change
-
-```java
-public class CacheConfigListener implements ConfigChangeListener {
-  private final CacheService cacheService;
-  
-  public CacheConfigListener(CacheService cacheService) {
-    this.cacheService = cacheService;
-  }
-  
-  @Override
-  public void onConfigChange(ConfigChangeEvent event) {
-    if (event.getProperty().equals("cache.ttl")) {
-      int newTtl = Integer.parseInt(event.getNewValue());
-      cacheService.setTtl(newTtl);
-      cacheService.clear();
-    }
-  }
-}
-```
-
-### Update Logger Configuration
-
-```java
-public class LoggerConfigListener implements ConfigChangeListener {
-  @Override
-  public void onConfigChange(ConfigChangeEvent event) {
-    if (event.getProperty().equals("logging.level")) {
-      String level = event.getNewValue();
-      LoggerFactory.setLogLevel(level);
-    }
-  }
-}
-```
-
-### Notify Dependents
-
-```java
-public class AppConfigListener implements ConfigChangeListener {
-  private final ApplicationEventBus eventBus;
-  
-  public AppConfigListener(ApplicationEventBus eventBus) {
-    this.eventBus = eventBus;
-  }
-  
-  @Override
-  public void onConfigChange(ConfigChangeEvent event) {
-    ConfigurationChangedEvent evt = 
-      new ConfigurationChangedEvent(event.getProperty(), event.getNewValue());
-    eventBus.publish(evt);
-  }
-}
-```
-
-## Using with Dependency Injection
-
-With Avaje Inject, register the listener in your application setup:
+## Practical Example: Dynamic Feature Flag
 
 ```java
 @Singleton
-public class ApplicationStartup {
-  public ApplicationStartup(ConfigChangeListener listener) {
-    Config.addChangeListener(listener);
+public class FeatureManager {
+  private volatile boolean featureEnabled;
+
+  @Inject
+  public FeatureManager() {
+    this.featureEnabled = Config.getBool("features.new-ui", false);
+
+    Config.onChangeBool("features.new-ui", newValue -> {
+      this.featureEnabled = newValue;
+      System.out.println("Feature toggle updated: " + newValue);
+    });
+  }
+
+  public boolean isEnabled() {
+    return featureEnabled;
   }
 }
+```
+
+## Triggering a Reload
+
+Force an immediate reload of all configuration sources (e.g. for AWS AppConfig):
+
+```java
+Config.asConfiguration().reloadSources();
 ```
 
 ## Important Notes
 
-- Listeners are called **synchronously** - keep processing quick
-- Changes are detected when configuration is reloaded
-- Use for dynamic reconfiguration, not for every request
-- External configuration services can push updates (cloud config)
+- Listeners are called **synchronously** — keep processing quick
+- Changes are delivered when configuration is reloaded (polling or explicit `reloadSources()`)
+- Use for dynamic reconfiguration (feature flags, pool sizes, log levels)
+- Listeners registered via `Config.onChange()` are held with a strong reference
 
 ## Next Steps
 
