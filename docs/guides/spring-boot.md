@@ -116,7 +116,7 @@ class TestDatabaseConfig {
 
   @Bean
   Database database() {
-    // Testcontainers PostgreSQL — registered before DatabaseConfig is processed
+    // Testcontainers PostgreSQL  registered before DatabaseConfig is processed
     var postgres = new PostgreSQLContainer<>("postgres:16");
     postgres.start();
 
