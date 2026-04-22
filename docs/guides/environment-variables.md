@@ -90,7 +90,7 @@ load time using the exact variable name you specify:
 database:
   host: ${DATABASE_HOST:localhost}
   port: ${DATABASE_PORT:5432}
-  password: ${DATABASE_PASSWORD}      # No default — env var required
+  password: ${DATABASE_PASSWORD}      # No default. An env var is required
 ```
 
 This form:
