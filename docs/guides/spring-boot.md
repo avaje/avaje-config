@@ -40,7 +40,7 @@ private String url;
 ```
 
 > **Important:** `avaje-config` is declared `provided` in `avaje-aws-appconfig`'s POM.
-> You must add it explicitly — it will not be pulled in transitively.
+> You must add it explicitly as it will not be pulled in transitively.
 
 ## Step 2: Configuration Files
 
