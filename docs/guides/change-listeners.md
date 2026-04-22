@@ -92,7 +92,7 @@ Config.asConfiguration().reloadSources();
 
 ## Important Notes
 
-- Listeners are called **synchronously** — keep processing quick
+- Listeners are called **synchronously**, keeping processing quick
 - Changes are delivered when configuration is reloaded (polling or explicit `reloadSources()`)
 - Use for dynamic reconfiguration (feature flags, pool sizes, log levels)
 - Listeners registered via `Config.onChange()` are held with a strong reference
