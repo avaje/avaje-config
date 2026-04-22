@@ -127,7 +127,7 @@ java myapp.jar
 String host = Config.get("database.host");
 ```
 
-The automatic check also acts as a **fallback for missing keys**: if a key is not
+The automatic check also acts as a **fallback for missing keys**. If a key is not
 found in any configuration file, avaje-config will check the translated env var name.
 
 ## Accessing in Code
