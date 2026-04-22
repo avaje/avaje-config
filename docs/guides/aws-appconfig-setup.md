@@ -29,19 +29,10 @@ Add both dependencies to your `pom.xml`:
 ```xml
 <dependency>
   <groupId>io.avaje</groupId>
-  <artifactId>avaje-config</artifactId>
-  <version>5.1</version>
-</dependency>
-<dependency>
-  <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>1.6</version>
+  <version>1.7</version>
 </dependency>
 ```
-
-> **Important:** `avaje-config` is declared as `provided` scope in
-> `avaje-aws-appconfig`'s POM, so it will **not** be included transitively.
-> You must declare `avaje-config` explicitly in your own POM.
 
 ## Step 2: Configure AWS AppConfig
 
