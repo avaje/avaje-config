@@ -19,3 +19,4 @@ Step-by-step guides for common tasks with avaje-config.
 - [Native Image](native-image.md) - Build GraalVM native images with avaje-config
 - [Testing](testing.md) - Write tests with avaje-config
 - [Troubleshooting](troubleshooting.md) - Common issues and solutions
+- [Spring Boot](spring-boot.md) - Using avaje-config with Spring Boot 3

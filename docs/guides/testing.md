@@ -26,13 +26,25 @@ cache:
   enabled: false
 ```
 
-## Using Test Configuration
+## Test Resource Auto-Loading
 
-Tests automatically use `src/test/resources/application.yaml`:
+avaje-config automatically loads `src/test/resources/application-test.yaml` (or
+`.properties`) when it is present on the classpath. This happens unconditionally, no profile activation (`config.profiles`, `avaje.profiles`, etc.) is needed.
+
+The loading order during tests is:
+
+1. `src/main/resources/application.yaml` — production defaults
+2. `src/test/resources/application-test.yaml` — test overrides (loaded automatically)
+3. System properties / command-line arguments — highest priority
+
+> **Note:** `application-test.yaml` is a special hardcoded filename. It is not the
+> same as activating a `test` profile. Other profile files (e.g., `application-it.yaml`)
+> still require explicit profile activation via `config.profiles=it`.
 
 ```java
 @Test
 public void testConfiguration() {
+  // application-test.yaml values are available automatically
   String dbHost = Config.get("database.host");
   assertEquals("localhost", dbHost);
 }
@@ -52,25 +64,6 @@ public void testWithCustomPort() {
   } finally {
     System.clearProperty("server.port");
   }
-}
-```
-
-## Mocking Configuration
-
-For advanced testing, mock the Config class:
-
-```java
-import static org.mockito.Mockito.*;
-
-@Test
-public void testWithMockedConfig() {
-  // Create spy on real Config
-  Config spy = spy(Config.class);
-  
-  when(spy.get("server.port")).thenReturn("9000");
-  
-  int port = Integer.parseInt(spy.get("server.port"));
-  assertEquals(9000, port);
 }
 ```
 
@@ -161,24 +154,32 @@ public class IntegrationTest {
 
 ## Testing Configuration Changes
 
-Test configuration change listeners:
+Test configuration change listeners using `Config.onChange()`:
 
 ```java
 @Test
 public void testConfigChangeListener() {
-  List<String> changes = new ArrayList<>();
-  
-  Config.addChangeListener(event -> {
-    changes.add(event.getProperty());
-  });
-  
+  List<String> changedKeys = new ArrayList<>();
+
+  Config.onChange(event -> {
+    changedKeys.addAll(event.modifiedKeys());
+  }, "server.port");
+
   System.setProperty("server.port", "9000");
-  
-  // Trigger configuration reload
-  Config.reload();
-  
-  assertTrue(changes.contains("server.port"));
+
+  // Trigger reload of all configuration sources
+  Config.asConfiguration().reloadSources();
+
+  assertTrue(changedKeys.contains("server.port"));
 }
+```
+
+For single-property typed listeners:
+
+```java
+Config.onChangeInt("server.port", newPort -> {
+  System.out.println("Port changed to: " + newPort);
+});
 ```
 
 ## Best Practices

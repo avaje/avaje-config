@@ -24,17 +24,15 @@ This guide provides step-by-step instructions for integrating **AWS AppConfig** 
 
 ## Step 1: Add AWS AppConfig Dependency
 
-Add the avaje-aws-appconfig dependency to your `pom.xml`:
+Add both dependencies to your `pom.xml`:
 
 ```xml
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-aws-appconfig</artifactId>
-  <version>1.0</version>
+  <version>1.7</version>
 </dependency>
 ```
-
-Replace `1.0` with the latest version from [Maven Central](https://mvnrepository.com/artifact/io.avaje/avaje-aws-appconfig).
 
 ## Step 2: Configure AWS AppConfig
 
@@ -115,7 +113,15 @@ aws.appconfig:
   enabled: false
 ```
 
-This prevents tests from requiring AWS credentials or network access to AWS AppConfig.
+**Why this is needed:** In Kubernetes the avaje-aws-appconfig plugin connects to an
+[AWS AppConfig Agent](https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-retrieving-managed-configuration-agent.html)
+sidecar container running on `localhost:2772`. This sidecar is not present in
+test or CI environments, so without `enabled: false` the plugin will fail on
+startup trying to connect.
+
+Additionally, because AppConfig is an additional configuration source loaded
+_after_ file-based resources, it would override your `application-test.yaml`
+values if left enabled. (Defeating the purpose of test configuration)
 
 ### Alternative with Properties Format
 

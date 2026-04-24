@@ -16,23 +16,26 @@ src/main/resources/
 
 ## Activating Profiles
 
-Activate a profile by setting the `config.profile` property:
+Activate a profile by setting the `config.profiles` property (note: plural):
 
 ```bash
 # Development
-java -Dconfig.profile=dev myapp.jar
+java -Dconfig.profiles=dev myapp.jar
 
 # Test
-java -Dconfig.profile=test myapp.jar
+java -Dconfig.profiles=test myapp.jar
 
 # Production
-java -Dconfig.profile=prod myapp.jar
+java -Dconfig.profiles=prod myapp.jar
+
+# Multiple profiles (comma-separated)
+java -Dconfig.profiles=prod,docker myapp.jar
 ```
 
 Or with environment variables:
 
 ```bash
-export CONFIG_PROFILE=prod
+export CONFIG_PROFILES=prod
 java myapp.jar
 ```
 
@@ -81,11 +84,38 @@ logging:
 Get the active profile:
 
 ```java
-String profile = Config.get("config.profile", "dev");
+String profile = Config.get("config.profiles", "dev");
 if (profile.equals("prod")) {
   // Production-specific behavior
 }
 ```
+
+## Test Configuration Auto-Loading vs Profile Activation
+
+These are two distinct mechanisms — do not confuse them:
+
+**`application-test.yaml` auto-loading (no activation needed):**
+`src/test/resources/application-test.yaml` is a special hardcoded filename.
+avaje-config loads it automatically whenever it is present on the classpath —
+typically during Maven/Gradle test runs. No `config.profiles=test` or
+`avaje.profiles=test` is required.
+
+```
+src/test/resources/
+└── application-test.yaml   ← loaded automatically, no profile activation needed
+```
+
+**Explicit profile activation (activation required):**
+All other profile files (`application-dev.yaml`, `application-it.yaml`, etc.)
+require explicit activation:
+
+```bash
+java -Dconfig.profiles=it myapp.jar   # loads application-it.yaml
+```
+
+> **Common mistake:** setting `-Davaje.profiles=test` in your test runner to
+> load `application-test.yaml`. This is not needed — the file is auto-loaded
+> unconditionally when present in test resources.
 
 ## Profile-Specific Beans
 

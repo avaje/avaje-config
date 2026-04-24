@@ -32,35 +32,38 @@ int port = Config.getInt("server.port", 8080); // Provide default
 **Symptom**: `application-prod.yaml` is not being loaded
 
 **Solution**:
-1. Verify profile is activated: `java -Dconfig.profile=prod myapp.jar`
-2. Check environment variable: `export CONFIG_PROFILE=prod`
+1. Verify profile is activated: `java -Dconfig.profiles=prod myapp.jar`
+2. Check environment variable: `export CONFIG_PROFILES=prod`
 3. Ensure file name matches the profile: `application-PROFILE.yaml`
 4. Verify file is in `src/main/resources/`
 
-Check active profile:
+> **Note:** `application-test.yaml` in `src/test/resources` is loaded automatically
+> and does **not** need profile activation. See [profiles guide](profiles.md) for details.
+
+Check active profiles:
 ```java
-String profile = Config.get("config.profile", "dev");
-System.out.println("Active profile: " + profile);
+String profiles = Config.get("config.profiles", "dev");
+System.out.println("Active profiles: " + profiles);
 ```
 
 ## Listener Not Called
 
-**Symptom**: `ConfigChangeListener` never triggers
+**Symptom**: `Config.onChange()` callback not triggered
 
 **Solution**:
-1. Ensure listener is registered: `Config.addChangeListener(listener)`
+1. Ensure listener is registered before the configuration change occurs
 2. Verify configuration source supports change notifications
-3. Call `Config.reload()` to trigger change detection
+3. Call `Config.asConfiguration().reloadSources()` to trigger change detection
 4. Check that the property actually changed
 
 Debug:
 ```java
-Config.addChangeListener(event -> {
-  System.out.println("Config changed: " + event.getProperty());
+Config.onChange(event -> {
+  System.out.println("Config changed: " + event.modifiedKeys());
 });
 
-// Force reload
-Config.reload();
+// Force reload of all configuration sources
+Config.asConfiguration().reloadSources();
 ```
 
 ## Type Conversion Error
