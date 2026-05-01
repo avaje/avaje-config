@@ -10,7 +10,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config</artifactId>
-  <version>2.5</version>
+  <version>5.1</version>
 </dependency>
 ```
 
