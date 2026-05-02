@@ -17,6 +17,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
    * Used to detect the start of an expression.
    */
   private static final String START = "${";
+  private static final int START_LEN = START.length();
 
   /**
    * Used to detect the end of an expression.
@@ -116,6 +117,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
 
     private final StringBuilder buf = new StringBuilder();
     private final String original;
+    private final int len;
     private int position;
     private int start;
     private int end;
@@ -124,6 +126,7 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
 
     EvalBuffer(String val, int start, int end) {
       this.original = val;
+      this.len = val.length();
       this.start = start;
       this.end = end;
       this.position = 0;
@@ -140,10 +143,10 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
     void parseForDefault() {
       int colonPos = original.indexOf(':', start);
       if (colonPos > start && colonPos < end) {
-        expression = original.substring(start + START.length(), colonPos);
+        expression = original.substring(start + START_LEN, colonPos);
         defaultValue = original.substring(colonPos + 1, end);
       } else {
-        expression = original.substring(start + START.length(), end);
+        expression = original.substring(start + START_LEN, end);
       }
     }
 
@@ -165,14 +168,14 @@ final class CoreExpressionEval implements Configuration.ExpressionEval {
     }
 
     String end() {
-      if (end < original.length() - 1) {
-        buf.append(original.substring(end + 1));
+      if (end < len - 1) {
+        buf.append(original, end + 1, len);
       }
       return buf.toString();
     }
 
     boolean next() {
-      if (end < original.length()) {
+      if (end < len) {
         int startPos = original.indexOf(START, end + 1);
         if (startPos > -1) {
           int endPos = original.indexOf(END, startPos + 1);
