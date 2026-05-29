@@ -29,7 +29,7 @@ public class AppConfig {
   public final int serverPort;
   public final String serverHost;
   public final boolean sslEnabled;
-  
+
   public AppConfig(
     @ConfigProperty(value = "server.port", defValue = "8080") int serverPort,
     @ConfigProperty(value = "server.host", defValue = "localhost") String serverHost,
@@ -69,11 +69,15 @@ database:
 
 ## Overriding Defaults
 
-Defaults can be overridden by:
+Defaults can be overridden during initial loading by:
 
 1. **System properties**: `java -Dserver.port=9000`
 2. **Environment variables**: `export SERVER_PORT=9000`
-3. **Configuration files** for current environment: `application-prod.yaml`
+3. **Explicit builder values**: `Configuration.builder().put("server.port", "9000")`
+4. **Configuration files**: `application.yaml`
+
+After startup, `Config.setProperty(...)`, `Configuration.setProperty(...)`, and
+dynamic configuration sources update the in-memory value used by subsequent reads.
 
 See [Profiles](profiles.md) for loading environment-specific defaults.
 

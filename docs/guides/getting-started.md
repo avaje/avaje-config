@@ -46,12 +46,18 @@ public class MyApplication {
 
 ## Configuration Sources
 
-Avaje Config supports multiple configuration sources (in priority order):
+Avaje Config supports multiple configuration sources. During initial loading the
+highest priority values are:
 
 1. System properties: `-Dserver.port=9000`
 2. Environment variables: `SERVER_PORT=9000`
-3. Application properties file: `application.yaml`
-4. Default values in code
+3. Explicit builder values such as `Configuration.builder().put(...)`
+4. Application properties files and resources, with later sources overriding earlier sources
+5. Default values in code
+
+Runtime calls to `Config.setProperty(...)`, `Configuration.setProperty(...)`, or
+dynamic configuration sources update the in-memory configuration immediately for
+subsequent reads.
 
 ## Type-Safe Configuration
 

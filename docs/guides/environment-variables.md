@@ -149,12 +149,42 @@ String dbHost = System.getenv("DATABASE_HOST");
 
 ## Priority Order
 
-Configuration values are resolved in this order (highest to lowest priority):
+There are two different cases to keep clear: initial loading and runtime changes.
 
-1. System properties: `java -Dserver.port=9000`
-2. Environment variables: `export SERVER_PORT=9000`
-3. Configuration file values: `application.yaml`
-4. Defaults in code
+During initial loading, values are resolved in this order (highest to lowest
+priority):
+
+1. System properties matching the configuration key: `java -Dserver.port=9000`
+2. Environment variables using the standard name mapping: `SERVER_PORT=9000`
+3. Explicit builder values such as `Configuration.builder().put(...)`
+4. Loaded configuration files and resources; later sources override earlier sources
+5. Defaults passed to getters in code, such as `Config.getInt("server.port", 8080)`
+
+The environment variable name is derived from the configuration key by replacing
+`.` with `_`, removing `-`, and upper-casing the result. For example,
+`backport.metrics.reporter` maps to `BACKPORT_METRICS_REPORTER`. Hyphens are
+removed rather than converted to underscores, so `my.feature-name` maps to
+`MY_FEATURENAME`.
+
+Runtime changes made through `Config.setProperty(...)`,
+`Configuration.setProperty(...)`, `putAll(...)`, or a dynamic configuration source
+such as AWS AppConfig update the in-memory configuration immediately and win for
+subsequent reads until the value is changed or cleared.
+
+### Builder values vs system properties and environment variables
+
+`Configuration.builder().put(...)` and `load(...)` are useful for explicit test or
+application defaults, but they are still overridden by matching system properties
+and environment variables when the configuration is built.
+
+```java
+var config = Configuration.builder()
+  .put("server.port", "8080")
+  .build();
+```
+
+With `-Dserver.port=9000`, `config.getInt("server.port")` returns `9000`.
+With `SERVER_PORT=9001` and no system property, it returns `9001`.
 
 ## Secrets Management
 
