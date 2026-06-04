@@ -1,0 +1,6 @@
+hex: '#FF0000'
+hex2: "#00FF00"
+neg: -5
+negFloat: -3.14
+negWithComment: -42 # this is negative forty-two
+plainHash: some#value

@@ -2,9 +2,10 @@ package io.avaje.config;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.yaml.snakeyaml.Yaml;
@@ -60,9 +61,30 @@ final class YamlLoaderSnake implements YamlLoader {
         Object val = entry.getValue();
         if (val instanceof Map) {
           loadMap((Map<String, Object>) val, key);
+        } else if (val instanceof List) {
+          loadList((List<?>) val, key);
         } else {
           addScalar(key, val);
         }
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadList(List<?> list, String path) {
+      boolean hasObjects = list.stream().anyMatch(item -> item instanceof Map);
+      if (hasObjects) {
+        for (int i = 0; i < list.size(); i++) {
+          Object item = list.get(i);
+          if (item instanceof Map) {
+            loadMap((Map<String, Object>) item, path + "[" + i + "]");
+          } else {
+            addScalar(path + "[" + i + "]", item);
+          }
+        }
+      } else {
+        add(path, list.stream()
+            .map(item -> item == null ? "" : item.toString())
+            .collect(Collectors.joining(",")));
       }
     }
 
@@ -71,8 +93,6 @@ final class YamlLoaderSnake implements YamlLoader {
         add(key, (String) val);
       } else if (val instanceof Number || val instanceof Boolean) {
         add(key, val.toString());
-      } else if (val instanceof Collection<?>) {
-        add(key, String.join(",", (Iterable<String>) val));
       }
     }
 

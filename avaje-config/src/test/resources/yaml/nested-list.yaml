@@ -1,0 +1,18 @@
+config:
+  dev:
+    - source: path/to/config
+      mapping:
+        - sourceKey: name
+          envVar: app.name
+        - sourceKey: auth
+          envVar: app.auth
+    - source: path/to/dev-config2
+      assumed_role: arn:some:role/cross-account-role
+      mapping:
+        - sourceKey: username
+          envVar: cross_username
+  qa:
+    - source: path/to/qa-config
+      mapping:
+        - sourceKey: name
+          envVar: app.name

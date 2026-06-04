@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -54,6 +53,7 @@ final class YamlLoaderSimple implements YamlLoader {
     private final Map<String, String> keyValues = new LinkedHashMap<>();
     private final Deque<Key> keyStack = new ArrayDeque<>();
     private final List<String> multiLines = new ArrayList<>();
+    private final Map<String, Integer> listCounters = new LinkedHashMap<>();
 
     private State state = State.RequireKey;
     private MultiLineTrim multiLineTrim = MultiLineTrim.Clip;
@@ -185,36 +185,68 @@ final class YamlLoaderSimple implements YamlLoader {
         return;
       }
 
+      if (currentIndent < line.length() && line.charAt(currentIndent) == '-') {
+        int afterDashStart = currentIndent + 1;
+        while (afterDashStart < line.length() && line.charAt(afterDashStart) == ' ') {
+          afterDashStart++;
+        }
+        final String afterDash = line.substring(afterDashStart);
+        final int colonPos = afterDash.indexOf(':');
+        final boolean isObjectItem = colonPos > 0
+            && (colonPos == afterDash.length() - 1 || afterDash.charAt(colonPos + 1) == ' ');
+        if (isObjectItem) {
+          processObjectListItem(afterDash);
+        } else {
+          processNonKey(line, true);
+        }
+        return;
+      }
+
       final int pos = line.indexOf(':');
-      var list = line.stripLeading().charAt(0) == '-';
-      if (pos == -1 || list) {
-        // value on another line
-        processNonKey(line, list);
+      if (pos == -1) {
+        processNonKey(line, false);
         return;
       }
       if (state == State.RequireTopKey && currentIndent > 0) {
         throw new IllegalStateException("Require top level key at line:" + currentLine + " [" + line + "]");
       }
 
-      // must be a key - would expect explicit multiline otherwise
       final Key key = new Key(currentIndent, trimKey(line.substring(0, pos)));
       popKeys(currentIndent);
       keyStack.push(key);
 
-      // look at the remainder of the line
       final String remaining = line.substring(pos + 1);
       final String trimmedValue = remaining.trim();
       if (trimmedValue.startsWith("|")) {
         multilineStart(multiLineTrimMode(trimmedValue));
-
-      } else if (trimmedValue.startsWith("-")) {
+      } else if ("-".equals(trimmedValue) || trimmedValue.startsWith("- ")) {
         listStart(multiLineTrimMode(trimmedValue));
       } else if (trimmedValue.isEmpty() || trimmedValue.startsWith("#")) {
-        // empty or comment
         state = State.KeyOrValue;
       } else {
-        // simple key value
         addKeyVal(trimValue(remaining.trim()));
+      }
+    }
+
+    private void processObjectListItem(String afterDash) {
+      popKeys(currentIndent);
+      final String counterKey = fullKey() + ":" + currentIndent;
+      final int index = listCounters.compute(counterKey, (k, v) -> v == null ? 0 : v + 1);
+      keyStack.push(new Key(currentIndent, "[" + index + "]"));
+
+      final int colonPos = afterDash.indexOf(':');
+      final String keyName = trimKey(afterDash.substring(0, colonPos));
+      final String remaining = afterDash.substring(colonPos + 1);
+      final String trimmedValue = remaining.trim();
+      keyStack.push(new Key(currentIndent + 1, keyName));
+      if (trimmedValue.startsWith("|")) {
+        multilineStart(multiLineTrimMode(trimmedValue));
+      } else if ("-".equals(trimmedValue) || trimmedValue.startsWith("- ")) {
+        listStart(multiLineTrimMode(trimmedValue));
+      } else if (trimmedValue.isEmpty() || trimmedValue.startsWith("#")) {
+        state = State.KeyOrValue;
+      } else {
+        addKeyVal(trimValue(trimmedValue));
       }
     }
 
@@ -285,6 +317,7 @@ final class YamlLoaderSimple implements YamlLoader {
     private boolean newDocument(String line) {
       if (line.startsWith("---")) {
         keyStack.clear();
+        listCounters.clear();
         return true;
       }
       return false;
@@ -302,7 +335,8 @@ final class YamlLoaderSimple implements YamlLoader {
       if (value.startsWith("\"")) {
         return unquoteValue('"', value);
       }
-      int commentPos = value.indexOf('#');
+      //yaml requires that comments have a space from the value
+      int commentPos = value.indexOf(" #");
       if (commentPos > -1) {
         return value.substring(0, commentPos).trim();
       }
@@ -315,12 +349,16 @@ final class YamlLoaderSimple implements YamlLoader {
     }
 
     private String fullKey() {
-      StringJoiner fullKey = new StringJoiner(".");
+      StringBuilder sb = new StringBuilder();
       Iterator<Key> it = keyStack.descendingIterator();
       while (it.hasNext()) {
-        fullKey.add(it.next().key());
+        String k = it.next().key();
+        if (sb.length() > 0 && !k.startsWith("[")) {
+          sb.append('.');
+        }
+        sb.append(k);
       }
-      return fullKey.toString();
+      return sb.toString();
     }
 
     private void popKeys(int indent) {

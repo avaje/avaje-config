@@ -197,6 +197,56 @@ class YamlParserTest {
   }
 
   @Test
+  void parse_nestedList() {
+    parse_nestedList(parseYaml2("/yaml/nested-list.yaml"));
+    parse_nestedList(parseYaml("/yaml/nested-list.yaml"));
+  }
+
+  private void parse_nestedList(Map<String, String> map) {
+    assertThat(map).containsOnlyKeys(
+        "config.dev[0].source",
+        "config.dev[0].mapping[0].sourceKey",
+        "config.dev[0].mapping[0].envVar",
+        "config.dev[0].mapping[1].sourceKey",
+        "config.dev[0].mapping[1].envVar",
+        "config.dev[1].source",
+        "config.dev[1].assumed_role",
+        "config.dev[1].mapping[0].sourceKey",
+        "config.dev[1].mapping[0].envVar",
+        "config.qa[0].source",
+        "config.qa[0].mapping[0].sourceKey",
+        "config.qa[0].mapping[0].envVar");
+    assertThat(map.get("config.dev[0].source")).isEqualTo("path/to/config");
+    assertThat(map.get("config.dev[0].mapping[0].sourceKey")).isEqualTo("name");
+    assertThat(map.get("config.dev[0].mapping[0].envVar")).isEqualTo("app.name");
+    assertThat(map.get("config.dev[0].mapping[1].sourceKey")).isEqualTo("auth");
+    assertThat(map.get("config.dev[0].mapping[1].envVar")).isEqualTo("app.auth");
+    assertThat(map.get("config.dev[1].source")).isEqualTo("path/to/dev-config2");
+    assertThat(map.get("config.dev[1].assumed_role")).isEqualTo("arn:some:role/cross-account-role");
+    assertThat(map.get("config.dev[1].mapping[0].sourceKey")).isEqualTo("username");
+    assertThat(map.get("config.dev[1].mapping[0].envVar")).isEqualTo("cross_username");
+    assertThat(map.get("config.qa[0].source")).isEqualTo("path/to/qa-config");
+    assertThat(map.get("config.qa[0].mapping[0].sourceKey")).isEqualTo("name");
+    assertThat(map.get("config.qa[0].mapping[0].envVar")).isEqualTo("app.name");
+  }
+
+  @Test
+  void parse_edgeCases() {
+    parse_edgeCases(parseYaml2("/yaml/edge-cases.yaml"));
+    parse_edgeCases(parseYaml("/yaml/edge-cases.yaml"));
+  }
+
+  private void parse_edgeCases(Map<String, String> map) {
+    assertThat(map).containsOnlyKeys("hex", "hex2", "neg", "negFloat", "negWithComment", "plainHash");
+    assertThat(map.get("hex")).isEqualTo("#FF0000");
+    assertThat(map.get("hex2")).isEqualTo("#00FF00");
+    assertThat(map.get("neg")).isEqualTo("-5");
+    assertThat(map.get("negFloat")).isEqualTo("-3.14");
+    assertThat(map.get("negWithComment")).isEqualTo("-42");
+    assertThat(map.get("plainHash")).isEqualTo("some#value");
+  }
+
+  @Test
   void parse_list() {
     var list =
         Map.of(
