@@ -64,6 +64,8 @@ public final class AppConfigPlugin implements ConfigurationSource {
     private final ReentrantLock lock = new ReentrantLock();
     private final AtomicReference<Instant> validUntil;
     private final long nextRefreshSeconds;
+    private final int initialLoadAttempts;
+    private final long initialLoadRetryMillis;
 
     private String currentVersion = "none";
 
@@ -91,19 +93,26 @@ public final class AppConfigPlugin implements ConfigurationSource {
       boolean pollEnabled = configuration.enabled("aws.appconfig.pollingEnabled", true);
       long pollSeconds = configuration.getLong("aws.appconfig.pollingSeconds", 45L);
       this.nextRefreshSeconds = configuration.getLong("aws.appconfig.refreshSeconds", pollSeconds - 1);
+      this.initialLoadAttempts = configuration.getInt("aws.appconfig.initialLoadAttempts", 60);
+      this.initialLoadRetryMillis = configuration.getLong("aws.appconfig.initialLoadRetryMillis", 500L);
       if (pollEnabled) {
         configuration.schedule(pollSeconds * 1000L, pollSeconds * 1000L, this::reload);
       }
     }
 
     /**
-     * Potential race conditional with AWS AppConfig sidecar so use simple retry loop.
+     * Potential race condition with AWS AppConfig sidecar so use simple retry loop.
+     * <p>
+     * The number of attempts and the delay between attempts can be tuned via
+     * {@code aws.appconfig.initialLoadAttempts} (default 60) and
+     * {@code aws.appconfig.initialLoadRetryMillis} (default 500).
      */
     int initialLoad() {
       lock.lock();
       try {
         Exception lastAttempt = null;
-        for (int i = 1; i < 11; i++) {
+        long parkNanos = initialLoadRetryMillis * 1_000_000L;
+        for (int i = 1; i <= initialLoadAttempts; i++) {
           try {
             loadAndPublish();
             return i;
@@ -111,10 +120,10 @@ public final class AppConfigPlugin implements ConfigurationSource {
             // often seeing this with apps that start quickly (and AppConfig sidecar not up yet)
             lastAttempt = e;
             log.log(DEBUG, "retrying, load attempt {0} got {1}", i, e.getMessage());
-            LockSupport.parkNanos(250_000_000); // 250 millis
+            LockSupport.parkNanos(parkNanos);
           }
         }
-        log.log(ERROR, "Failed initial AwsAppConfig load", lastAttempt);
+        log.log(ERROR, "Failed initial AwsAppConfig load after {0} attempts", initialLoadAttempts, lastAttempt);
         return -1;
 
       } finally{
