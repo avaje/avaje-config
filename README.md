@@ -1,3 +1,4 @@
+![Supported JVM Versions](https://img.shields.io/badge/JVM-11+-brightgreen.svg?&logo=openjdk)
 [![Discord](https://img.shields.io/discord/1074074312421683250?color=%237289da&label=discord)](https://discord.gg/Qcqf9R27BR)
 [![Maven Central](https://img.shields.io/maven-central/v/io.avaje/avaje-config.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/io.avaje/avaje-config)
 [![javadoc](https://javadoc.io/badge2/io.avaje/avaje-config/javadoc.svg?color=purple)](https://javadoc.io/doc/io.avaje/avaje-config/latest/io.avaje.config/io/avaje/config/package-summary.html)
