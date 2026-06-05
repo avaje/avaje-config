@@ -18,7 +18,7 @@
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <project.build.outputTimestamp>2026-01-26T18:52:33Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-06-05T04:17:30Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>5.1</version>
+      <version>5.2-RC1</version>
     </dependency>
 
     <dependency>
