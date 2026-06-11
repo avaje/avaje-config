@@ -11,7 +11,7 @@
   <name>Avaje Config Toml</name>
   <groupId>io.avaje</groupId>
   <artifactId>avaje-config-toml</artifactId>
-  <version>5.0</version>
+  <version>5.2</version>
 
   <scm>
     <connection>scm:git:git@github.com:avaje/avaje-config.git</connection>
@@ -21,7 +21,7 @@
 
   <properties>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <project.build.outputTimestamp>2026-06-11T14:46:52Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-06-11T14:52:30Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
