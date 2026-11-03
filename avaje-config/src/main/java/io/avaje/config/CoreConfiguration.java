@@ -92,9 +92,26 @@ final class CoreConfiguration implements Configuration {
     if (loader != null) {
       logMessage(loader);
       applyPlugins();
+      // use valueOrNull to avoid caching a default entry
+      if (Boolean.parseBoolean(properties.valueOrNull("config.eval.afterPlugins"))) {
+        reevalUnresolved();
+      }
     }
     log.postInitialisation();
     return this;
+  }
+
+  /**
+   * Re-evaluate expressions that could not be resolved during the initial load
+   * as plugins may have since supplied the missing properties.
+   */
+  private void reevalUnresolved() {
+    lock.lock();
+    try {
+      properties.reevalUnresolved();
+    } finally {
+      lock.unlock();
+    }
   }
 
   private void applyPlugins() {
@@ -563,6 +580,18 @@ final class CoreConfiguration implements Configuration {
       entries.forEach((key, entry) -> {
         if (!excludedSet.contains(key) && !entry.isNull()) {
           System.setProperty(key, requireNonNull(entry.value()));
+        }
+      });
+    }
+
+    void reevalUnresolved() {
+      final var resolved = CoreExpressionEval.evalFor(entries);
+      entries.forEach((key, entry) -> {
+        if (entry.needsEvaluation()) {
+          final var newEntry = resolved.get(key);
+          if (newEntry != null && !Objects.equals(newEntry.value(), entry.value())) {
+            entries.put(key, newEntry);
+          }
         }
       });
     }

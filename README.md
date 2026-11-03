@@ -120,3 +120,14 @@ When properties are loaded they are merged/overlayed.
 
 ### config.load.systemProperties
 If we set `config.load.systemProperties` to true then all the properties that have been loaded are then set into system properties.
+
+### config.eval.afterPlugins
+Expressions such as `${foo}` are resolved when the configuration is first loaded. A property that references
+a key supplied later by a plugin (e.g. AWS AppConfig) stays unresolved (the literal `${foo}`).
+Set `config.eval.afterPlugins=true` to re-evaluate unresolved expressions once, after all plugins have been applied.
+
+- This is set in a source loaded before plugins, e.g. `application.yaml`, an environment variable or a system property.
+- It only runs once during initialisation. Values supplied by later dynamic updates do not cause earlier properties to be re-evaluated.
+- No change events are published for the re-evaluated properties.
+- Re-evaluated values are not copied into System properties, even when `config.load.systemProperties` is true.
+- Expressions that still cannot be resolved are left as is.

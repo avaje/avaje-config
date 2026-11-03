@@ -18,6 +18,18 @@
  * then all the properties are loaded into System properties.
  * </p>
  *
+ * <h2>Re-evaluating expressions after plugins</h2>
+ * <p>
+ * Expressions like <code>${foo}</code> are resolved on the initial load. If they reference
+ * a property supplied later by a plugin (e.g. AWS AppConfig) they remain unresolved.
+ * Setting <code>config.eval.afterPlugins=true</code> re-evaluates the unresolved expressions
+ * once, after all plugins have been applied.
+ * </p>
+ * <p>
+ * This only occurs during initialisation, no change events are published and the
+ * re-evaluated values are not loaded into System properties.
+ * </p>
+ *
  * <h2>File watching and reloading</h2>
  * <p>
  * We can enable watching configuration files by setting

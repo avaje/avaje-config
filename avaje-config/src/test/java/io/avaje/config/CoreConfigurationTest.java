@@ -628,4 +628,33 @@ class CoreConfigurationTest {
     assertThat(entryOther).isPresent().get().extracting(Entry::source).isEqualTo("SystemProperty");
   }
 
+
+  private CoreConfiguration withPlugin(boolean reeval) {
+    var props = new Properties();
+    props.setProperty("config.eval.afterPlugins", String.valueOf(reeval));
+    props.setProperty("ra", "${late.key}");
+    props.setProperty("rb", "x-${ra}");
+    props.setProperty("rc", "${never.resolved}");
+    ConfigurationPlugin plugin = config -> config.setProperty("late.key", "late");
+    var base = new CoreComponents();
+    var components = new CoreComponents(base.runner(), base.log(), base.parsers(), List.of(), List.of(plugin));
+    var loader = new InitialLoader(components, ConfigServiceLoader.get().resourceLoader());
+    return new CoreConfiguration(components, CoreExpressionEval.evalFor(CoreEntry.newMap(props, "test"))).postLoad(loader);
+  }
+
+  @Test
+  void reevalAfterPlugins_enabled() {
+    var config = withPlugin(true);
+    assertThat(config.get("ra")).isEqualTo("late");
+    assertThat(config.get("rb")).isEqualTo("x-late");
+    assertThat(config.get("rc")).isEqualTo("${never.resolved}");
+  }
+
+  @Test
+  void reevalAfterPlugins_disabledByDefault() {
+    var config = withPlugin(false);
+    assertThat(config.get("ra")).isEqualTo("${late.key}");
+    assertThat(config.get("rb")).isEqualTo("x-${late.key}");
+    assertThat(config.get("rc")).isEqualTo("${never.resolved}");
+  }
 }
